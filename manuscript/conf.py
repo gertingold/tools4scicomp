@@ -46,8 +46,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'tools4scicomp'
-copyright = '2018, Gert-Ludwig Ingold'
+project = 'Tools for Scientific Computing'
+copyright = '2018, Gert-Ludwig Ingold, license: CC BY 4.0 International'
 author = 'Gert-Ludwig Ingold'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -83,7 +83,7 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'haiku'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -112,23 +112,25 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'tools4scicompdoc'
+htmlhelp_basename = 'tools4scicomp'
 
 
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
+    'papersize': 'a4paper',
 
     # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
+    'pointsize': '10pt',
 
     # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
+    'preamble': ur'''
+    \hypersetup{pdftitle={Tools for Scientific Computing},
+                pdfauthor={Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>},
+                pdfsubject={Manuskript zur Vorlesung »Tools for Scientific Computing«},
+                pdfkeywords={Lecture notes, scientific computing, version control, testing, PHM-0223}}
+    '''
 
     # Latex figure (float) alignment
     #
@@ -139,7 +141,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'tools4scicomp.tex', 'tools4scicomp Documentation',
+    (master_doc, 'tools4scicomp.tex', 'Tools for Scientific Computing',
      'Gert-Ludwig Ingold', 'manual'),
 ]
 
@@ -149,7 +151,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'tools4scicomp', 'tools4scicomp Documentation',
+    (master_doc, 'tools4scicomp', 'Tools for Scientific Computing',
      [author], 1)
 ]
 
@@ -160,7 +162,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'tools4scicomp', 'tools4scicomp Documentation',
+    (master_doc, 'tools4scicomp', 'Tools for Scientific Computing',
      author, 'tools4scicomp', 'One line description of project.',
      'Miscellaneous'),
 ]
