@@ -1,2 +1,4 @@
 # Sphinx documentation
 manuscript/_build/
+manuscript/_static/
+manuscript/_templates/
