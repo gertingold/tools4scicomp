@@ -42,7 +42,21 @@ going back to an older version. In this way, trying out new ideas can be
 encouraged.
 
 A version control system storing the history of a software project is clearly
-an invaluable tool. This insight is all but new and indeed the first version
-control system 
+an invaluable tool. This insight is anything but new and indeed as early as in
+the 1970s, a first version control system, SCCS (short for source code control
+system), was developed. Later systems in wide use include RCS (revision control
+system) and CVS  (concurrent versions system), both developed in the last century,
+Subversion developed around the turn of the century and more recent systems
+like Git, Mercurial and Bazaar.
+
+Here, we will discuss the version control system Git created by Linus Torvalds
+in 2005. Its original purpose was to serve in the development of the Linux
+kernel. In order to make certain aspects of Git better understandable and to
+highlight some of its advantages, we will consider in the following section
+in some more detail different approaches to version control.
+
+Centralized and distributed version control systems
+===================================================
+
 
 
