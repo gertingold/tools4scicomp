@@ -130,11 +130,11 @@ latex_elements = {
                 pdfauthor={Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>},
                 pdfsubject={Manuskript zur Vorlesung »Tools for Scientific Computing«},
                 pdfkeywords={Lecture notes, scientific computing, version control, testing, PHM-0223}}
-    '''
+    ''',
 
     # Latex figure (float) alignment
     #
-    # 'figure_align': 'htbp',
+    'figure_align': 'tbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -168,4 +168,8 @@ texinfo_documents = [
 ]
 
 
+# -- gli
 
+numfig = True
+numfig_format = {'figure': 'Figure %s', 'table': 'Table %s',
+                 'code-block': 'Listing %s', 'section': 'Section %s'}

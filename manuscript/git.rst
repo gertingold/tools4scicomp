@@ -58,5 +58,83 @@ in some more detail different approaches to version control.
 Centralized and distributed version control systems
 ===================================================
 
+Often software is developed by a team. For the sake of illustration let us
+think of a number of authors working jointly on a text. In fact, scientific
+manuscripts are often written in (La)TeX which can be viewed as a specialized
+programming language. Obviously, there exists a probability that persons
+working in parallel on the text will make incompatible changes. Inevitably, at
+some point the question arises which version should actually be accepted. We
+will encounter such situations later as so-called merge conflicts.
+
+Early version control systems like RCS avoided such conflicts by a locking
+technique. In order to change the text or code, it was necessary to first
+lock the corresponding file, thus preventing other persons from modifying the
+same file at the same time. Unfortunately, this technique tends to impede
+parallel development. For our example of manuscript, it is perfectly fine
+if several persons work in parallel on different sections. Therefore, locking
+has been found not to be a good idea and it is not substitute for communication
+between team members about who is doing what.
+
+More modern version control systems are designed to favor collaboration within
+a team. There exist two different approaches: centralized version control
+systems on the one hand and distributed version control systems on the other
+hand. The version control system Git which we are going to discuss in more
+detail in this chapter is a distributed version control system. In order to
+better understand some of its aspects, it is useful to contrast it with a
+centralized version control system like Subversion.
+
+.. _cvcs:
+.. figure:: img/cvcs.*
+   :width: 30em
+   :align: center
+
+   A centralized version control system contains a well defined set of
+   files at any given moment in time which can be referred to by a
+   sequential revision number.
 
 
+More modern version control systems are designed to favor collaboration within
+a team. There exist two different approaches: centralized version control
+systems on the one hand and distributed version control systems on the other
+hand. The version control system Git which we are going to discuss in more
+detail in this chapter is a distributed version control system. In order to
+better understand some of its aspects, it is useful to contrast it with a
+centralized version control system like Subversion.
+
+The basic structure of a centralized version control system is depicted in the
+left part of :numref:`cvcs`. One or more developers, referred to as clients
+here, exchange code versions via the internet with a central server. At any
+moment of time, the server contains a definite set of files, i.e. a revision
+which is numbered sequentially as indicated in the right part of :numref:`cvcs`.
+From one revision to the next, files can change or remain unchanged and files
+can be added or removed. The prize to pay for this simple sequential history 
+is that an internet connection and a working server is needed in order to
+create a new revision. A developer cannot create new revisions of the code
+while working off-line, an important drawback of centralized version control
+systems.
+
+.. _dvcs:
+.. figure:: img/dvcs.*
+   :width: 30em
+   :align: center
+
+   In a distributed version control system each user keeps file versions in
+   a local repository and exchanges versions with other respositories when
+   needed. As a consequence no global sequential history can be defined.
+
+As an alternative, one can use a distributed version control system which
+is schematically represented in :numref:`dvcs`. In such a setup, each developer
+keeps his or her own versions in a local respository and exchanges files
+with other repositories when needed. Due to the local repository, one can
+create a new version at any time, even in the absence of an internet connection.
+On the other hand, there exist local version histories and the concept of
+a global sequential revision numbering scheme does not make sense anymore.
+Instead, Git uses hexadecimal hash values to identify versions of individual
+files and sets of files, so-called commits, which reflect changes in the
+codebase. The main point to understand here is that the seemingly natural
+sequential numbering scheme cannot work in a distributed version control
+system. 
+
+In most cases, a distributed version control system is not implemented precisely
+in the way presented in :numref:`dvcs` as it would require communication between
+potentially a large number of local repositories. A setup like 
