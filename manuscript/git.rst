@@ -510,11 +510,86 @@ unit.  This approach is particularly helpful if one has to revert to a previous
 version.  If a logical change affects several files, it is easy to revert this
 change. If on the other hand, a big commit comprises many logically different
 changes, one will have to sort out which changes to revert and which ones to
-keep. Therefore, one could aim at so-called atomic commits where a commit
-collects all file changes associated with a minimal logical change. On the other
-hand, in the initial versions of program development, it often does not make
-sense to do atomic commits. The situation may change though as the development
-of the code progresses.
+keep. Therefore, it makes sense to aim at so-called atomic commits where a
+commit collects all file changes associated with a minimal logical change
+[#add-p]_.  On the other hand, in the initial versions of program development,
+it often does not make sense to do atomic commits. The situation may change
+though as the development of the code progresses.
+
+At the end of this section on the basic workflow, we point out one issue which
+in a sense could already be addressed in the initial setting up of the repository,
+but which can motivate only now. Having our previous versions safely stored in
+the repository, we might be brave enough to refactor our script by defining a
+function to repeatedly printing a given text. Doing so, we end up with two files
+
+.. code-block:: python
+
+   # hello.py
+   from repeat import repeated_print
+
+   repeated_print("Hello world!", 3)
+
+and
+
+.. code-block:: python
+
+   # repeat.py
+   def repeated_print(text, repetitions):
+       for n in range(repetitions):
+           print(text)
+
+We verify that the scripts do what they are supposed to do ::
+
+   $ python hello.py
+   Hello world!
+   Hello world!
+   Hello world!
+
+Everything works fine so that we add the two files to the staging area and
+check the status before committing. ::
+
+   $ git add hello.py
+   $ git add repeat.py
+   $ git status
+   On branch master
+   Changes to be committed:
+     (use "git reset HEAD <file>..." to unstage)
+
+           modified:   hello.py
+           new file:   repeat.py
+
+   Untracked files:
+     (use "git add <file>..." to include in what will be committed)
+
+           __pycache__/
+
+Everything looks fine except for the fact that there is an untracked directory
+``__pycache__``. This directory and its content are created during the import of
+``repeat.py`` and should not go into the repository. After all, they are automatically
+generated when needed. Here, it comes in handy to make use of a ``.gitignore`` file.
+Each line in this file contains one entry which defines files to be ignored by Git.
+For projects based on Python, Github proposes a ``.gitignore`` file starting with
+the following lines::
+
+   # Byte-compiled / optimized / DLL files
+   __pycache__/
+   *.py[cod]
+   *$py.class
+
+Lines starting with # are interpreted as comments. The second line excludes the
+directory ``__pycache__`` as well as its content. The star in the last two
+lines can replace any number of characters. The third line will exclude all
+files ending with ``.pyc``, ``.pyo``, and ``.pyc``. For more details see ``git
+help ignore`` and the `collection of gitignore files
+<https://github.com/github/gitignore>`_, in particular ``Python.gitignore``.
+The ``.gitignore`` file should be put under version control as it might develop
+over time.
+
+Working with branches
+=====================
+
+Collaborative code development with Gitlab
+==========================================
 
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
    a Gitlab server at ``git.rz.uni-augsburg.de`` which is accessible to anybody
@@ -523,3 +598,8 @@ of the code progresses.
 .. [#sha1] SHA-1 is a hash checksum which characterizes an object but does not
    allow to reconstruct it. Consisting of 160 bits, it allows for
    :math:`2^{160}\approx 10^{48}` different values.
+
+.. [#add-p] Occasionally, one has made several changes which should be separated
+   into different atomic commits. In such a case ``git add -p`` might come in
+   handy as it allows to select chunks of code while adding a file to the 
+   staging area.
