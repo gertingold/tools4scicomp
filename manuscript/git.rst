@@ -339,7 +339,7 @@ command ``git status``. When working with Git, you will use this command often
 to make sure that everything works as expected or to remind yourself of the status
 of the project files.
 
-Suppose that we have just initialized our Git repository as expalined in the 
+Suppose that we have just initialized our Git repository as explained in the 
 previous section. Then, Git would report the following status::
 
    $ git status
@@ -403,7 +403,7 @@ there.
 
 At this point it is worth emphasizing that we could collect several files in
 the staging area. We could then transfer all files to the repository in one single
-commit. Committing the file to the respository would be the next logical step.
+commit. Committing the file to the repository would be the next logical step.
 However, for the sake of illustration, we want to first modify our script. Our
 new script could read
 
@@ -473,7 +473,7 @@ if we do not wish to commit more than one file::
    On branch master
    nothing to commit, working tree clean
 
-Now, we have commited two versions of our script as can easily be verified::
+Now, we have committed two versions of our script as can easily be verified::
 
    $ git log
    commit e18f9ff9a7f3962c3085334c2de98435402e8fe4
