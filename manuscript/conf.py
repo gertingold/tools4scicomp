@@ -135,6 +135,10 @@ latex_elements = {
     # Latex figure (float) alignment
     #
     'figure_align': 'tbp',
+
+    'passoptionstopackages': r'\PassOptionsToPackage{svgnames}{xcolor}',
+    'sphinxsetup': 'verbatimwithframe=false, VerbatimColor={named}{AliceBlue},',
+
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
