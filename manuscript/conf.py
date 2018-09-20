@@ -137,8 +137,12 @@ latex_elements = {
     'figure_align': 'tbp',
 
     'passoptionstopackages': r'\PassOptionsToPackage{svgnames}{xcolor}',
-    'sphinxsetup': 'verbatimwithframe=false, VerbatimColor={named}{AliceBlue},',
-
+    'sphinxsetup': '''verbatimwithframe=false,
+                      VerbatimColor={named}{AliceBlue},
+                      attentionborder=1pt,
+                      attentionBorderColor={named}{Crimson},
+                      attentionBgColor={named}{MistyRose},
+                   ''',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
