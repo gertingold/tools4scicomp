@@ -591,6 +591,15 @@ Working with branches
 Collaborative code development with Gitlab
 ==========================================
 
+.. _gitlab:
+.. figure:: img/gitlab.*
+   :width: 30em
+   :align: center
+
+   Workflow for collaborative development in a distributed version control system
+   with a Gitlab instance as central server.
+
+
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
    a Gitlab server at ``git.rz.uni-augsburg.de`` which is accessible to anybody
    in possession of a valid user-ID of the computing center.
