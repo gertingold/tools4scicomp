@@ -181,3 +181,5 @@ texinfo_documents = [
 numfig = True
 numfig_format = {'figure': 'Figure %s', 'table': 'Table %s',
                  'code-block': 'Listing %s', 'section': 'Section %s'}
+
+today_fmt = "%B %d, %Y"
