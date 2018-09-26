@@ -467,7 +467,7 @@ we can carry out this procedure in one single step. However, this is only possib
 if we do not wish to commit more than one file::
 
    $ git commit -a -m 'repetition of hello world implemented'
-   [master e18f9ff] repetition of hello world implemented
+   [master 572e27b] repetition of hello world implemented
     1 file changed, 2 insertions(+), 1 deletion(-)
    $ git status
    On branch master
@@ -476,17 +476,18 @@ if we do not wish to commit more than one file::
 Now, we have committed two versions of our script as can easily be verified::
 
    $ git log
-   commit e18f9ff9a7f3962c3085334c2de98435402e8fe4
+   commit 572e27bcb96441c19ee9dca948d0ac24f81eee79
    Author: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
-   Date:   Thu Sep 20 14:29:23 2018 +0200
+   Date:   Wed Sep 26 11:17:43 2018 +0200
 
        repetition of hello world implemented
 
-   commit 39977af84732147e09a0177c1521f4a992f30ee6
+   commit d4a783b4a9f91a02f1a4ae127c07e6f47f8281e6
    Author: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
-   Date:   Thu Sep 20 14:24:09 2018 +0200
+   Date:   Wed Sep 26 11:17:23 2018 +0200
 
        simple hello world script added
+
 
 As we had discussed in :numref:`cvcs-vs-dvcs` the concept of distributed
 version control systems does not allow for sequential revision numbers. Our two
@@ -587,6 +588,12 @@ over time.
 
 Working with branches
 =====================
+
+In the previous section, the result of the command ``git status`` contained in
+its first line the information ``On branch master``. The existence of one branch
+strongly suggests that there could be more branches and this is actually the case.
+So far, we have been working on the branch which Git had created for us during
+initialization and which happens to be called ``master`` by default.
 
 Collaborative code development with Gitlab
 ==========================================
