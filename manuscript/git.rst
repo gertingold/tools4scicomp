@@ -593,7 +593,425 @@ In the previous section, the result of the command ``git status`` contained in
 its first line the information ``On branch master``. The existence of one branch
 strongly suggests that there could be more branches and this is actually the case.
 So far, we have been working on the branch which Git had created for us during
-initialization and which happens to be called ``master`` by default.
+initialization and which happens to be called ``master`` by default. As the use
+of branches can be very useful, we will discuss them in the following.
+
+In the previous section, we had created a Git respository and made a few commits.
+Suppose that we have also committed the refactored version of our script as well
+as the ``.gitignore`` file. The history of our repository then looks as follows::
+
+   $ git log --oneline --graph --decorate --all
+   * cf870a6 (HEAD -> master) .gitignore for Python added
+   * c4b2a9e hello world script refactored
+   * 572e27b repetition of hello world implemented
+   * d4a783b simple hello world script added
+
+Before discussing the output, let us briefly comment on the options used in the
+``git log`` command. Usually, this command will be more verbose, giving the full
+hash value of the commit, the name of the author and the date of the commit together
+with the commit message. Using the switch ``--oneline``, this information can be
+reduced to a single line. Its content could be configured but we do not need to
+do this here. The options ``--graph`` and ``--all`` will have an effect once more
+than one branch is present. Then, we will obtain a graphical representation of
+the commit tree, i.e. the relation between the different branches. In addition,
+we will be shown information about all branches, not only the branch we are on.
+Finally, ``--decorate`` shows us references existing for certain commits. In our
+case, the commit ``cf870a6`` is referred to as ``HEAD`` because that is the version
+we are presently seeing in our working directory. This is also where the branch
+``master`` is positioned right now. The usefulness of this information  will become
+clear once we have more than one branch or when even working with remote branches.
+
+The history documented by the output of ``git log`` is linear with the most
+recent commit on top. As we have discussed earlier, Git is distributed version
+control system. Therefore, we have to expect that other developers are doing
+work in parallel which at some time should connect to our work. Otherwise, we
+could simply ignore these developers. Consequently, in general we cannot expect
+the history of our repository to be as simple as it is up to now.
+
+However, we do not need other developers to have several lines of development
+running in parallel for some time. Even for a single developer, it makes sense
+to keep different lines of development separated at least for some time.
+Suppose for the moment that you have a working program that is used to produce
+data, the production version of the program. At the same time, you want to
+develop this program further, e.g. in order to add functionality or to improve
+its speed. Such a development should be carried out separately from the
+production version so that the latter can easily be accessed in the repository
+at any time. Or you have a potentially good idea which you would like to try
+out, but you do not know whether this idea will make it into the main code.
+Again, it is useful to keep the exploration of your idea separate from the
+production version of your program. Of course, if the idea turns out to be a
+good one, it should be possible to merge the new code into the production
+version.
+
+The solution to the needs occurring in these scenarios are branches. In a typical
+scenario, one would keep the production version in the master branch which in
+a sense forms the trunk of a tree. At a certain commit of the master branch,
+a new branch will take that commit as a parent on which further development of,
+e.g., a new aspect of the program is based. There could be different branches
+extending from various commits and a branch can have further branches. The picture
+of a tree thus seems quite appropriate. However, typically branches will not grow
+forever in their own direction. Ideally, the result of the development in a branch
+should ultimately flow back into the production code, a step referred to as
+merging. 
+
+Let us take a look at an example. As branches can be become a bit confusing once
+you have several of them, it makes sense to make sure from time to time that you
+are still on the right branch. We have not created a new branch and therefore are
+on the master branch. This can be verified as follows::
+
+   $ git branch
+   * master
+
+So far, we have only a single branch named ``master``. The star in front indicates
+that we are indeed on that branch.
+
+Now suppose that the idea came up not to greet the whole world but a single person
+instead. This implies a major change of the program and there is a risk that the
+program used in production might not always be working correctly if we do our work
+on the master branch. It is definitely time to create a new branch. We call the
+new branch ``dev`` for development but we could choose any other name. In general,
+it is a good idea to choose telling names, in particular as the number of branches
+grows.
+
+The new branch can be created by means of ::
+
+   $ git branch dev
+
+We can verify the existence of the new branch::
+
+   $ git branch
+     dev
+   * master
+
+As the star indicates, we are still on the master branch, but a new branch named
+``dev`` exists. Switching back and forth between different branches is done by means
+of the ``checkout`` command. With the following commands, we got to the development
+branch and back to the master branch while verifying where we are after each checkout::
+
+   $ git checkout dev
+   Switched to branch 'dev'
+   $ git branch
+   * dev
+     master
+   $ git checkout master
+   Switched to branch 'master'
+   $ git branch
+     dev
+   * master
+
+In addition, we can check the history of our repository::
+
+   $ git log --oneline --graph --decorate --all
+   * cf870a6 (HEAD -> master, dev) .gitignore for Python added
+   * c4b2a9e hello world script refactored
+   * 572e27b repetition of hello world implemented
+   * d4a783b simple hello world script added
+
+Now, commit ``cf870a6`` is also part of the branch ``dev``. For the moment, the
+new branch is not really visible as branch because we have not done any development.
+
+Above, we have first created a new branch and then switched to the new branch. As one
+typically wants to switch to the new branch immediately after having created it, there
+exists a shortcut::
+
+   $ git checkout -b dev
+   Switched to a new branch 'dev'
+
+The option ``-b`` demands a new branch to be created.
+
+Everything is set up now to work on the new idea. Let us suppose that at some point
+you arrive at the following script::
+
+   # hello.py
+   from repeat import repeated_print
+
+   def hello(name="", repetitions=1):
+       if name:
+           s = "Hello, " + name
+           repeated_print(s, repetitions)
+       else:
+           repeated_print("Hello world!", repetitions)
+
+After committing it, the commit log looks as follows::
+
+   $ git log --oneline --graph --decorate --all
+   * c4e6c3a (HEAD -> dev) name as new argument implemented
+   * cf870a6 (master) .gitignore for Python added
+   * c4b2a9e hello world script refactored
+   * 572e27b repetition of hello world implemented
+   * d4a783b simple hello world script added
+   
+The history is still linear, but clearly the master branch and the development
+branch are in different states now. The master branch is still at commit
+``cf870a6`` while the development branch is at ``c4e6c3a``.  At this point, it
+is worth going back to the master branch and to check the content of
+``hello.py``. At first, it might appear that we have lost our recent work but
+this is not the case because we had committed the new version in the development
+branch. Switching back to ``dev``, we indeed find the new version of the
+script.
+
+During the development of the new script, we realized that it is a good idea
+to define a default value for the number of repetitions and we decide that it
+is a good idea to make a corresponding change in the master branch. Before
+continuing to work in the development branch, we perform the following steps:
+
+  1. check out the master branch ::
+
+        $ git checkout master
+
+  2. make modifications to ``repeat.py`` ::
+
+        # repeat.py
+        def repeated_print(text, repetitions=1):
+            for n in range(repetitions):
+                print(text)
+
+  3. commit the new version of the script ::
+
+        $ git commit -a -m 'default value for number of repetitions defined'
+
+  4. check out the development branch ::
+
+        $ git checkout dev
+
+The commit history is no longer linear but has clearly separated into two branches::
+
+   $ git log --oneline --graph --decorate --all
+   * 36fdabf (master) default value for number of repetitions defined
+   | * c4e6c3a (HEAD -> dev) name as new argument implemented
+   |/  
+   * cf870a6 .gitignore for Python added
+   * c4b2a9e hello world script refactored
+   * 572e27b repetition of hello world implemented
+   * d4a783b simple hello world script added
+
+Now it is time to complete the script ``hello.py`` by adding an exclamation mark
+after the name and calling the new function ``hello``::
+
+   # hello.py
+   from repeat import repeated_print
+
+   def hello(name="", repetitions=1):
+       if name:
+           s = "Hello, " + name + "!"
+           repeated_print(s, repetitions)
+       else:
+           repeated_print("Hello world!", repetitions)
+
+   if __name__ == "__main__":
+       hello("Alice", 3)
+
+Before committing the new version, we start thinking about atomic commits. Strictly
+speaking, we made to different kinds of changes. We have added the exclamation mark
+and added the function call. Instead of going back and making the changes one after
+the other, we can recall that the option ``-p`` allows to choose which changes to
+add to the staging area::
+
+   $ git add -p hello.py
+   diff --git a/hello.py b/hello.py
+   index 9b21403..4577216 100644
+   --- a/hello.py
+   +++ b/hello.py
+   @@ -2,7 +2,10 @@ from repeat import repeated_print
+ 
+    def hello(name="", repetitions=1):
+        if name:
+   -        s = "Hello, " + name
+   +        s = "Hello, " + name + "!"
+            repeated_print(s, repetitions)
+        else:
+            repeated_print("Hello world!", repetitions)
+   +
+   +if __name__ == "__main__":
+   +    hello("Alice", 3)
+   Stage this hunk [y,n,q,a,d,/,s,e,?]?
+
+Answering the question with ``s``, we are offered the possibility to add the
+two changes separately to the changing area. In this way, we can create two
+separate commits. After actually doing the commits, we arrive at the following
+history::
+
+   $ git log --oneline --graph --decorate --all
+   * 69ae96f (HEAD -> dev) function call added
+   * 8396a6b exclamation mark added
+   * c4e6c3a name as new argument implemented
+   | * 36fdabf (master) default value for number of repetitions defined
+   |/  
+   * cf870a6 .gitignore for Python added
+   * c4b2a9e hello world script refactored
+   * 572e27b repetition of hello world implemented
+   * d4a783b simple hello world script added
+
+Now, it is time to make the new functionality available for production, i.e. to
+merge the commits from the development branch into the master branch. To this
+end, we check out the master branch and merge the development branch::
+
+   $ git checkout master
+   Switched to branch 'master'
+   $ git merge dev
+   Merge made by the 'recursive' strategy.
+    hello.py | 10 +++++++++-
+    1 file changed, 9 insertions(+), 1 deletion(-)
+   $ git log --oneline --graph --decorate --all
+   *   d7ae102 (HEAD -> master) Merge branch 'dev'
+   |\  
+   | * 69ae96f (dev) function call added
+   | * 8396a6b exclamation mark added
+   | * c4e6c3a name as new argument implemented
+   * | 36fdabf default value for number of repetitions defined
+   |/  
+   * cf870a6 .gitignore for Python added
+   * c4b2a9e hello world script refactored
+   * 572e27b repetition of hello world implemented
+   * d4a783b simple hello world script added
+
+In this case, Git has made a so-called three-way merge based on the common ancestor
+of the two branched (``cf870a6``) and the current versions in the two branches
+(``36fdabf``) and (``69ae96f``). It is interesting to compare the script ``repeat.py``
+in these three versions. The version in the common ancestor was::
+
+   # repeat.py cf870a6
+   def repeated_print(text, repetitions):
+       for n in range(repetitions):
+           print(text)
+
+In the master branch, we have ::
+
+   # repeat.py 36fdabf
+   def repeated_print(text, repetitions=1):
+       for n in range(repetitions):
+           print(text)
+
+while in the development branch, the script reads ::
+
+   # repeat.py 69ae96f
+   def repeated_print(text, repetitions):
+       for n in range(repetitions):
+           print(text)
+
+Note that in ``36fdabf`` a default value for the variable ``repetitions`` is
+present while it is not in ``69ae96f``. The common ancestor serves to resolve
+this discrepancy.  Obviously, a change was made in the master branch while it
+was not done in the development branch. Therefore, the change is kept.  The
+other modifications in the branches were not in contradiction, so that the
+merge could be done automatically and produced the desired result.
+
+The life of the development branch does not necessarily end here if we decide
+to continue to work on it. In fact, the branch ``dev`` continues to exist until
+we decide to delete it. Since all work done in the development branch is now
+present in the master branch, we decide to delete the branch ``dev``::
+
+   $ git branch -d dev
+   Deleted branch dev (was 69ae96f).
+
+An attempt to delete a branch which was not fully merged, will be rejected. This
+could be the case if the idea developed in a branch turns out not to be a good
+idea after all. The, deletion of the branch can be forced by replacing the option
+``-d`` by ``-D``.
+
+In general, one cannot expect a merge to run as smoothly as in our example. Frequently,
+a so-called merge conflict arises. This is quite common if different developers work
+in the same part of the code and their results are incompatible. For the sake of example,
+let us assume that we add a doc string to the ``repeated_print`` function but choose
+a different text in the master branch and in the development branch. In the master branch
+we have ::
+
+   # repeat.py in master
+   def repeated_print(text, repetitions=1):
+       """print text repeatedly
+   
+       """
+       for n in range(repetitions):
+           print(text)
+
+while in the development branch we have chosen a different doc string ::
+
+   # repeat.py in dev
+   def repeated_print(text, repetitions):
+       """print text several times"""
+       for n in range(repetitions):
+           print(text)
+
+The commit history of which we only show the more recent part now becomes a bit
+more complex::
+
+   $ git log --oneline --graph --decorate --all -n8
+   * 550d988 (HEAD -> dev) added a doc string
+   | * f75d4bf (master) doc string added
+   | *   d7ae102 Merge branch 'dev'
+   | |\  
+   | |/  
+   |/|   
+   * | 69ae96f function call added
+   * | 8396a6b exclamation mark added
+   * | c4e6c3a name as new argument implemented
+   | * 36fdabf default value for number of repetitions defined
+   |/  
+   * cf870a6 .gitignore for Python added
+
+We check out the master branch and try to merge once more the development branch::
+
+   $ git checkout master
+   Switched to branch 'master'
+   11:45 $ git merge dev
+   CONFLICT (content): Merge conflict in repeat.py
+   Automatic merge failed; fix conflicts and then commit the result.
+
+This time, the merge fails and Git informs us about a merge conflict. At this point,
+Git needs to be told which version of the doc string should be used in the master
+branch. Let us take a look at our script::
+
+   # repeat.py
+   <<<<<<< HEAD
+   def repeated_print(text, repetitions=1):
+       """print text repeatedly
+   
+       """
+   =======
+   def repeated_print(text, repetitions):
+       """print text several times"""
+   >>>>>>> dev
+       for n in range(repetitions):
+           print(text)
+
+There are two blocks separated by ``=======``. The first block starting with
+``<<<<<<< HEAD`` is the present version in the master branch where we are right
+now. The second block terminated by ``>>>>>>> dev`` stems from the development
+branch. The reason in the conflict lies in the different doc strings. In such a
+situation, Git needs help. The script should now be brought into the desired
+form by using an editor or a tool to handle merge conflicts. We choose ::
+
+   # repeat.py
+   def repeated_print(text, repetitions=1):
+       """print text repeatedly
+    
+       """
+       for n in range(repetitions):
+           print(text)
+
+but the other version or a version with further modifications would have been
+possible as well. In order to tell Git that the version conflict has been
+resolved, we add it to the staging area and commit it as usual. The history
+now looks as follows::
+
+   *   abcf4ed (HEAD -> master) merge conflict resolved
+   |\  
+   | * 550d988 (dev) added a doc string
+   * | f75d4bf doc string added
+   * |   d7ae102 Merge branch 'dev'
+   |\ \  
+   | |/  
+   | * 69ae96f function call added
+   | * 8396a6b exclamation mark added
+   | * c4e6c3a name as new argument implemented
+   * | 36fdabf default value for number of repetitions defined
+   |/  
+   * cf870a6 .gitignore for Python added
+
+While the use of branches can be an extremely valuable technique even for a
+single developer, branches will inevitable appear in a multi-developer environment.
+A good understanding of branches will therefore be helpful in the following section.
+
 
 Collaborative code development with Gitlab
 ==========================================
