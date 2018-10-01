@@ -1016,6 +1016,17 @@ A good understanding of branches will therefore be helpful in the following sect
 Collaborative code development with Gitlab
 ==========================================
 
+So far, we have only worked within a single developer scenario and a local Git
+repository was sufficient. However, scientific research is often carried out in
+teams with several persons working on the same project at the same time. While
+a distributed version control system like Git allows each person to work with
+her or his local repository for some time, it will become necessary at some
+point to share code. One way would be to grant all persons on the project
+read access to all local repositories. However, in general such an approach
+will result in a significant administrative load. It is much more common to
+exchange code via a central server, typically a Gitlab server run by an
+institution or a service like `Github <https://github.com/>`_.
+
 .. _gitlab:
 .. figure:: img/gitlab.*
    :width: 30em
@@ -1023,6 +1034,73 @@ Collaborative code development with Gitlab
 
    Workflow for collaborative development in a distributed version control system
    with a Gitlab instance as central server.
+
+Independently of whether one uses a Gitlab server or Github, the typical setup
+looks like depicted in :numref:`gitlab` and consists of three repositories. In
+order to understand this setup, we introduce to roles. The user is representative
+of one of the individual developers while the maintainer controls the main project
+repository. As a consequence of their respective roles, the user has read and
+write access to her or his local repository while the maintainer has read and
+write access to the main project repository, often referred to as ``upstream``.
+Within a project team, every member should be able to access the common code
+base and therefore should have read access to ``upstream``. In order to avoid that
+the maintainer needs read access to the user's local repository, it is common
+to create a third repository often called ``origin`` to which the user has read
+and write access while the maintainer has read access. In order to facilitate
+the rights management, ``origin`` and ``upstream`` are usually hosted on the same
+central server. At same point in time, the user creates ``origin`` by a process
+called forking, thereby creating her or his own copy of ``upstream``. This process
+needs only to be done once. Afterwards, the code can flow in counter-clockwise
+direction in :numref:`gitlab`. The individual steps are as follows:
+
+1. The user can always get the code from the ``upstream`` respository, e.g. to
+   use it as basis for the future development. There are two options, namely
+   ``git pull`` and the two-step process ``git fetch`` and ``git merge`` which
+   will discuss below.
+2. Having read and write access both on the local repository and the ``origin``
+   repository, the user can ``git push`` to move code to the central server.
+   With ``git pull``, code can also be brought from the central server to a
+   local repository. The latter is particularly useful if the user is working
+   on several machines with individual local repositories.
+3. As long as the user has no write access to ``upstream``, only the maintainer
+   can transfer code from the user's ``origin`` to ``upstream``. Usually, the
+   user will inform the maintainer by means of a merge request that code is being
+   ready to be merged into the ``upstream`` repository [#merge_pull]_. After an
+   optional discussion of the suitability of the code, the maintainer can merge
+   the code into the ``upstream`` repository.
+
+.. _gitlab-create-project-1:
+.. figure:: img/gitlab-create-project-1.png
+   :width: 30em
+   :align: center
+
+   Creation of a new project
+
+
+
+.. _gitlab-create-project-2:
+.. figure:: img/gitlab-create-project-2.png
+   :width: 30em
+   :align: center
+
+   During the creation of a project its name and its visibility level need to
+   be defined. In addition, it makes sense to add a project description and to
+   initialize the repository with a README file.
+
+After these conceptual considerations, we discuss a more practical example. The
+maintainer of the project will be called Big Boss and she or he starts by creating
+a repository for a project named ``example`` as shown in :numref:`gitlab-create-project-1`.
+
+.. _gitlab-create-project-3:
+.. figure:: img/gitlab-create-project-3.png
+   :width: 30em
+   :align: center
+
+   xxx
+
+
+
+
 
 
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
@@ -1037,3 +1115,6 @@ Collaborative code development with Gitlab
    into different atomic commits. In such a case ``git add -p`` might come in
    handy as it allows to select chunks of code while adding a file to the 
    staging area.
+
+.. [#merge_pull] On Github, instead of "merge request" the term "pull request" is
+   used, meaning the same.
