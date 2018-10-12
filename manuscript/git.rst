@@ -1069,14 +1069,19 @@ direction in :numref:`gitlab`. The individual steps are as follows:
    optional discussion of the suitability of the code, the maintainer can merge
    the code into the ``upstream`` repository.
 
+After these conceptual considerations, we discuss a more practical example. The
+maintainer of the project will be called Big Boss and she or he starts by creating
+a repository for a project named ``example``. We will first go through the steps
+required to set up the project and then focus on how one remotely interacts with
+this repository either as an owner of the repository or a collaborator who 
+contributes code via his or her repository.
+
 .. _gitlab-create-project-1:
 .. figure:: img/gitlab-create-project-1.png
    :width: 30em
    :align: center
 
-   Creation of a new project
-
-
+   Creation of a new project in a Gitlab repository.
 
 .. _gitlab-create-project-2:
 .. figure:: img/gitlab-create-project-2.png
@@ -1087,9 +1092,30 @@ direction in :numref:`gitlab`. The individual steps are as follows:
    be defined. In addition, it makes sense to add a project description and to
    initialize the repository with a README file.
 
-After these conceptual considerations, we discuss a more practical example. The
-maintainer of the project will be called Big Boss and she or he starts by creating
-a repository for a project named ``example`` as shown in :numref:`gitlab-create-project-1`.
+After logging into a Gitlab server, one finds in the dashboard on the top of
+the screen the possibility to created a new project as shown in
+:numref:`gitlab-create-project-1`. In order to actually create a new project,
+some basic information is needed as shown in :numref:gitlab-create-project-2`.
+Mandatory are the name as well as the visibility level of the project. A private
+project will only be visible to the owner and members who were invited to join
+the project. Public projects, on the other hand, can be accessed without any
+authentication. It is recommended to add a short description of the project so
+that its purpose becomes apparent to visitors of the project page. In addition,
+it is useful to add at least a short README file. This file can contain more
+explicit information about the project and can be extended over time by adding
+information useful for visitors of the project page. In addition, creating a
+README file makes sure that the repository contains at least one file.
+
+.. tip:: 
+
+   Markup can be used to format the README page. Markup features include
+   headers, lists, web links and more. Gitlab and Github recognize markdown
+   (file extension ``.md``) and  restructured text (file extension ``.rst``).
+   We recommend to take a look at the `Markdown Style Guide of Gitlab
+   <https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/>`_
+   and to experiment with different formatting possibilities. This is also a
+   good opportunity to exercise your version control skills. You can check the
+   effect of the markup by taking a look at the project page.
 
 .. _gitlab-create-project-3:
 .. figure:: img/gitlab-create-project-3.png
