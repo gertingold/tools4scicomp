@@ -157,19 +157,19 @@ a local repository is completely sufficient and there is no need to use another
 server.
 
 A central server for the use with the version control system Git can be set up
-based on Gitlab. Many institutions are running a Gitlab instance
-[#gitlab_uaux]_.  In addition, there exists the Github service at `github.com
-<https://github.com/>`_. Github is popular among developers of open software
+based on GitLab. Many institutions are running a GitLab instance
+[#gitlab_uaux]_.  In addition, there exists the GitHub service at `github.com
+<https://github.com/>`_. GitHub is popular among developers of open software
 projects for which it provides repositories free of charge. Private
 repositories can be obtained at a monthly rate, but there exists also the
 possibility to apply for temporary free private repositories for academic use.
 In later sections, when discussing collaborative code development with Git, we
-will specifically address Gitlab, but the differences to Github are usually
+will specifically address GitLab, but the differences to GitHub are usually
 minor.
 
 In the following sections, we will start by explaining the use of Git in a
 single-user scenario with a local repository. This knowledge also forms the
-basis for work in a multi-developer environment using Gitlab or Github.
+basis for work in a multi-developer environment using GitLab or GitHub.
 
 Getting help
 ============
@@ -278,7 +278,7 @@ The directory is hidden to avoid that it is accidentally deleted.
 
    Never delete the directory ``.git`` unless you really want to. You will
    loose the complete history of your project if you did not backup the project
-   directory or synchronized your work with a Gitlab server or Github. Removing
+   directory or synchronized your work with a GitLab server or GitHub. Removing
    the project directory will remove the subdirectory ``.git`` as well. 
 
 The newly created directory contains a number of files and subdirectories::
@@ -569,7 +569,7 @@ Everything looks fine except for the fact that there is an untracked directory
 ``repeat.py`` and should not go into the repository. After all, they are automatically
 generated when needed. Here, it comes in handy to make use of a ``.gitignore`` file.
 Each line in this file contains one entry which defines files to be ignored by Git.
-For projects based on Python, Github proposes a ``.gitignore`` file starting with
+For projects based on Python, Git proposes a ``.gitignore`` file starting with
 the following lines::
 
    # Byte-compiled / optimized / DLL files
@@ -596,7 +596,7 @@ So far, we have been working on the branch which Git had created for us during
 initialization and which happens to be called ``master`` by default. As the use
 of branches can be very useful, we will discuss them in the following.
 
-In the previous section, we had created a Git respository and made a few commits.
+In the previous section, we had created a Git repository and made a few commits.
 Suppose that we have also committed the refactored version of our script as well
 as the ``.gitignore`` file. The history of our repository then looks as follows::
 
@@ -1013,7 +1013,7 @@ single developer, branches will inevitable appear in a multi-developer environme
 A good understanding of branches will therefore be helpful in the following section.
 
 
-Collaborative code development with Gitlab
+Collaborative code development with GitLab
 ==========================================
 
 So far, we have only worked within a single developer scenario and a local Git
@@ -1024,8 +1024,8 @@ her or his local repository for some time, it will become necessary at some
 point to share code. One way would be to grant all persons on the project
 read access to all local repositories. However, in general such an approach
 will result in a significant administrative load. It is much more common to
-exchange code via a central server, typically a Gitlab server run by an
-institution or a service like `Github <https://github.com/>`_.
+exchange code via a central server, typically a GitLab server run by an
+institution or a service like `GitHub <https://github.com/>`_.
 
 .. _gitlab:
 .. figure:: img/gitlab.*
@@ -1033,9 +1033,9 @@ institution or a service like `Github <https://github.com/>`_.
    :align: center
 
    Workflow for collaborative development in a distributed version control system
-   with a Gitlab instance as central server.
+   with a GitLab instance as central server.
 
-Independently of whether one uses a Gitlab server or Github, the typical setup
+Independently of whether one uses a GitLab server or GitHub, the typical setup
 looks like depicted in :numref:`gitlab` and consists of three repositories. In
 order to understand this setup, we introduce to roles. The user is representative
 of one of the individual developers while the maintainer controls the main project
@@ -1053,7 +1053,7 @@ called forking, thereby creating her or his own copy of ``upstream``. This proce
 needs only to be done once. Afterwards, the code can flow in counter-clockwise
 direction in :numref:`gitlab`. The individual steps are as follows:
 
-1. The user can always get the code from the ``upstream`` respository, e.g. to
+1. The user can always get the code from the ``upstream`` repository, e.g. to
    use it as basis for the future development. There are two options, namely
    ``git pull`` and the two-step process ``git fetch`` and ``git merge`` which
    will discuss below.
@@ -1081,7 +1081,7 @@ contributes code via his or her repository.
    :width: 30em
    :align: center
 
-   Creation of a new project in a Gitlab repository.
+   Creation of a new project in a GitLab repository.
 
 .. _gitlab-create-project-2:
 .. figure:: img/gitlab-create-project-2.png
@@ -1092,7 +1092,7 @@ contributes code via his or her repository.
    be defined. In addition, it makes sense to add a project description and to
    initialize the repository with a README file.
 
-After logging into a Gitlab server, one finds in the dashboard on the top of
+After logging into a GitLab server, one finds in the dashboard on the top of
 the screen the possibility to create a new project as shown in
 :numref:`gitlab-create-project-1`. In order to actually create a new project,
 some basic information is needed as shown in :numref:`gitlab-create-project-2`.
@@ -1104,15 +1104,15 @@ project so that its purpose becomes apparent to visitors of the project page.
 In addition, it is useful to add at least a short README file. This README file
 initially will contain the name of the repository and the project description.
 It can be extended over time by adding information useful for visitors of the
-project page. In addition, creating a README file makes sure that the
-repository contains at least one file.
+project page. Creating a README file also ensures that the repository contains
+at least one file.
 
 .. tip:: 
 
    Markup can be used to format the README page. Markup features include
-   headers, lists, web links and more. Gitlab and Github recognize markdown
+   headers, lists, web links and more. GitLab and GitHub recognize markdown
    (file extension ``.md``) and  restructured text (file extension ``.rst``).
-   We recommend to take a look at the `Markdown Style Guide of Gitlab
+   We recommend to take a look at the `Markdown Style Guide of GitLab
    <https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/>`_
    and to experiment with different formatting possibilities. This is also a
    good opportunity to exercise your version control skills. You can check the
@@ -1123,7 +1123,62 @@ repository contains at least one file.
    :width: 30em
    :align: center
 
-   xxx
+   The new repository can be accessed via the HTTP and SSH protocols. Users with
+   access to the repository can also fork it.
+
+The project page shown in :numref:`gitlab-create-project-3` contains relevant
+elements for users collaborating on the project. There is the possibility to
+create a fork of the project. According to the workflow represented in
+:numref:`gitlab`, forking a project creates a new repository usually referred
+to as ``origin`` which is based on the repository referred to as ``upstream``.
+The key point in forking is to create a repository to which the user has write
+access, which need not be the case for the original project.
+
+Furthermore, the screen depicted in :numref:`gitlab-create-project-3` contains
+information about the URL under which the repository can be accessed. We will
+need this information later on. As the figure shows, the repository can be
+accessed via the HTTP protocol which will ask for the username and password, if
+necessary. An alternative is the SSH protocol which requires that a public SSH
+key of the user is stored on the GitLab server. Finally,
+:numref:`gitlab-create-project-3` demonstrates how the information entered when
+setting up the project is used to create a minimal README file which is displayed
+in a formatted way at the bottom of the project page.
+
+.. tip::
+
+   Information on how to create a SSH key can be found for example in the
+   section `GitLab and SSH keys <https://docs.gitlab.com/ee/ssh/>`_ of the
+   GitLab documentation.
+
+.. _gitlab-create-project-4:
+.. figure:: img/gitlab-create-project-4.png
+   :width: 30em
+   :align: center
+
+   On the setting page, other users can be invited to join the project and their
+   permissions can be defined.
+
+.. _gitlab-create-project-5:
+.. figure:: img/gitlab-create-project-5.png
+   :width: 30em
+   :align: center
+
+   A new team member has been added to the project as developer.
+
+The previous discussion had already the idea of collaborative work on the
+project in mind. However, for the moment nobody has access to the project
+except the owner who had created the project. Additional team members can be
+invited in the settings menu by accessing the members page shown in
+:numref:`gitlab-create-project-4`. Here, team members can be invited and their
+permissions can be defined. If a new team member should be able to contribute
+code to the project, he or she while typically take on the role of a developer.
+:numref:`gitlab-create-project-5` shows that a new team member has been successfully
+added in the role of a developer. The project maintainer can remove team members
+at any time by clicking on the red icon on the right.
+
+We are now in a position to explore the collaborative workflow shown in
+:numref:`gitlab`. There exists an alternative approach relying on protected branches
+which we do not cover here [#protected_branches]_. 
 
 
 
@@ -1131,7 +1186,7 @@ repository contains at least one file.
 
 
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
-   a Gitlab server at ``git.rz.uni-augsburg.de`` which is accessible to anybody
+   a GitLab server at ``git.rz.uni-augsburg.de`` which is accessible to anybody
    in possession of a valid user-ID of the computing center.
 
 .. [#sha1] SHA-1 is a hash checksum which characterizes an object but does not
@@ -1143,5 +1198,9 @@ repository contains at least one file.
    handy as it allows to select chunks of code while adding a file to the 
    staging area.
 
-.. [#merge_pull] On Github, instead of "merge request" the term "pull request" is
+.. [#merge_pull] On GitHub, instead of "merge request" the term "pull request" is
    used, meaning the same.
+
+.. [#protected_branches] More information on working with protected branches can
+   be found at `Protected Branches <https://docs.gitlab.com/ee/user/project/protected_branches.html>`_
+   in the GitLab documentation.
