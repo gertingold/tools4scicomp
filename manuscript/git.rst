@@ -1218,10 +1218,93 @@ a project of user ``gert``. In the notation of :numref:`gitlab`, a repository
 
 According to :numref:`gitlab`, the developer now needs to create a local
 repository for the project based on his or her own repository on the GitLab
-server, i.e. the repository referred to as ``origin``. 
+server, i.e. the repository referred to as ``origin``. Using the URL shown
+in :numref:`gitlab-create-project-3`, the repository is cloned into a local
+directory as follows::
+
+   $ git clone ssh://git@localhost:30022/gert/example.git
+   Klone nach 'example' ...
+   Enter passphrase for key '/home/gert/.ssh/id_rsa': 
+   remote: Enumerating objects: 3, done.
+   remote: Counting objects: 100% (3/3), done.
+   remote: Compressing objects: 100% (2/2), done.
+   remote: Total 3 (delta 0), reused 3 (delta 0)
+   Empfange Objekte: 100% (3/3), Fertig.
+   $ ls -a example
+   .  ..  .git  README.md
+
+In the third line, the passphrase for the SSH key needs to be given. If the
+HTTP protocol were used, username and password would have been requested. In
+the last line we see that the directory `.git` has been created without the
+need of initializing the repository. By default, `git clone` transfers the
+repository with its complete history, unless only part of the history is
+requested by means of the ``--depth`` argument.
+
+In contrast to the previous sections, we are no longer only working with a 
+local repository but also with the two remote repositories ``origin`` and
+``upstream`` on the GitLab server. To find out which remote repositories are
+locally known, we go to the directory where the repository is located and use::
+
+   $ git remote -v
+   origin  ssh://git@localhost:30022/gert/example.git (fetch)
+   origin  ssh://git@localhost:30022/gert/example.git (push)
+
+These lines tell us that the developer's repository ``example`` on the remote
+server is availabel for read and write under the name ``origin``. However, we
+also need access to the repository usually referred to as ``upstream``. This
+can be achieved by telling Git about this remote repository::
+
+   $ git remote add upstream ssh://git@localhost:30022/boss/example.git
+   $ git remote -v
+   origin  ssh://git@localhost:30022/gert/example.git (fetch)
+   origin  ssh://git@localhost:30022/gert/example.git (push)
+   upstream        ssh://git@localhost:30022/boss/example.git (fetch)
+   upstream        ssh://git@localhost:30022/boss/example.git (push)
+
+Now we can refer to the original remote repository as ``upstream``. The existence
+of a channel for pushing does not necessarily imply that we have the permission
+to actually write to ``upstream``.
+
+Being a developer on the ``example`` project, we want to contribute code to the
+project. Already in our discussion of the workflow within a purely local
+repository we have seen that it might be useful to do development work in
+dedicated branches. The same is true in a setup involving remote repositories.
+In the discussion of merge requests we will give an additional argument in
+favor of using dedicated branches for different aspects of development. While
+various approaches to the use of branches are possible, a judicious choice
+would be to attribute a special role to the master branch by keeping it in sync
+with the ``upstream`` repository. By branching off from the ``master`` repository,
+the development activities can be kept close to the code on ``upstream``, thereby
+facilitating a later merge into the main code base.
+
+The developer decides to contribute a "Hello world" script to the ``example`` project
+and first creates a new branch named ``hello``::
+
+    git checkout -b hello
+    Zu neuem Branch 'hello' gewechselt
+    $ git branch
+    * hello
+      master
+
+We already now how to commit a script to the new branch. After doing so, the content
+of the main directory is::
+
+   $ ls -a
+   .  ..  .git  hello.py  README.md
+
+and the history reads::
+
+   $ git log --oneline --graph --decorate --all
+   * 313a6a5 (HEAD -> hello) hello world script added
+   * 7219a23 (origin/master, origin/HEAD, master) Initial commit
+
+The local branch ``master`` as well as the remote branch ``origin/master`` are still
+at the initial commit ``7219a23`` while the local branch ``hello`` is one commit
+ahead. The remote repository ``origin`` is not aware of the new branch yet. Furthermore,
+the local repository has not yet any information about the remote repository ``upstream``.
 
 
-
+   
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
    a GitLab server at ``git.rz.uni-augsburg.de`` which is accessible to anybody
    in possession of a valid user-ID of the computing center.
