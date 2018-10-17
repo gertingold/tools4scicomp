@@ -1070,11 +1070,11 @@ direction in :numref:`gitlab`. The individual steps are as follows:
    the code into the ``upstream`` repository.
 
 After these conceptual considerations, we discuss a more practical example. The
-maintainer of the project will be called Big Boss and she or he starts by creating
-a repository for a project named ``example``. We will first go through the steps
-required to set up the project and then focus on how one remotely interacts with
-this repository either as an owner of the repository or a collaborator who 
-contributes code via his or her repository.
+maintainer of the project will be called Big Boss with username ``boss`` and
+she or he starts by creating a repository for a project named ``example``. We
+will first go through the steps required to set up the project and then focus
+on how one remotely interacts with this repository either as an owner of the
+repository or a collaborator who contributes code via his or her repository.
 
 .. _gitlab-create-project-1:
 .. figure:: img/gitlab-create-project-1.png
@@ -1180,8 +1180,45 @@ We are now in a position to explore the collaborative workflow shown in
 :numref:`gitlab`. There exists an alternative approach relying on protected branches
 which we do not cover here [#protected_branches]_. 
 
+For the following discussion, we assume that user ``boss`` has created a
+project called ``example`` which can be accessed as indicated in
+:numref:`gitlab-create-project-3`.  In our case, the HTTP access would be via
+the address ``http://localhost:30080/boss/example.git`` and for SSH access we
+would use ``ssh://git@localhost:30080/boss/example.git``. In a real
+application, be sure to replace these addresses by the addresses indicated on
+the project page. Maintainer ``boss`` has invited developer ``gert`` to the
+project team and the latter now has to set up his system to be able to
+contribute to project ``example``. During the discussion, it might be useful to
+occasionally take a look at :numref:`gitlab` in order to connect the details to
+the overall picture.
 
+.. _gitlab-developer-1:
+.. figure:: img/gitlab-developer-1.png
+   :width: 30em
+   :align: center
 
+   In order to navigate to a repository, one can for example search for it or
+   use a direct link if one has joined the project recently. This page can be
+   accessed by choosing "Profile" from the avatar menu in the upper right
+   corner.
+
+In a first step, user ``gert`` logs into the GitLab server and goes to the
+project ``example`` of user ``boss``. A possibility to do so consists in
+searching for the project name in the dashboard as shown in
+:numref:`gitlab-developer-1`. On the user's profile page, there might be
+alternative ways like in :numref:`gitlab-developer-1` where the repository is
+listed because the user joined it recently. At a later stage, it would also be
+possible to go via the forked repository or the list of contributed projects.
+In any case, the user ``gert`` will see a page looking almost like the one
+displayed in :numref:`gitlab-create-project-3`. In particular, there will be a
+fork button which initiates the creation of a fork of the original project as
+a project of user ``gert``. In the notation of :numref:`gitlab`, a repository
+``origin`` has been created as a copy of the present state of the repository
+``upstream``.
+
+According to :numref:`gitlab`, the developer now needs to create a local
+repository for the project based on his or her own repository on the GitLab
+server, i.e. the repository referred to as ``origin``. 
 
 
 
