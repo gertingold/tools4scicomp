@@ -1093,18 +1093,19 @@ contributes code via his or her repository.
    initialize the repository with a README file.
 
 After logging into a Gitlab server, one finds in the dashboard on the top of
-the screen the possibility to created a new project as shown in
+the screen the possibility to create a new project as shown in
 :numref:`gitlab-create-project-1`. In order to actually create a new project,
-some basic information is needed as shown in :numref:gitlab-create-project-2`.
-Mandatory are the name as well as the visibility level of the project. A private
-project will only be visible to the owner and members who were invited to join
-the project. Public projects, on the other hand, can be accessed without any
-authentication. It is recommended to add a short description of the project so
-that its purpose becomes apparent to visitors of the project page. In addition,
-it is useful to add at least a short README file. This file can contain more
-explicit information about the project and can be extended over time by adding
-information useful for visitors of the project page. In addition, creating a
-README file makes sure that the repository contains at least one file.
+some basic information is needed as shown in :numref:`gitlab-create-project-2`.
+Mandatory are the name as well as the visibility level of the project. A
+private project will only be visible to the owner and members who were invited
+to join the project. Public projects, on the other hand, can be accessed
+without any authentication. It is recommended to add a short description of the
+project so that its purpose becomes apparent to visitors of the project page.
+In addition, it is useful to add at least a short README file. This README file
+initially will contain the name of the repository and the project description.
+It can be extended over time by adding information useful for visitors of the
+project page. In addition, creating a README file makes sure that the
+repository contains at least one file.
 
 .. tip:: 
 
