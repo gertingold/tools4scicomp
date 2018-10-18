@@ -1294,7 +1294,7 @@ of the main directory is::
 
 and the history reads::
 
-   $ git log --oneline --graph --decorate --all
+   $ git log --oneline --decorate
    * 313a6a5 (HEAD -> hello) hello world script added
    * 7219a23 (origin/master, origin/HEAD, master) Initial commit
 
@@ -1303,6 +1303,99 @@ at the initial commit ``7219a23`` while the local branch ``hello`` is one commit
 ahead. The remote repository ``origin`` is not aware of the new branch yet. Furthermore,
 the local repository has not yet any information about the remote repository ``upstream``.
 
+In a next step, the developer pushes the new commit or several of them to the
+remote repository ``origin`` where he or she has write permission::
+
+   $ git push -u origin hello
+   Zähle Objekte: 3, Fertig.
+   Delta compression using up to 4 threads.
+   Komprimiere Objekte: 100% (2/2), Fertig.
+   Schreibe Objekte: 100% (3/3), 328 bytes | 328.00 KiB/s, Fertig.
+   Total 3 (delta 0), reused 0 (delta 0)
+   remote:
+   remote: To create a merge request for hello, visit:
+   remote:   http://localhost:30080/gert/example/merge_requests/new?merge_request%5Bsource_branch%5D=hello
+   remote:
+   To ssh://localhost:30022/gert/example.git
+    * [new branch]      hello -> hello
+   Branch 'hello' folgt nun Remote-Branch 'hello' von 'origin'.
+
+.. _gitlab-developer-2:
+.. figure:: img/gitlab-developer-2.png
+   :width: 30em
+   :align: center
+
+   The script ``hello.py`` has been successfully pushed to the remote branch
+   ``origin/hello``. It can now be brought to the remote repository ``upstream``
+   by means of a merge request.
+
+Actually, two things have happened here at the same time. The commit ``313a6a5`` was
+pushed to the branch ``hello`` on ``origin``. Because of the option ``-u``, the local
+branch was associated with the remote branch. From now on, if one wants to push
+commits from the local branch ``hello`` to the corresponding remote branch, it suffices
+to use ``git push``. This is not only shorter to type but also avoids to accidentally
+push commits to the wrong branch. We can verify that the commit is now present on the
+remote server either by means of::
+
+   $ git log --oneline --decorate
+   313a6a5 (HEAD -> hello, origin/hello) hello world script added
+   7219a23 (origin/master, origin/HEAD, master) Initial commit
+
+where commit ``313a6a5`` now also refers to ``origin/hello``. Alternatively,
+one can take a look at the project page on the GitLab server which will look
+like :numref:`gitlab-developer-2`. Make sure that the branch has been changed
+from ``master`` to ``hello`` because that is where the script has been pushed
+to. It is not and should not be present in ``origin/master`` at this point.
+
+Following the workflow displayed in :numref:`gitlab`, the developer might now want
+to contribute the new script to the ``upstream`` repository. If the developer has
+no write access to this repository, he or she can make a merge request as we will
+explain now. If, on the other hand, the developer has write access to the ``upstream``
+repository, he or she could push the script directly there. However, even with
+with write access it might be preferable to contribute code via a merge request
+and this could be the general policy applying even to maintainers. The advantage
+of merge requests is that other team members can automatically be informed about
+new contributions and have a chance to discuss them before they become part of
+the ``upstream`` repository. As long as the person merging the submitted code
+is different from the submitter, a second pair of eyes can take a look at the
+code and spot potential problems. In the end, the project team or the team leaders
+have to decide which policy to follow.
+
+.. _gitlab-developer-3:
+.. figure:: img/gitlab-developer-3.png
+   :width: 30em
+   :align: center
+
+   GitLab page for the preparation of a new merge request.
+
+On the project page shown in :numref:`gitlab-developer-2`, there is a button in the
+upper right with the title "Create merge request" which does precisely what this
+title says. Clicking this button will bring up a page like the one depicted in
+:numref:`gitlab-developer-3`. It is important to give a descriptive title as it
+will appear in a list of potentially many merge requests. In addition, the purpose
+of the merge request as well as additional relevant information like design
+considerations should be stated in the description field. Optionally, labels can
+be attributed to the merge request or merge requests can be assigned to milestones.
+As these possibilities are mostly of interest in larger projects, we will not
+discuss them any further here.
+
+.. _gitlab-developer-4:
+.. figure:: img/gitlab-developer-4.png
+   :width: 30em
+   :align: center
+
+   A merge request can be discussed. It can be merged and closed or even closed
+   without merging if the code has been found to be unsuitable for the project.
+
+Even though the merge request is based on code in the repository ``origin``, it
+will appear in the list of merge requests for the repository ``upstream`` because
+that is where the code should be merged. The page of an open merge request looks
+similar to :numref:`gitlab-developer-4`. It offers the possibility to view the
+commits included in the merge request and to comment on them. Persons with write
+permission on ``upstream`` have the possibility to merge the commits contained
+in the merge request and to close it afterwards. If the code should not be
+included in ``upstream``, the merge request can also be closed without merging.
+In this case, reasons should of course be given in the discussion section.
 
    
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
