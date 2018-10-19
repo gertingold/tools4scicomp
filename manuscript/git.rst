@@ -1379,6 +1379,14 @@ be attributed to the merge request or merge requests can be assigned to mileston
 As these possibilities are mostly of interest in larger projects, we will not
 discuss them any further here.
 
+At this point, it is appropriate to give the use of branches a bit more consideration.
+Suppose that the merge request is not merged into ``upstream`` right away and
+that the developer is continuing development. After some time, he or she will
+commit the new work to the ``hello`` branch on ``origin``. Then this new commit
+will automatically be part of the present merge request even though the new
+commit might not be logically related to the merge request. In such a situation,
+it is better to start a new branch, probably based on the local ``master`` branch.
+
 .. _gitlab-developer-4:
 .. figure:: img/gitlab-developer-4.png
    :width: 30em
@@ -1386,6 +1394,8 @@ discuss them any further here.
 
    A merge request can be discussed. It can be merged and closed or even closed
    without merging if the code has been found to be unsuitable for the project.
+   The page shown here assumes that the user logged in has write permission for
+   the project.
 
 Even though the merge request is based on code in the repository ``origin``, it
 will appear in the list of merge requests for the repository ``upstream`` because
@@ -1396,8 +1406,99 @@ permission on ``upstream`` have the possibility to merge the commits contained
 in the merge request and to close it afterwards. If the code should not be
 included in ``upstream``, the merge request can also be closed without merging.
 In this case, reasons should of course be given in the discussion section.
+Let us assume that the maintainer merges the commits in the merge request without
+further discussion and closes the merge request.
 
+The developer's code has successfully found its way to the ``upstream`` repository.
+However, his or her local repository does not yet reflect this change. It is now
+time to complete the circle depicted in :numref:`gitlab` and to get the changes
+from the ``upstream`` repository into the local repository. We will assume that
+we organise our branches in such a way that the local ``master`` branch should be
+kept in sync with the ``master`` branch in the ``upstream`` repository. If we
+are still in the development branch ``hello``, it is now time to go back to the
+``master`` branch::
+
+   $ git checkout master
+   Zu Branch 'master' gewechselt
+   Ihr Branch ist auf demselben Stand wie 'origin/master'.
+
+Now, we have two options. With ``git pull upstream master``, the present state
+of the remote branch ``master`` on ``upstream`` would be downloaded and merged
+into the present local branch. For a better control of the process, one can split
+it into two steps::
    
+   $ git fetch upstream
+   remote: Enumerating objects: 1, done.
+   remote: Counting objects: 100% (1/1), done.
+   remote: Total 1 (delta 0), reused 0 (delta 0)
+   Entpacke Objekte: 100% (1/1), Fertig.
+    * [neuer Branch]    master     -> upstream/master
+   $ git merge upstream/master
+   Aktualisiere 7219a23..e55831a
+   Fast-forward
+    hello.py | 1 +
+    1 file changed, 1 insertion(+)
+    create mode 100644 hello.py
+
+``git fetch`` gets new objects from the ``master`` branch and ``git merge upstream/master``
+merge the object from the remote branch ``upstream/master``. The history of the
+local ``master`` repository looks as follows::
+
+   $ git log --oneline --graph --decorate --all
+   *   e55831a (HEAD -> master, upstream/master) Merge branch 'hello' into 'master'
+   |\
+   | * 313a6a5 (origin/hello, hello) hello world script added
+   |/
+   * 7219a23 (origin/master, origin/HEAD) Initial commit
+
+As we can see, the local ``master`` branch and the remote ``master`` branch on the ``upstream``
+repository are in sync while the ``master`` branch on the ``origin`` repository is still
+in its original state. This makes sense because the hello world script was pushed to
+the ``hello`` repository on the ``origin`` repository, but not its ``master`` branch.
+We can change this by pushing the local ``master`` branch to ``origin``.
+
+Before we doing so, let us remove the ``hello`` branches which we do not need anymore::
+
+   $ git push origin --delete hello
+   To ssh://localhost:30022/gert/example.git
+    - [deleted]         hello
+   $ git branch -d hello
+   Branch hello entfernt (war 313a6a5).   
+
+.. _gitlab-developer-5:
+.. figure:: img/gitlab-developer-5.png
+   :width: 30em
+   :align: center
+
+   At the tab "Settings - Branches" individual branches or all merged branches can
+   be removed.
+
+The first command deleted the remote branch. As an alternative way, one can use the
+GitLab web interface as shown in :numref:`gitlab-developer-5`. There individual
+branches or all merged branches can be removed. The second command deletes the
+local branch, provided that no unmerged commits are still present. One can force
+deletion of the branch with the option ``-D`` but may risk the loss of data. Using
+``-D`` instead of ``-d`` should thus be done with care.
+
+After pushing the local ``master`` branch to ``origin``, the log looks as follows::
+
+   $ git push origin master
+   Zähle Objekte: 1, Fertig.
+   Schreibe Objekte: 100% (1/1), 281 bytes | 281.00 KiB/s, Fertig.
+   Total 1 (delta 0), reused 0 (delta 0)
+   To ssh://localhost:30022/gert/example.git
+      7219a23..e55831a  master -> master
+   $ git log --oneline --decorate --graph
+   *   e55831a (HEAD -> master, upstream/master, origin/master, origin/HEAD) Merge branch 'hello' into 'master'
+   |\
+   | * 313a6a5 hello world script added
+   |/
+   * 7219a23 Initial commit
+
+All three ``master`` branches are now in the same state and we have completed a basic
+development cycle.
+
+
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
    a GitLab server at ``git.rz.uni-augsburg.de`` which is accessible to anybody
    in possession of a valid user-ID of the computing center.
