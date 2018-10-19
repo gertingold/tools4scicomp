@@ -6,9 +6,9 @@ Lecture notes »Tools for Scientific Computing«
 
    introduction
    git
+   testing
    numpy
    graphics
-   testing
    profiling
    documenting
    parallel
