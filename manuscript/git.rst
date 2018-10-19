@@ -1498,6 +1498,93 @@ After pushing the local ``master`` branch to ``origin``, the log looks as follow
 All three ``master`` branches are now in the same state and we have completed a basic
 development cycle.
 
+Sundry topics
+=============
+
+In the previous sections, we have only discussed the basic workflows with Git
+and certainly did not even attempt to be complete. In the day-to-day work with
+a Git repository, certain problems occasionally arise. Some of them will be
+discussed in this section.
+
+For the first scenario, let us assume that we have created a ``dev`` branch
+where we modified the ``hello.py`` script and committed the new version. We
+can then change between branches without any problem::
+
+   $ git checkout -b dev
+   Zu neuem Branch 'dev' gewechselt
+   $ cat hello.py
+   print("Hello world!")
+   print("Hello world!")
+   print("Hello world!")
+   $ git commit -a -m'repetitive output of message'
+   [dev 01dc5a1] repetitive output of message
+    1 file changed, 2 insertions(+)
+   $ git checkout master
+   Zu Branch 'master' gewechselt
+   Ihr Branch ist auf demselben Stand wie 'origin/master'.
+   $ git checkout dev
+   Zu Branch 'dev' gewechselt
+
+The situation is different if we do not commit the changes. In the following
+example, we have implemented the repetitive output by means of a for loop
+but did not commit the change. Git now does not allow us to change to the
+``master`` branch because we might lose data::
+
+   $ cat hello.py
+   for _ in range(3):
+       print("Hello world!")
+   $ git checkout master
+   error: Ihre lokalen Änderungen in den folgenden Dateien würden beim Auschecken
+   überschrieben werden:
+           hello.py
+   Bitte committen oder stashen Sie Ihre Änderungen, bevor Sie Branches
+   wechseln.
+   Abbruch
+
+We could force Git to change branches by means of the option ``-f`` but probably
+it is a better idea to follow Git's advice and commit or stash the changes. We
+know about committing but what does stashing mean? The idea is to pack away the
+uncommitted changes so that they can be retrieved when we return to the ``dev``
+branch::
+
+   $ git stash
+   Speicherte Arbeitsverzeichnis und Index-Status WIP on dev: 01dc5a1 repetitive output of message
+   $ git checkout master
+   Zu Branch 'master' gewechselt
+   Ihr Branch ist auf demselben Stand wie 'origin/master'.
+   $ git checkout dev
+   Zu Branch 'dev' gewechselt
+   $ cat hello.py
+   print("Hello world!")
+   print("Hello world!")
+   print("Hello world!")
+
+After stashing the changes, Git allowed us to switch back and forth between the
+``master`` and ``dev`` branch. However, after returning to the ``dev`` branch
+it looks as if the script with the for loop were lost. Fortunately, this is not
+the case as becomes clear from listing the content of the stash. One can retrieve
+the modified script by popping it from the stash::
+
+   $ git stash list
+   stash@{0}: WIP on dev: 01dc5a1 repetitive output of message
+   $ git stash pop
+   Auf Branch dev
+   Änderungen, die nicht zum Commit vorgemerkt sind:
+     (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
+     (benutzen Sie "git checkout -- <Datei>...", um die Änderungen im Arbeitsverzeichnis zu verwerfen)
+
+           geändert:       hello.py
+
+   keine Änderungen zum Commit vorgemerkt (benutzen Sie "git add" und/oder "git commit -a")
+   refs/stash@{0} (049ca57b4dda40d0869129482e2d216f82186d75) gelöscht
+   $ cat hello.py
+   for _ in range(3):
+       print("Hello world!")
+
+As it is easy to forget what one had stashed some time ago, stashing is most
+suited for brief interruption where one needs to change branches for a short
+period of time. Otherwise, committing the changes might be a better solution.
+
 
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
    a GitLab server at ``git.rz.uni-augsburg.de`` which is accessible to anybody
