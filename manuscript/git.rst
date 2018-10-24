@@ -1223,13 +1223,12 @@ in :numref:`gitlab-create-project-3`, the repository is cloned into a local
 directory as follows::
 
    $ git clone ssh://git@localhost:30022/gert/example.git
-   Klone nach 'example' ...
-   Enter passphrase for key '/home/gert/.ssh/id_rsa': 
+   Cloning into 'example' ...
    remote: Enumerating objects: 3, done.
    remote: Counting objects: 100% (3/3), done.
    remote: Compressing objects: 100% (2/2), done.
    remote: Total 3 (delta 0), reused 3 (delta 0)
-   Empfange Objekte: 100% (3/3), Fertig.
+   Receiving objects: 100% (3/3), done.
    $ ls -a example
    .  ..  .git  README.md
 
@@ -1280,8 +1279,8 @@ facilitating a later merge into the main code base.
 The developer decides to contribute a "Hello world" script to the ``example`` project
 and first creates a new branch named ``hello``::
 
-    git checkout -b hello
-    Zu neuem Branch 'hello' gewechselt
+    $ git checkout -b hello
+    Switched to a new branch 'hello'
     $ git branch
     * hello
       master
@@ -1307,10 +1306,10 @@ In a next step, the developer pushes the new commit or several of them to the
 remote repository ``origin`` where he or she has write permission::
 
    $ git push -u origin hello
-   Zähle Objekte: 3, Fertig.
+   Counting objects: 3, done.
    Delta compression using up to 4 threads.
-   Komprimiere Objekte: 100% (2/2), Fertig.
-   Schreibe Objekte: 100% (3/3), 328 bytes | 328.00 KiB/s, Fertig.
+   Compressing objects: 100% (2/2), done.
+   Writing objects: 100% (3/3), 328 bytes | 328.00 KiB/s, done.
    Total 3 (delta 0), reused 0 (delta 0)
    remote:
    remote: To create a merge request for hello, visit:
@@ -1318,7 +1317,7 @@ remote repository ``origin`` where he or she has write permission::
    remote:
    To ssh://localhost:30022/gert/example.git
     * [new branch]      hello -> hello
-   Branch 'hello' folgt nun Remote-Branch 'hello' von 'origin'.
+   Branch 'hello' set up to track remote branch 'hello' from 'origin'.
 
 .. _gitlab-developer-2:
 .. figure:: img/gitlab-developer-2.png
@@ -1419,8 +1418,8 @@ are still in the development branch ``hello``, it is now time to go back to the
 ``master`` branch::
 
    $ git checkout master
-   Zu Branch 'master' gewechselt
-   Ihr Branch ist auf demselben Stand wie 'origin/master'.
+   Switched to branch 'master'
+   Your branch is up-to-date with 'origin/master'.
 
 Now, we have two options. With ``git pull upstream master``, the present state
 of the remote branch ``master`` on ``upstream`` would be downloaded and merged
@@ -1431,10 +1430,10 @@ it into two steps::
    remote: Enumerating objects: 1, done.
    remote: Counting objects: 100% (1/1), done.
    remote: Total 1 (delta 0), reused 0 (delta 0)
-   Entpacke Objekte: 100% (1/1), Fertig.
-    * [neuer Branch]    master     -> upstream/master
+   Unpacking objects: 100% (1/1), done.
+    * [new branch]    master     -> upstream/master
    $ git merge upstream/master
-   Aktualisiere 7219a23..e55831a
+   Updating 7219a23..e55831a
    Fast-forward
     hello.py | 1 +
     1 file changed, 1 insertion(+)
@@ -1463,7 +1462,7 @@ Before we doing so, let us remove the ``hello`` branches which we do not need an
    To ssh://localhost:30022/gert/example.git
     - [deleted]         hello
    $ git branch -d hello
-   Branch hello entfernt (war 313a6a5).   
+   Deleted branch hello (war 313a6a5).   
 
 .. _gitlab-developer-5:
 .. figure:: img/gitlab-developer-5.png
@@ -1483,8 +1482,8 @@ deletion of the branch with the option ``-D`` but may risk the loss of data. Usi
 After pushing the local ``master`` branch to ``origin``, the log looks as follows::
 
    $ git push origin master
-   Zähle Objekte: 1, Fertig.
-   Schreibe Objekte: 100% (1/1), 281 bytes | 281.00 KiB/s, Fertig.
+   Counting objects: 1, done.
+   Writing objects: 100% (1/1), 281 bytes | 281.00 KiB/s, done.
    Total 1 (delta 0), reused 0 (delta 0)
    To ssh://localhost:30022/gert/example.git
       7219a23..e55831a  master -> master
@@ -1511,7 +1510,7 @@ where we modified the ``hello.py`` script and committed the new version. We
 can then change between branches without any problem::
 
    $ git checkout -b dev
-   Zu neuem Branch 'dev' gewechselt
+   Switched to a new branch 'dev'
    $ cat hello.py
    print("Hello world!")
    print("Hello world!")
@@ -1520,10 +1519,10 @@ can then change between branches without any problem::
    [dev 01dc5a1] repetitive output of message
     1 file changed, 2 insertions(+)
    $ git checkout master
-   Zu Branch 'master' gewechselt
-   Ihr Branch ist auf demselben Stand wie 'origin/master'.
+   Switched to branch 'master'
+   Your branch is up-to-date with 'origin/master'.
    $ git checkout dev
-   Zu Branch 'dev' gewechselt
+   Switched to branch 'dev'
 
 The situation is different if we do not commit the changes. In the following
 example, we have implemented the repetitive output by means of a for loop
@@ -1534,12 +1533,10 @@ but did not commit the change. Git now does not allow us to change to the
    for _ in range(3):
        print("Hello world!")
    $ git checkout master
-   error: Ihre lokalen Änderungen in den folgenden Dateien würden beim Auschecken
-   überschrieben werden:
+   error: Your local changes to the following files would be overwritten by checkout:
            hello.py
-   Bitte committen oder stashen Sie Ihre Änderungen, bevor Sie Branches
-   wechseln.
-   Abbruch
+   Please commit your changes or stash them before you switch branches.
+   Aborting
 
 We could force Git to change branches by means of the option ``-f`` but probably
 it is a better idea to follow Git's advice and commit or stash the changes. We
@@ -1548,12 +1545,12 @@ uncommitted changes so that they can be retrieved when we return to the ``dev``
 branch::
 
    $ git stash
-   Speicherte Arbeitsverzeichnis und Index-Status WIP on dev: 01dc5a1 repetitive output of message
+   Saved working directory and index state WIP on dev: 01dc5a1 repetitive output of message
    $ git checkout master
-   Zu Branch 'master' gewechselt
-   Ihr Branch ist auf demselben Stand wie 'origin/master'.
+   Switched to branch 'master'
+   Your branch is up-to-date with 'origin/master'.
    $ git checkout dev
-   Zu Branch 'dev' gewechselt
+   Switched to branch 'dev'
    $ cat hello.py
    print("Hello world!")
    print("Hello world!")
@@ -1568,15 +1565,15 @@ the modified script by popping it from the stash::
    $ git stash list
    stash@{0}: WIP on dev: 01dc5a1 repetitive output of message
    $ git stash pop
-   Auf Branch dev
-   Änderungen, die nicht zum Commit vorgemerkt sind:
-     (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
-     (benutzen Sie "git checkout -- <Datei>...", um die Änderungen im Arbeitsverzeichnis zu verwerfen)
+   On branch dev
+   Changes not staged for commit:
+     (use "git add <file>..." to update what will be committed)
+     (use "git checkout -- <file>..." to discard changes in working directory)
 
            geändert:       hello.py
 
-   keine Änderungen zum Commit vorgemerkt (benutzen Sie "git add" und/oder "git commit -a")
-   refs/stash@{0} (049ca57b4dda40d0869129482e2d216f82186d75) gelöscht
+   no changes added to commit (use "git add" and/or "git commit -a")
+   Dropped refs/stash@{0} (049ca57b4dda40d0869129482e2d216f82186d75)
    $ cat hello.py
    for _ in range(3):
        print("Hello world!")
