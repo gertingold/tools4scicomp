@@ -1570,7 +1570,7 @@ the modified script by popping it from the stash::
      (use "git add <file>..." to update what will be committed)
      (use "git checkout -- <file>..." to discard changes in working directory)
 
-           geändert:       hello.py
+           modified:       hello.py
 
    no changes added to commit (use "git add" and/or "git commit -a")
    Dropped refs/stash@{0} (049ca57b4dda40d0869129482e2d216f82186d75)
