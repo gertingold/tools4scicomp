@@ -1578,9 +1578,11 @@ the modified script by popping it from the stash::
    for _ in range(3):
        print("Hello world!")
 
-As it is easy to forget what one had stashed some time ago, stashing is most
-suited for brief interruption where one needs to change branches for a short
-period of time. Otherwise, committing the changes might be a better solution.
+As the code example given above demonstrates, one can list the content of the
+stash. However, after some time it is easy to forget that one has stashed code
+in the first place. Therefore, stashing is most suited for brief interruptions
+where one needs to change branches for a short period of time. Otherwise,
+committing the changes might be a better solution.
 
 
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
