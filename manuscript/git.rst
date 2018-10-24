@@ -586,6 +586,8 @@ help ignore`` and the `collection of gitignore files
 The ``.gitignore`` file should be put under version control as it might develop
 over time.
 
+.. _git_branches:
+
 Working with branches
 =====================
 
@@ -1500,6 +1502,9 @@ development cycle.
 Sundry topics
 =============
 
+Stashing
+--------
+
 In the previous sections, we have only discussed the basic workflows with Git
 and certainly did not even attempt to be complete. In the day-to-day work with
 a Git repository, certain problems occasionally arise. Some of them will be
@@ -1583,6 +1588,78 @@ stash. However, after some time it is easy to forget that one has stashed code
 in the first place. Therefore, stashing is most suited for brief interruptions
 where one needs to change branches for a short period of time. Otherwise,
 committing the changes might be a better solution.
+
+Tagging
+-------
+
+As we know, a specific revision of the code can be specified by means of its
+SHA1 value. Occasionally, it is useful to tag a revision with a name for easier
+reference. For example, one might want to introduce different versions of the
+code tagged by labels like ``v1``, ``v2`` and so on.
+
+The present revision can be tagged as follows::
+
+   $ git tag -a v1 -m "first production release"
+
+Here, the option ``-a`` means that an annotated tag is created which will
+have additional information very similar to a commit. There can be e.g. a message,
+here given by means of the option ``-m``, the name of the tagger and the date.
+This information and more can be displayed::
+
+   $ git show v1
+   tag v1
+   Tagger: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
+   Date:   Wed Oct 24 14:23:44 2018 +0200
+
+   first production release
+
+   commit d08b08646d933e0b7240cbbdbb194143ede1f29c (HEAD -> master, tag: v1)
+   Merge: a459aec 7a7b8f7
+   Author: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
+   Date:   Mon Oct 22 09:28:03 2018 +0200
+
+       Merge branch 'dev'
+
+It is also possible to tag older revisions by referring to a specific commit like
+in the following example::
+
+   $ git tag -a v0.1 -m "prerelease version" a459aec
+   $ git tag
+   v0.1
+   v1
+   $ git log --oneline -n5
+   d08b086 (HEAD -> master, tag: v1) Merge branch 'dev'
+   7a7b8f7 added doc string
+   a459aec (tag: v0.1) doc string added
+   ac805d5 Merge branch 'dev'
+   41e9e21 function call added
+
+The logs demonstrate that indeed the tags are connected with a certain script.
+In addition to annotated tags, there are also so-called light-weight tags which
+cannot contain further attributes. Usually, light-weight tags are employed if
+they are only temporarily needed.
+
+So far, the tag is only known to the local Git repository. In order for the tag
+to be known also on a remote repository like ``origin``, one needs to push the
+information about the tag::
+
+   $ git push origin v1
+   Enumerating objects: 1, done.
+   Counting objects: 100% (1/1), done.
+   Writing objects: 100% (1/1), 187 bytes | 187.00 KiB/s, done.
+   Total 1 (delta 0), reused 0 (delta 0)
+   To ssh://localhost:30022/gert/myrepo.git
+    * [new tag]         v1 -> v1
+
+The tag is now also visible on the project's webpage as shown in :numref:`gitlab-tag`.
+
+.. _gitlab-tag:
+.. figure:: img/gitlab-tag.png
+   :width: 30em
+   :align: center
+
+   After a tag has been pushed to the remote repository, it can be used on the
+   project's webpag to navigate to the commit associated with the tag.
 
 
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
