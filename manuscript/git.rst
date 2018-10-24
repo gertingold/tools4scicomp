@@ -1763,6 +1763,26 @@ to do so, Git will give the following warning::
 The new branch needs to be created before garbage collection destroys the
 commit ``4d252a9``. 
 
+Manipulating history
+--------------------
+
+Travelling back in time and changing the past can have strange effects on the
+future. What is well known to readers of science fiction also applies to some
+extent to users of Git. Occasionally, it is tempting to correct the history of
+the repository. Reasons can be for example typos in commit messages or stupid
+mistakes in the code. When code is concerned, it usually is preferable to
+simply correct mistakes in a new commit. On the other hand, it sometimes might
+make sense to remove a certain commit from the history. It also happens that
+right after committing code one realizes that there was a typo in the commit
+message. Correcting the message is still possible and usually is not harmful.
+
+Generally speaking, one get away with manipulations of the history of a 
+repository as long as the part of the history affected by the manipulations
+is still completely local. Once the relevant commits have been pushed to
+a remote repository and others have pulled these commits into their own
+repositories, changing the history is a potentially great way to make
+fellow developers very unhappy.
+
 
 
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
