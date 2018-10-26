@@ -1251,7 +1251,7 @@ locally known, we go to the directory where the repository is located and use::
    origin  ssh://git@localhost:30022/gert/example.git (push)
 
 These lines tell us that the developer's repository ``example`` on the remote
-server is availabel for read and write under the name ``origin``. However, we
+server is available for read and write under the name ``origin``. However, we
 also need access to the repository usually referred to as ``upstream``. This
 can be achieved by telling Git about this remote repository::
 
@@ -1776,13 +1776,157 @@ make sense to remove a certain commit from the history. It also happens that
 right after committing code one realizes that there was a typo in the commit
 message. Correcting the message is still possible and usually is not harmful.
 
-Generally speaking, one get away with manipulations of the history of a 
+Generally speaking, one can get away with manipulations of the history of a 
 repository as long as the part of the history affected by the manipulations
 is still completely local. Once the relevant commits have been pushed to
 a remote repository and others have pulled these commits into their own
 repositories, changing the history is a potentially great way to make
-fellow developers very unhappy.
+fellow developers very unhappy, something which you definitely want to avoid.
 
+Frequently it happens that one commits code and realizes immediately that
+the commit message contains a typo. It is rather straightforward to correct
+such a mistake locally. Suppose that "How are you?" has been added to the
+output of the script ``hello.py`` and that the recent history looks as follows::
+
+   $ git log --oneline -n5
+   c7be5c2 (HEAD -> master) 'Who are you' added
+   89f459f Merge branch 'dev'
+   7a7b8f7 added doc string
+   a459aec (tag: v0.1) doc string added
+   ac805d5 Merge branch 'dev'
+
+Clearly, the commit message is wrong and even worse, it is misleading. The commit
+message of the last commit can be amended in the following way::
+
+   $ git commit --amend -m"'How are you?' added"
+   [master 3eec1a6] 'How are you?' added
+    Date: Fri Oct 26 14:49:03 2018 +0200
+    1 file changed, 1 insertion(+), 1 deletion(-)
+   $ git log --oneline -n5
+   3eec1a6 (HEAD -> master) 'How are you?' added
+   89f459f Merge branch 'dev'
+   7a7b8f7 added doc string
+   a459aec (tag: v0.1) doc string added
+   ac805d5 Merge branch 'dev'
+   
+If the option ``-m`` is omitted, an editor will be opened to allow you to enter
+the new commit message.
+
+If you have made a commit erroneously and want to get rid of it, ``git reset`` can
+be used to reset ``HEAD`` to another commit. For example, ``HEAD^`` denotes the
+first parent of ``HEAD`` so that the last commit can be removed by::
+
+   $ git reset --hard HEAD^
+   HEAD is now at 89f459f Merge branch 'dev'
+   $ git log --oneline -n5
+   89f459f (HEAD -> master) Merge branch 'dev'
+   7a7b8f7 added doc string
+   a459aec (tag: v0.1) doc string added
+   ac805d5 Merge branch 'dev'
+   41e9e21 function call added
+
+As a result, commit ``3eec1a6`` is gone.
+
+More general changes are possible by means of an interactive rebase. Rebase applies
+commits on top of a base tip and doing so interactively allows to decide which
+commits should actually be applied. While a rebase can be done within a single
+branch, we will directly proceed to the discussion of a rebase across two branches.
+Suppose that we have the following history::
+
+   $ git log --oneline --graph --all
+   * 06933ed (master) headline modified
+   | * e0ac1ba (HEAD -> dev) add __name__ to output
+   | * 8c167c1 Test output amended
+   |/
+   * 99091f2 Test script added
+
+The test script ``test.py`` should output some headline and the content of the
+variable ``__name__``.  In the development branch, this headline has been
+modified and a print statement for the variable ``__name__`` was added. On the
+other hand, the headline has been modified in the master branch as well. For
+further development, the headline from the master branch should be used, so
+commit ``8c167c1`` should be replaced by ``06933ed``. So solve this issue, an
+interactive rebase is done on ``master``::
+
+   $ git rebase -i master
+
+An editor opens and displays the following information:
+
+.. code-block:: none
+
+   pick 8c167c1 Test output amended
+   pick e0ac1ba add __name__ to output
+   
+   # Rebase 06933ed..e0ac1ba onto 06933ed (2 commands)
+   #
+   # Commands:
+   # p, pick <commit> = use commit
+   # r, reword <commit> = use commit, but edit the commit message
+   # e, edit <commit> = use commit, but stop for amending
+   # s, squash <commit> = use commit, but meld into previous commit
+   # f, fixup <commit> = like "squash", but discard this commit's log message
+   # x, exec <command> = run command (the rest of the line) using shell
+   # d, drop <commit> = remove commit
+   # l, label <label> = label current HEAD with a name
+   # t, reset <label> = reset HEAD to a label
+   # m, merge [-C <commit> | -c <commit>] <label> [# <oneline>]
+   # .       create a merge commit using the original merge commit's
+   # .       message (or the oneline, if no original merge commit was
+   # .       specified). Use -c <commit> to reword the commit message.
+   #
+   # These lines can be re-ordered; they are executed from top to bottom.
+   #
+   # If you remove a line here THAT COMMIT WILL BE LOST.
+   #
+   #       However, if you remove everything, the rebase will be aborted.
+   #
+   #
+   # Note that empty commits are commented out
+
+Replacing ``pick`` by ``drop`` in front of commit ``8c167c1`` and leaving the
+editor, git answers
+
+.. code-block:: none
+
+   Auto-merging test.py
+   CONFLICT (content): Merge conflict in test.py
+   error: could not apply e0ac1ba... add __name__ to output
+
+   Resolve all conflicts manually, mark them as resolved with
+   "git add/rm <conflicted_files>", then run "git rebase --continue".
+   You can instead skip this commit: run "git rebase --skip".
+   To abort and get back to the state before "git rebase", run "git rebase --abort".
+
+   Could not apply e0ac1ba... add __name__ to output
+
+The merge conflict needs to be resolved in the usual way so that the rebase can be
+continued::
+
+   $ git add test.py
+   $ git rebase --continue
+   [detached HEAD 7c9c8d1] add __name__ to output
+    1 file changed, 2 insertions(+), 1 deletion(-)
+   Successfully rebased and updated refs/heads/dev.
+
+The rebase operation was successfully carried out and the new history is::
+
+   $ git log --oneline --graph --all
+   * 7c9c8d1 (HEAD -> dev) add __name__ to output
+   * 06933ed (master) headline modified
+   * 99091f2 Test script added
+
+Now, commit ``7c9c8d1`` is following directly after commit ``06933ed``.
+
+Two comments are in order here. The SHA1 hash of the commit with the commit
+message ``add __name__ to output`` has changed from ``e0ac1ba`` to ``7c9c8d1``.
+Rebasing thus will create significant problems if the commits of the development
+branch have been pushed to a remote branch and pulled from there by other developers
+before the rebasing has been carried out. It is therefore strongly recommended
+that rebasing is done only if local commits are applied. On the other hand, as we
+have seen, a rebase gives us the opportunity to take into account what has happened
+in the master branch and to resolve merge conflicts. In this way it can be avoided
+that a merge request containing commits from the development branch will contain
+merge conflicts with the master branch.
 
 
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
