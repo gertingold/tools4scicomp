@@ -365,3 +365,9 @@ to choose the approach discussed in the next section instead of using doctests.
 
 Testing with py.test
 ====================
+
+For more complex test cases, the Python standard library provides a framework called
+``unittest``. Recently, however, ``py.test`` has become very popular as it requires
+less overhead when writing tests. In this section we will focus on ``py.test`` which
+is not part of the Python standard library but it included e.g. in the Anaconda
+distribution.
