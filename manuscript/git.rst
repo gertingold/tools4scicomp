@@ -1442,7 +1442,7 @@ it into two steps::
     create mode 100644 hello.py
 
 ``git fetch`` gets new objects from the ``master`` branch and ``git merge upstream/master``
-merge the object from the remote branch ``upstream/master``. The history of the
+merges the objects from the remote branch ``upstream/master``. The history of the
 local ``master`` repository looks as follows::
 
    $ git log --oneline --graph --decorate --all
@@ -1458,7 +1458,7 @@ in its original state. This makes sense because the hello world script was pushe
 the ``hello`` repository on the ``origin`` repository, but not its ``master`` branch.
 We can change this by pushing the local ``master`` branch to ``origin``.
 
-Before we doing so, let us remove the ``hello`` branches which we do not need anymore::
+Before doing so, let us remove the ``hello`` branche which we do not need anymore::
 
    $ git push origin --delete hello
    To ssh://localhost:30022/gert/example.git
@@ -1634,7 +1634,7 @@ in the following example::
    ac805d5 Merge branch 'dev'
    41e9e21 function call added
 
-The logs demonstrate that indeed the tags are connected with a certain script.
+The logs demonstrate that indeed the tags are connected with a certain commit.
 In addition to annotated tags, there are also so-called light-weight tags which
 cannot contain further attributes. Usually, light-weight tags are employed if
 they are only temporarily needed.
