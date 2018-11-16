@@ -1474,12 +1474,15 @@ Before doing so, let us remove the ``hello`` branche which we do not need anymor
    At the tab "Settings - Branches" individual branches or all merged branches can
    be removed.
 
-The first command deleted the remote branch. As an alternative way, one can use the
-GitLab web interface as shown in :numref:`gitlab-developer-5`. There individual
-branches or all merged branches can be removed. The second command deletes the
-local branch, provided that no unmerged commits are still present. One can force
-deletion of the branch with the option ``-D`` but may risk the loss of data. Using
-``-D`` instead of ``-d`` should thus be done with care.
+The first command deleted the remote branch. As an alternative way, one can use
+the GitLab web interface as shown in :numref:`gitlab-developer-5`. There
+individual branches or all merged branches can be removed. However, the local
+references to the remote branches are not yet deleted. If one wants to remove
+references to branches on ``origin`` which do no longer exist, one can use
+``git remote prune origin``. The second command above deletes the local
+branch, provided that no unmerged commits are still present. One can force
+deletion of the branch with the option ``-D`` but may risk the loss of data.
+Using ``-D`` instead of ``-d`` should thus be done with care.
 
 After pushing the local ``master`` branch to ``origin``, the log looks as follows::
 
