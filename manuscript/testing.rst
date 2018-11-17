@@ -363,11 +363,185 @@ they are particularly well suited for numerical tests where results have to agre
 only to a certain precision. For more complex test cases, it might also be helpful
 to choose the approach discussed in the next section instead of using doctests.
 
-Testing with py.test
-====================
+Testing with pytest
+===================
 
-For more complex test cases, the Python standard library provides a framework called
-``unittest``. Recently, however, ``py.test`` has become very popular as it requires
-less overhead when writing tests. In this section we will focus on ``py.test`` which
-is not part of the Python standard library but it included e.g. in the Anaconda
+For more complex test cases, the Python standard library provides a framework
+called ``unittest``. Another often used test framework is ``nose``. Recently,
+``pytest`` has become very popular which compared ``unittest`` requires less
+overhead when writing tests. In this section we will focus on ``pytest`` which
+is not part of the Python standard library but is included e.g. in the Anaconda
 distribution.
+
+We illustrate the basic usage of ``pytest`` by testing a function generating
+a line of Pascal's triangle.
+
+.. code-block:: python
+
+   def pascal(n):
+       """create the n-th line of Pascal's triangle
+   
+          The linenumbers start with n=0 for the line
+          containing only the entry 1. The elements of
+          a line a generated successively.
+   
+       """
+       x = 1
+       yield x
+       for k in range(n):
+           x = x*(n-k)//(k+1)
+           yield x
+   
+   if __name__ == '__main__':
+       for n in range(7):
+           line = ' '.join('{:2}'.format(x) for x in pascal(n))
+           print(str(n)+line.center(25))
+
+   $ python pascal.py
+   0             1
+   1           1  1
+   2          1  2  1
+   3        1  3  3  1
+   4       1  4  6  4  1
+   5     1  5 10 10  5  1
+   6    1  6 15 20 15  6  1
+
+The function ``pascal(n)`` successively returns the elements of the :math:`n`-th
+line of Pascal's triangle and it is this function which we are going to test now.
+The function is based on the fact that the elements of Pascal's triangle are binomial
+coefficients. While the output of the first seven lines looks fine, it make sense
+to test the function more thoroughly.
+
+The first and most obvious test is to automate at least part of the test which we
+were just doing visually. It is always a good idea to check boundary cases. In our
+case this means that we make sure that ``n=0`` indeed corresponds to the first line.
+We also check the following line as well as a typical non-trivial line. We call the
+following script ``test_pascal.py`` because ``pytest`` will run scripts with names
+of the form ``test_*.py`` or ``*_test.py`` in the present directory or its subdirectories
+automatically. Here, the star stands for any other valid part of a filename.
+Within the script, the test functions should start with ``test_`` to distinguish
+them from other functions which may be present.
+
+.. code-block:: python
+
+   from pascal import pascal
+
+   def test_n0():
+       assert list(pascal(0)) == [1]
+
+   def test_n1():
+       assert list(pascal(1)) == [1, 1]
+
+   def test_n5():
+       expected = [1, 4, 6, 4, 1]
+       assert list(pascal(5)) == expected
+
+The tests contain an ``assert`` statement which raises an ``AssertionError`` in
+case the test should fail. In fact, this will happen for our test script, even though
+the implementation of the function ``pascal`` is not to blame. In this case, we have
+inserted a mistake into our test script to show the output of ``pytest`` in the case
+of errors. Can you find the mistake in the test script? If not, it suffices to run
+the script::
+
+   $ pytest
+   ============================= test session starts =============================
+   platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1
+   rootdir: /home/gert/pascal, inifile:
+   plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+   collected 3 items                                                             
+
+   test_pascal.py ..F                                                      [100%]
+
+   ================================== FAILURES ===================================
+   ___________________________________ test_n5 ___________________________________
+
+       def test_n5():
+           expected = [1, 4, 6, 4, 1]
+   >       assert list(pascal(5)) == expected
+   E       assert [1, 5, 10, 10, 5, 1] == [1, 4, 6, 4, 1]
+   E         At index 1 diff: 5 != 4
+   E         Left contains more items, first extra item: 1
+   E         Use -v to get the full diff
+
+   test_pascal.py:11: AssertionError
+   ===================== 1 failed, 2 passed in 0.04 seconds ======================
+   
+
+The last line in the first part of the output, before the header entitled ``FAILURES``,
+``pytest`` gives a summary of the test run. It ran three tests present in the script
+``test_pascal.py`` and the result is indicated by ``..F`` . The two dots represent
+two successful tests and the ``F`` marks test which failed and for which detailed information
+is given in the second part of the output. Clearly, the elements of line 5 in Pascal's
+triangle yielded by our function does not coincide with our expectation.
+
+It occasionally happens that a test is known to fail in the present of development.
+One still may want to keep the test in the test suite, but it should not be flagged
+as failure. In such a case, the test can be decorated with ``pytest.mark.xfail``.
+The relevant test then looks as follows
+
+.. code-block:: python
+
+   @pytest.mark.xfail
+   def test_n5():
+       expected = [1, 4, 6, 4, 1]
+       assert list(pascal(5)) == expected
+
+In addition, the ``pytest`` module need to be imported. Now, the test is marked
+by an ``x`` for expected failure::
+
+   $ pytest
+   ============================= test session starts =============================
+   platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1
+   rootdir: /home/gert/pascal, inifile:
+   plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+   collected 3 items                                                             
+
+   test_pascal.py ..x                                                      [100%]
+
+   ===================== 2 passed, 1 xfailed in 0.04 seconds =====================
+
+One can also skip tests by means of the decorator ``pytest.mark.skip`` which
+takes an optional variable ``reason``.
+
+.. code-block:: python
+
+   @pytest.mark.skip(reason="just for demonstration")
+   def test_n5():
+       expected = [1, 4, 6, 4, 1]
+       assert list(pascal(5)) == expected
+
+However, the reason will only be listed in the output, if the option ``-r s`` is
+applied::
+
+   $ pytest -r s
+   ============================= test session starts =============================
+   platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1
+   rootdir: /home/gert/pascal, inifile:
+   plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+   collected 3 items
+
+   test_pascal.py ..s                                                      [100%]
+   =========================== short test summary info ===========================
+   SKIP [1] test_pascal.py:10: just for demonstration
+
+   ===================== 2 passed, 1 skipped in 0.01 seconds =====================
+
+In our case, it is of course better to correct the expected result in function ``test_n5``.
+The we obtain the following output from ``pytest``::
+
+   $ pytest
+   ============================= test session starts =============================
+   platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1
+   rootdir: /home/gert/pascal, inifile:
+   plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+   collected 3 items
+
+   test_pascal.py ...                                                      [100%]
+
+   ========================== 3 passed in 0.01 seconds ===========================
+
+Now, all tests pass just fine.
+
+One might object that the test so far only verify a few special cases and in particular
+are limited to very small values of ``n``. How do we test line 10000 of Pascal's triangle
+without having to determine the expected result?
