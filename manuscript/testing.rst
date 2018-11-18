@@ -381,7 +381,7 @@ a line of Pascal's triangle.
    def pascal(n):
        """create the n-th line of Pascal's triangle
    
-          The linenumbers start with n=0 for the line
+          The line numbers start with n=0 for the line
           containing only the entry 1. The elements of
           a line a generated successively.
    
@@ -544,4 +544,237 @@ Now, all tests pass just fine.
 
 One might object that the test so far only verify a few special cases and in particular
 are limited to very small values of ``n``. How do we test line 10000 of Pascal's triangle
-without having to determine the expected result?
+without having to determine the expected result? We can test properties related to the
+fact that the elements of Pascal's triangle are binomial coefficients. The sum of the
+elements in the :math:`n`-th line amounts to :math:`2^n` and if the sign is changed
+from element to element the sum vanishes. This kind of test is quite independent of the
+logic of the function ``pascal`` and therefore particularly significant. We can implement
+the two tests in the following way.
+
+.. code-block:: python
+
+   def test_sum():
+       for n in (10, 100, 1000, 10000):
+           assert sum(pascal(n)) == 2**n
+   
+   def test_alternate_sum():
+       for n in (10, 100, 1000, 10000):
+           assert sum(alternate(pascal(n))) == 0
+   
+   def alternate(g):
+       sign = 1
+       for elem in g:
+           yield sign*elem
+           sign = -sign
+
+Here, the name of the function ``alternate`` does not start with the string ``test`` because
+this function is not intended to be executed as a test. Instead, it serves to alternate
+the sign of subsequent elements used in the test ``test_alternate_sum``. One can verify that
+indeed five tests are run. For a change, we use the option ``-v`` for a verbose output
+listing the name of the test functions being executed. ::
+
+   $ pytest -v
+   ============================ test session starts ============================
+   platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1 -- /home/gert/anaconda3/bin/python
+   cachedir: .pytest_cache
+   rootdir: /home/gert/pascal, inifile:
+   plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+   collected 5 items
+   
+   test_pascal.py::test_n0 PASSED                                        [ 20%]
+   test_pascal.py::test_n1 PASSED                                        [ 40%]
+   test_pascal.py::test_n5 PASSED                                        [ 60%]
+   test_pascal.py::test_sum PASSED                                       [ 80%]
+   test_pascal.py::test_alternate_sum PASSED                             [100%]
+   
+   ========================= 5 passed in 0.10 seconds ==========================
+
+We could also check whether a line in Pascal's triangle can be constructed from the previous
+line by adding neighboring elements. This test is completely independent of the inner logic
+of the function to be tested. Furthermore, we can execute it for arbitrary line numbers, at least
+in principle. We add the test
+
+.. code-block:: python
+
+   def test_generate_next_line():
+       for n in (10, 100, 1000, 10000):
+           for left, right, new in zip(chain([0], pascal(n)),
+                                       chain(pascal(n), [0]),
+                                       pascal(n+1)):
+               assert left+right == new
+
+where we need to add ``from itertools import chain`` in the import section of our test script.
+
+The last three of our tests contain loops, but they do not behave like several tests. As
+soon as an exception is raised, the test has failed. In contrast our first three tests for
+the lines in Pascal's triangle with numbers 0, 1, and 5 are individual tests which could
+be unified. How can we do this while the keeping the individuality of the test? The answer
+is the ``parametrize`` decorator which we use in the following new version of our test script.
+
+.. code-block:: python
+   :linenos:
+
+   import pytest
+   from itertools import chain
+   from pascal import pascal
+   
+   @pytest.mark.parametrize("lineno, expected", [
+       (0, [1]),
+       (1, [1, 1]),
+       (5, [1, 5, 10, 10, 5, 1])
+   ])
+   def test_line(lineno, expected):
+       assert list(pascal(lineno)) == expected
+   
+   powers_of_ten = pytest.mark.parametrize("lineno",
+                       [10, 100, 1000, 10000])
+   
+   @powers_of_ten
+   def test_sum(lineno):
+       assert sum(pascal(lineno)) == 2**lineno
+   
+   @powers_of_ten
+   def test_alternate_sum(lineno):
+       assert sum(alternate(pascal(lineno))) == 0
+   
+   def alternate(g):
+       sign = 1
+       for elem in g:
+           yield sign*elem
+           sign = -sign
+   
+   @powers_of_ten
+   def test_generate_next_line(lineno):
+       for left, right, new in zip(chain([0], pascal(lineno)),
+                                   chain(pascal(lineno), [0]),
+                                   pascal(lineno+1)):
+           assert left+right == new
+
+The function ``test_line`` replaces the original first three tests. In order to do
+so, it takes two arguments which are provided by the decorator in lines 5 to 9. This
+decorator makes sure that the test function is run three times with different values
+of the line number in Pascal's triangle and the expected result. In the remaining three
+test functions, we have replaced the original loop by a ``parametrize`` decorator. 
+In order to avoid repetitive code, we have defined a decorator ``powers_of_ten`` in 
+line 13 and 14 which then is used in three tests. Our script now contains 15 tests.
+
+When discussing doctests, we had seen how one can make sure that a certain exception
+is raised. Of course, this can also be achieved with ``pytest``. At least in the present
+form, it does not make sense to call ``pascal`` with a negative value for the line number.
+In such a case, a ``ValueError`` should be raised, a behavior which can be tested with
+the following test.
+
+.. code-block:: python
+
+   def test_negative_int():
+       with pytest.raises(ValueError):
+           next(pascal(-1))
+
+Here, ``next`` explicitly asks the generator to provide us with a value so that the function
+``pascal`` gets a chance to check the validity of the line number. Of course, this test will
+only pass once we have adapted our function ``pascal`` accordingly.
+
+In order to illustrate a problem frequently occurring when writing tests for scientific
+applications, we generalize our function ``pascal`` to floating point number arguments.
+As an example, let us choose the argument 1/3. We would then obtain the coefficients in
+the Taylor expansion
+
+.. math::
+
+   (1+x)^{1/3} = 1+\frac{1}{3}x-\frac{1}{9}x^2+\frac{5}{81}x^3+\ldots
+
+Be aware that the generator will now provide us with an infinite number of
+return values so that we should take care not to let this happen. In the
+following script ``pascal_float``, we do so by taking advantage of the fact
+that ``zip`` terminates whenever one of the generators is exhausted.
+
+.. code-block:: python
+
+   def taylor_power(power):
+       """generate the Taylor coefficients of (1+x)**power
+   
+          This function is based on the function pascal().
+   
+       """
+       coeff = 1
+       yield coeff
+       k = 0
+       while power-k != 0:
+           coeff = coeff*(power-k)/(k+1)
+           k = k+1
+           yield coeff
+   
+   if __name__ == '__main__':
+       for n, val in zip(range(5), taylor_power(1/3)):
+           print(n, val)
+
+We call this script ``pascal_float.py`` and obtain the following output by running it::
+
+   0 1
+   1 0.3333333333333333
+   2 -0.11111111111111112
+   3 0.0617283950617284
+   4 -0.0411522633744856
+
+The first four lines match our expectations from the Taylor expansion of :math:`(1+x)^{1/3}`.
+
+We test our new function with the test script ``test_taylor_power``.
+
+.. code-block:: python
+
+   import pytest
+   from pascal_float import taylor_power
+   
+   def test_one_third():
+       p = taylor_power(1/3)
+       result = [next(p) for _ in range(4)]
+       expected = [1, 1/3, -1/9, 5/81]
+       assert result == expected
+
+The failures section of the ``pytest`` output shows where the problem lies::
+
+   ______________________________ test_one_third _______________________________
+   
+       def test_one_third():
+           p = taylor_power(1/3)
+           result = [next(p) for _ in range(4)]
+           expected = [1, 1/3, -1/9, 5/81]
+   >       assert result == expected
+   E       assert [1, 0.3333333...7283950617284] == [1, 0.33333333...2839506172839]
+   E         At index 2 diff: -0.11111111111111112 != -0.1111111111111111
+   E         Full diff:
+   E         - [1, 0.3333333333333333, -0.11111111111111112, 0.0617283950617284]
+   E         ?                                            -                   ^
+   E         + [1, 0.3333333333333333, -0.1111111111111111, 0.06172839506172839]
+   E         ?                                                               ^^
+   
+   test_taylor_power.py:8: AssertionError
+   ========================= 1 failed in 0.04 seconds ==========================
+
+It looks like rounding errors spoil our test and this problem will get worse if we
+want to check further coefficients. We are thus left with two problems. First, one
+needs to have an idea of how well the actual and the expected result should agree.
+It is not straightforward to answer this, because the precision of a result may
+depend strongly on the numerical methods employed. For a numerical integration, a
+relative error of :math:`10^{-8}` might be prefectly acceptable while for a pure
+rounding error, this value would be too large. On a more practical side, how can
+we test in the presence of numerical errors. For a list of values to be compared,
+one would typically use functions supplied by the NumPy package. Since we will
+discuss NumPy in a later chapter, we use here ``math.isclose`` together with ``all``.
+
+.. code-block:: python
+
+   import math
+   import pytest
+   from pascal_float import taylor_power
+   
+   def test_one_third():
+       p = taylor_power(1/3)
+       result = [next(p) for _ in range(4)]
+       expected = [1, 1/3, -1/9, 5/81]
+       assert all(math.isclose(x, y, abs_tol=1e-13)
+                  for x, y in zip(result, expected))
+
+In this section, we have discussed some of the more important aspects of ``pytest``
+without being complete. More information can be found in the `corresponding documentation
+<https://docs.pytest.org>`_.
