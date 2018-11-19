@@ -383,7 +383,7 @@ a line of Pascal's triangle.
    
           The line numbers start with n=0 for the line
           containing only the entry 1. The elements of
-          a line a generated successively.
+          a line are generated successively.
    
        """
        x = 1
