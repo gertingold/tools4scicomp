@@ -500,6 +500,10 @@ by an ``x`` for expected failure::
 
    ===================== 2 passed, 1 xfailed in 0.04 seconds =====================
 
+The marker ``x`` is set in lowercase to distinguish it from serious failures like
+``F`` for a failed test. If a test expected to fail actually passes, it will be
+marked by an uppercase ``X`` to indicate that corresponding test should not pass.
+
 One can also skip tests by means of the decorator ``pytest.mark.skip`` which
 takes an optional variable ``reason``.
 
