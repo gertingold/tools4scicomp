@@ -297,12 +297,12 @@ with an appropriate error message.
    :linenos:
 
    # hello.py
-   
+
    def welcome(name='', lang='en'):
        """Print a greeting.
-   
+
        name: name of the person to greet
-   
+
        >>> welcome()
        'Hello!'
        >>> welcome('')
@@ -325,7 +325,7 @@ with an appropriate error message.
            return '{} {}!'.format(hellostring, name)
        else:
            return '{}!'.format(hellostring)
-   
+
    if __name__ == '__main__':
        welcome('Alice', 'fr')
 
@@ -380,18 +380,18 @@ a line of Pascal's triangle.
 
    def pascal(n):
        """create the n-th line of Pascal's triangle
-   
-          The line numbers start with n=0 for the line
-          containing only the entry 1. The elements of
-          a line are generated successively.
-   
+
+       The line numbers start with n=0 for the line
+       containing only the entry 1. The elements of
+       a line are generated successively.
+
        """
        x = 1
        yield x
        for k in range(n):
            x = x*(n-k)//(k+1)
            yield x
-   
+
    if __name__ == '__main__':
        for n in range(7):
            line = ' '.join('{:2}'.format(x) for x in pascal(n))
@@ -560,11 +560,11 @@ the two tests in the following way.
    def test_sum():
        for n in (10, 100, 1000, 10000):
            assert sum(pascal(n)) == 2**n
-   
+
    def test_alternate_sum():
        for n in (10, 100, 1000, 10000):
            assert sum(alternate(pascal(n))) == 0
-   
+
    def alternate(g):
        sign = 1
        for elem in g:
@@ -621,7 +621,7 @@ is the ``parametrize`` decorator which we use in the following new version of ou
    import pytest
    from itertools import chain
    from pascal import pascal
-   
+
    @pytest.mark.parametrize("lineno, expected", [
        (0, [1]),
        (1, [1, 1]),
@@ -629,18 +629,18 @@ is the ``parametrize`` decorator which we use in the following new version of ou
    ])
    def test_line(lineno, expected):
        assert list(pascal(lineno)) == expected
-   
+
    powers_of_ten = pytest.mark.parametrize("lineno",
                        [10, 100, 1000, 10000])
-   
+
    @powers_of_ten
    def test_sum(lineno):
        assert sum(pascal(lineno)) == 2**lineno
-   
+
    @powers_of_ten
    def test_alternate_sum(lineno):
        assert sum(alternate(pascal(lineno))) == 0
-   
+
    def alternate(g):
        sign = 1
        for elem in g:
@@ -696,9 +696,9 @@ that ``zip`` terminates whenever one of the generators is exhausted.
 
    def taylor_power(power):
        """generate the Taylor coefficients of (1+x)**power
-   
+
           This function is based on the function pascal().
-   
+
        """
        coeff = 1
        yield coeff
@@ -707,7 +707,7 @@ that ``zip`` terminates whenever one of the generators is exhausted.
            coeff = coeff*(power-k)/(k+1)
            k = k+1
            yield coeff
-   
+
    if __name__ == '__main__':
        for n, val in zip(range(5), taylor_power(1/3)):
            print(n, val)
@@ -728,7 +728,7 @@ We test our new function with the test script ``test_taylor_power``.
 
    import pytest
    from pascal_float import taylor_power
-   
+
    def test_one_third():
        p = taylor_power(1/3)
        result = [next(p) for _ in range(4)]
@@ -771,13 +771,15 @@ discuss NumPy in a later chapter, we use here ``math.isclose`` together with ``a
    import math
    import pytest
    from pascal_float import taylor_power
-   
+
    def test_one_third():
        p = taylor_power(1/3)
        result = [next(p) for _ in range(4)]
        expected = [1, 1/3, -1/9, 5/81]
        assert all(math.isclose(x, y, abs_tol=1e-13)
                   for x, y in zip(result, expected))
+
+
 
 In this section, we have discussed some of the more important aspects of ``pytest``
 without being complete. More information can be found in the `corresponding documentation
