@@ -43,7 +43,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'index_latex'
 
 # General information about the project.
 project = 'Tools for Scientific Computing'
@@ -183,3 +183,5 @@ numfig_format = {'figure': 'Figure %s', 'table': 'Table %s',
                  'code-block': 'Listing %s', 'section': 'Section %s'}
 
 today_fmt = "%B %d, %Y"
+
+latex_appendices = ['decorators']

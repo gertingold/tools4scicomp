@@ -12,10 +12,3 @@ Lecture notes »Tools for Scientific Computing«
    profiling
    documenting
    parallel
-
-Appendix
-
-.. toctree::
-   :maxdepth: 2
-
-   decorators
