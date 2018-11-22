@@ -757,16 +757,25 @@ The failures section of the output of ``pytest -v`` shows where the problem lies
    test_taylor_power.py:8: AssertionError
    ========================= 1 failed in 0.04 seconds ==========================
 
-It looks like rounding errors spoil our test and this problem will get worse if we
-want to check further coefficients. We are thus left with two problems. First, one
-needs to have an idea of how well the actual and the expected result should agree.
-It is not straightforward to answer this, because the precision of a result may
-depend strongly on the numerical methods employed. For a numerical integration, a
-relative error of :math:`10^{-8}` might be prefectly acceptable while for a pure
-rounding error, this value would be too large. On a more practical side, how can
-we test in the presence of numerical errors. For a list of values to be compared,
-one would typically use functions supplied by the NumPy package. Since we will
-discuss NumPy in a later chapter, we use here ``math.isclose`` together with ``all``.
+It looks like rounding errors spoil our test and this problem will get worse if
+we want to check further coefficients. We are thus left with two problems.
+First, one needs to have an idea of how well the actual and the expected result
+should agree.  It is not straightforward to answer this, because the precision
+of a result may depend strongly on the numerical methods employed. For a
+numerical integration, a relative error of :math:`10^{-8}` might be prefectly
+acceptable while for a pure rounding error, this value would be too large. On a
+more practical side, how can we test in the presence of numerical errors?
+
+There are actually a number of possibilities. The ``math``-module of the Python
+standard library provides a function ``isclose`` which allows to check whether
+two numbers agree up to a given absolute or relative tolerance. However, one
+would have to compare each pair of numbers individually and then combine the
+Boolean results by means of ``all``. When dealing with arrays, the NumPy
+library provides a number of useful functions in its ``testing`` module. Several
+of these functions can be useful when comparing floats. Finally, ``pytest``
+itself provides a function ``approx`` which can test individual values or
+values collected in a list, a NumPy array, or even a dictionary. Using
+``pytest.approx``, our test could look as follows.
 
 .. code-block:: python
 
@@ -778,11 +787,24 @@ discuss NumPy in a later chapter, we use here ``math.isclose`` together with ``a
        p = taylor_power(1/3)
        result = [next(p) for _ in range(4)]
        expected = [1, 1/3, -1/9, 5/81]
-       assert all(math.isclose(x, y, abs_tol=1e-13)
-                  for x, y in zip(result, expected))
+       assert result == pytest.approx(expected, abs=0, rel=1e-15)
 
+Here we test whether the relative tolerance between two values in a pair is at
+most :math:`10^{-15}`. By default, the absolute tolerance is set to
+:math:`10^{-12}` and the relative tolerance to :math:`10^{-6}` where in the end
+the larger value is taken. If we would not specify ``abs=0``, a very small
+relative tolerance would be ignored in favor of the default absolute tolerance.
+On the other hand, if no relative tolerance is specified, the absolute
+tolerance is taken for the comparison.
 
+``pytest.approx`` and ``math.isclose`` differ when the relative tolerance is
+checked. While the first one takes the relative tolerance with respect to the
+argument of ``pytest.approx``, the second one checks whether the relative
+tolerances are met with respect to both values.
 
 In this section, we have discussed some of the more important aspects of ``pytest``
 without being complete. More information can be found in the `corresponding documentation
-<https://docs.pytest.org>`_.
+<https://docs.pytest.org>`_. Of interest, in particular if more extensive tests
+are written, could be the possibility to group tests in classes. This can also
+be useful if a number of tests requires the same setup which then can be defined
+in a dedicated function.
