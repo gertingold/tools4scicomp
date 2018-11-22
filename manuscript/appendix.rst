@@ -1,9 +1,8 @@
-.. raw:: latex
+========
+Appendix
+========
 
-   \appendix
+.. _appendixdecorators:
 
-.. toctree::
-   :maxdepth: 2
-   :hidden:
-
-   decorators
+Decorators
+==========
