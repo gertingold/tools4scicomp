@@ -3,6 +3,8 @@ Lecture notes »Tools for Scientific Computing«
 
 .. toctree::
    :maxdepth: 2
+   :numbered:
+   :includehidden:
 
    introduction
    git
@@ -12,10 +14,4 @@ Lecture notes »Tools for Scientific Computing«
    profiling
    documenting
    parallel
-
-Appendix
-
-.. toctree::
-   :maxdepth: 2
-
-   decorators
+   appendix
