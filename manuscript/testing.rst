@@ -724,7 +724,7 @@ We call this script ``pascal_float.py`` and obtain the following output by runni
 
 The first four lines match our expectations from the Taylor expansion of :math:`(1+x)^{1/3}`.
 
-We test our new function with the test script ``test_taylor_power``.
+We test our new function with the test script ``test_taylor_power.py``.
 
 .. code-block:: python
 
@@ -737,7 +737,7 @@ We test our new function with the test script ``test_taylor_power``.
        expected = [1, 1/3, -1/9, 5/81]
        assert result == expected
 
-The failures section of the ``pytest`` output shows where the problem lies::
+The failures section of the output of ``pytest -v`` shows where the problem lies::
 
    ______________________________ test_one_third _______________________________
    
