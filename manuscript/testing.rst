@@ -397,6 +397,8 @@ a line of Pascal's triangle.
            line = ' '.join('{:2}'.format(x) for x in pascal(n))
            print(str(n)+line.center(25))
 
+Running this script returns the first seven lines of Pascal's triangle::
+
    $ python pascal.py
    0             1
    1           1  1
@@ -406,11 +408,11 @@ a line of Pascal's triangle.
    5     1  5 10 10  5  1
    6    1  6 15 20 15  6  1
 
-The function ``pascal(n)`` successively returns the elements of the :math:`n`-th
-line of Pascal's triangle and it is this function which we are going to test now.
-The function is based on the fact that the elements of Pascal's triangle are binomial
-coefficients. While the output of the first seven lines looks fine, it make sense
-to test the function more thoroughly.
+We will now test the function ``pascal(n)`` which returns the elements of the
+:math:`n`-th line of Pascal's triangle.  The function is based on the fact that
+the elements of Pascal's triangle are binomial coefficients. While the output
+of the first seven lines looks fine, it make sense to test the function more
+thoroughly.
 
 The first and most obvious test is to automate at least part of the test which we
 were just doing visually. It is always a good idea to check boundary cases. In our
