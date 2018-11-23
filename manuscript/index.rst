@@ -2,7 +2,7 @@ Lecture notes »Tools for Scientific Computing«
 ==============================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :numbered:
 
    introduction
