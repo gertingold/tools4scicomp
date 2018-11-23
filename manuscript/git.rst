@@ -1458,7 +1458,7 @@ in its original state. This makes sense because the hello world script was pushe
 the ``hello`` repository on the ``origin`` repository, but not its ``master`` branch.
 We can change this by pushing the local ``master`` branch to ``origin``.
 
-Before doing so, let us remove the ``hello`` branche which we do not need anymore::
+Before doing so, let us remove the ``hello`` branch which we do not need anymore::
 
    $ git push origin --delete hello
    To ssh://localhost:30022/gert/example.git
@@ -1746,7 +1746,7 @@ The important point here is that the branch is in a so-called "detached head sta
 At first sight, this branch behaves like a usual branch where we can look around
 and even commit changes. However, once we leave the branch, there is no way to
 get back to these commits. As Git explains in the message reproduced above, one
-needs to check out the branch into a regular new branch if one wants to keept
+needs to check out the branch into a regular new branch if one wants to keep
 the commits generated in a branch in a "detached head state". If one forgets
 to do so, Git will give the following warning::
 

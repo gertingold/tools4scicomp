@@ -766,7 +766,7 @@ we want to check further coefficients. We are thus left with two problems.
 First, one needs to have an idea of how well the actual and the expected result
 should agree.  It is not straightforward to answer this, because the precision
 of a result may depend strongly on the numerical methods employed. For a
-numerical integration, a relative error of :math:`10^{-8}` might be prefectly
+numerical integration, a relative error of :math:`10^{-8}` might be perfectly
 acceptable while for a pure rounding error, this value would be too large. On a
 more practical side, how can we test in the presence of numerical errors?
 
