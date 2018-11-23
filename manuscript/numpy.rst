@@ -243,12 +243,142 @@ Let us consider a first example::
 
 We have started with a list of lists which is a valid argument for ``np.array``.
 Printing out the result indicates indeed that we have obtained a NumPy array.
-Confirmation is obtained by asking for the type of ``myarray``.
+A confirmation is obtained by asking for the type of ``myarray``.
 
+The data of an array are stored contiguously in memory but what does that really
+mean for the two-dimensional array which we have just created? Natural ways would
+be store the date columnwise or rowwise. The first variant is realized in the
+programming language C while the second variant is used by Fortran. Apart from
+the actual data, an array obviously needs a number of metadata in order to know
+how to interpret the content of the memory space attributed to the area. These
+metadata are a powerful concept because they make it possible to change the
+interpretation of the data without copying them, thereby contributing to the
+efficiency of Numpy arrays.
 
+It is useful to get some basic insight into how a Numpy array works. In order
+to analyze the metadata, we use a short function enabling us to list the 
+attributes of an array.
 
+.. code-block:: python
 
+   def array_attributes(a):
+       for attr in ('ndim', 'size', 'itemsize', 'dtype', 'shape', 'strides'):
+           print(f'{attr:8s}: {getattr(a, attr)}')
 
+A convenient way of generating an array for test purposes is the ``arange`` function
+which works very much like the standard ``range`` iterator as far as its basic
+arguments ``start``, ``stop``, and ``step`` are concerned. In this way, we can
+easily construct a one-dimensional array with integer entries from 0 to 15 and
+inspect its properties::
+
+   >>> matrix = np.arange(16)
+   >>> matrix
+   array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15])
+   >>> array_attributes(matrix)
+   ndim    : 1
+   size    : 16
+   itemsize: 8
+   dtype   : int64
+   shape   : (16,)
+   strides : (8,)
+
+Let us take a look at the different attributes. The attribute ``ndim`` indicates
+the number of dimension of the array which in our example is one-dimensional and
+therefore ``ndim`` equals 1. The ``size`` of 16 means that the array contains a
+total of 16 items. Each item has an ``itemsize`` of 8 bytes or 64 bits, resulting
+in a total size of 128 bytes::
+
+   >>> matrix.nbytes
+   128
+
+The attribute ``dtype`` represents the datatype which in our example is ``int64``,
+i.e. an integer type of a length of 64 bits. Quite in contrast to the usual integer
+type in Python which can in principle handle integers of arbitrary size, the integer
+values in our array are clearly limited. An example using integers of only 8 bits
+length can serve to illustrate the problem of overflows::
+
+   >>> np.arange(1, 160, 10, dtype=np.int8)
+   array([   1,   11,   21,   31,   41,   51,   61,   71,   81,   91,  101,
+           111,  121, -125, -115, -105], dtype=int8)
+
+Take a look at the items in this array and try to understand what is going on.
+
+   >>> for k, v in np.core.numerictypes.sctypes.items():
+   ...     print(k)
+   ...     for elem in v:
+   ...         print(f'    {elem}')
+   ... 
+   int
+       <class 'numpy.int8'>
+       <class 'numpy.int16'>
+       <class 'numpy.int32'>
+       <class 'numpy.int64'>
+   uint
+       <class 'numpy.uint8'>
+       <class 'numpy.uint16'>
+       <class 'numpy.uint32'>
+       <class 'numpy.uint64'>
+   float
+       <class 'numpy.float16'>
+       <class 'numpy.float32'>
+       <class 'numpy.float64'>
+       <class 'numpy.float128'>
+   complex
+       <class 'numpy.complex64'>
+       <class 'numpy.complex128'>
+       <class 'numpy.complex256'>
+   others
+       <class 'bool'>
+       <class 'object'>
+       <class 'bytes'>
+       <class 'str'>
+       <class 'numpy.void'>
+
+The first four groups of datatypes include integers, unsigned integers, floats and
+complex numbers of different sizes. Among the other types, booleans as well as strings
+are of some interest. Note, however, that the data in an array always should be homogeneous.
+If different datatypes are mixed in the assignment to an array, it may happen that a datatype
+is cast to a more flexible one. For strings, the size of each entry will be determined by
+the longest string.
+
+Probably the most interesting attributes of an array are ``shape`` and ``strides`` because
+the allow us to reinterprete the data of the original one-dimensional array in different
+ways without the need to copy from memory to memory. Let us first try to understand the meaning
+of the tuples ``(16,)`` for ``shape`` and ``(8,)`` for ``strides``. Both tuples have the same
+size which equals one because the considered array is one-dimensional. Therefore, ``shape`` does
+not contain any new information. It simply reflects the size of the array as does the attribute
+``size``. The value of ``strides`` means that in order to move from the beginning of an item
+in memory to the beginning of the next one, one needs to more eight bytes. This information
+is consistent with the ``itemsize``. What seems like redundant information becomes more
+interesting when we go from a one-dimensional array to a multi-dimensional array. For simplicity
+we convert the our one-dimensional array ``matrix`` into a two-dimensional square array.
+To this purpose we make use of the ``reshape`` method::
+
+   >>> matrix = matrix.reshape(4, 4)
+   >>> matrix
+   array([[ 0,  1,  2,  3],
+          [ 4,  5,  6,  7],
+          [ 8,  9, 10, 11],
+          [12, 13, 14, 15]])
+   >>> array_attributes(matrix)
+   ndim    : 2
+   size    : 16
+   itemsize: 8
+   dtype   : int64
+   shape   : (4, 4)
+   strides : (32, 8)
+
+In the first line, we bring our one-dimensional array with 16 elements into a
+:math:`4\times4` array.  Three attributes change their value in this process.
+``ndim`` is now 2 because we created a two-dimensional array. The ``shape`` attribute
+with value `(4, 4)`` reflects the fact that now we have 4 rows and 4 columns.
+Finally, the ``strides`` are given by the tuple ``(32, 8)``. To go in memory from
+an item to the item in the next column and in the same row means that we should move
+by 8 bytes. The two items are neighbors in memory. However, if we stay within the
+same column and want to move to the next row, we have to jump by 32 bytes in memory.
+
+To further illustrate the meaning of ``shape`` and ``strides`` we consider a second
+example.
 
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
