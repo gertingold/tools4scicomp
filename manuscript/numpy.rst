@@ -43,6 +43,8 @@ through the scikit-learn package [#sklearn]_.
 
 We emphasize that the list of packages briefly described here, is not exhaustive
 and there exist more interesting Python packages useful in scientific applications.
+A recommended source of information on the Python scientific ecosystem are the
+`Scipy lecture notes <https://www.scipy-lectures.org/>`_.
 
 NumPy
 =====
