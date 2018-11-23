@@ -371,7 +371,7 @@ To this purpose we make use of the ``reshape`` method::
 In the first line, we bring our one-dimensional array with 16 elements into a
 :math:`4\times4` array.  Three attributes change their value in this process.
 ``ndim`` is now 2 because we created a two-dimensional array. The ``shape`` attribute
-with value `(4, 4)`` reflects the fact that now we have 4 rows and 4 columns.
+with value ``(4, 4)`` reflects the fact that now we have 4 rows and 4 columns.
 Finally, the ``strides`` are given by the tuple ``(32, 8)``. To go in memory from
 an item to the item in the next column and in the same row means that we should move
 by 8 bytes. The two items are neighbors in memory. However, if we stay within the
