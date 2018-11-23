@@ -68,7 +68,7 @@ channels red, green, and blue as visualized in :numref:`rgbarray`.
    represented as a :math:`N\times M\times 3` array where the three planes correspond
    to the red, green, and blue channels.
 
-The first question to address is how one can stroe such data structures in Python and
+The first question to address is how one can store such data structures in Python and
 how can one make sure that the data can be processed fast. Among the standard datatypes
 available in Python, a natural candidate would be lists. In Python, lists are very
 flexible objects which allow to store element of all kinds of datatypes including lists.
@@ -124,6 +124,127 @@ row, not the first column. Even though there are ways to extract a column from a
 lists, e.g. by means of a list comprehension, there is now consistent approach to extracting
 rows and columns from a list of lists. Our construction is certainly not a good one and
 we are in need of a new datatype.
+
+NumPy arrays
+------------
+
+The new datatype provided by NumPy is a multidimensional homogeneous array of fixed-size
+items called ``ndarray``. Before starting to explore this datatype, we need to import
+the NumPy package. While there are different ways to do so, there is one recommended way.
+Let us take a look at the various alternatives::
+
+   from numpy import *                # don't do this!
+   from numpy import array, sin, cos  # not recommended
+   import numpy                       # ok, but the following line is better
+   import numpy as np                 # recommended way
+
+Importing the complete namespace of NumPy as done in the first line is no good idea because
+the namespace is rather large. Therefore, there is a danger of name conflicts and loss of
+control. As an alternative, one could restrict the import to the functions actually needed
+as shown in the second line. However, as can be seen in our example, there exist functions
+like sine (``sin``) and cosine (``cos``) in NumPy. In the body of the code it might not always
+be evident whether these functions are taken from NumPy or rather the ``math`` or ``cmath``
+module. It is better to more explicit. The import given in the third line is acceptable but
+it requires to put ``numpy.`` in front of each object taken from the NumPy namespace.
+The usual way to import NumPy is given in the fourth line. Virtually every user seeing ``np.``
+in the code will assume that the corresponding object belongs to NumPy. It is always a
+good idea to stick to such conventions to render the code easily understandable.
+
+As the next step, we need to create an array and fill it with data. Whenever we
+are simply referring to an array, we actually mean an object of datatype
+``ndarray``. Given certain similarities with Python lists, it is tempting to
+use the ``append`` method for that purpose as one often does with lists. In
+fact, NumPy provides an ``append`` method. However, because Python lists and
+NumPy arrays are conceptually quite different, there exist good reasons for
+avoiding this method if at all possible.
+
+The objects contained in a Python list are typically scattered in memory and the
+position of each chunk of data is stored in a list of pointers. In contrast, the
+data of a NumPy array are stored in one contiguous piece of memory. As we will
+see later, this way of storing an array allows to determine by means of a simple
+calculation where a certain element can be found. Accessing elements therefore is
+very efficient. 
+
+When appending data to an array, there will generally be no place for the data
+in memory to guarantee the array to remain contiguous. Appending data in NumPy
+thus implies the creation of an entirely new array. As a consequence, the data
+constituting the original array have to be moved to a new place in memory. The
+time required for this process can become significant for larger arrays and
+ultimately is limited by the hardware. Using the ``append`` method can thus
+become a serious performance problem.
+
+Generally, when working with NumPy arrays, it is a good idea to avoid the creation
+of new arrays as much as possible as this may drastically degrade performance.
+In particular, one should not count on changing the size of an array during the
+calculation. Already for the creation of the array one should decide how large
+it will need to be.
+
+One way to find out how a NumPy array can be created it to search the NumPy documentation.
+This can be done even within Python::
+
+   >>> np.lookfor('create array')
+   Search results for 'create array'
+   ---------------------------------
+   numpy.array
+       Create an array.
+   numpy.memmap
+       Create a memory-map to an array stored in a *binary* file on disk.
+   numpy.diagflat
+       Create a two-dimensional array with the flattened input as a diagonal.
+   numpy.fromiter
+       Create a new 1-dimensional array from an iterable object.
+   numpy.partition
+       Return a partitioned copy of an array.
+
+Here, we have only have reproduced a small part of the output. Furthermore, here and
+in the following, we assume that NumPy has been imported in the way recommended above
+so that its namespace can be accessed via the abbreviation ``np``.
+
+Already the first entry in the list of proposed methods is the one to use in our
+present situation. More information can be obtained as usual by means of ``help(np.array)``
+or alternatively by ::
+
+   >>> np.info(np.array)
+   array(object, dtype=None, copy=True, order='K', subok=False, ndmin=0)
+
+   Create an array.
+
+   Parameters
+   ----------
+   object : array_like
+       An array, any object exposing the array interface, an object whose
+       __array__ method returns an array, or any (nested) sequence.
+   dtype : data-type, optional
+       The desired data-type for the array.  If not given, then the type will
+       be determined as the minimum type required to hold the objects in the
+       sequence.  This argument can only be used to 'upcast' the array.  For
+       downcasting, use the .astype(t) method.
+
+Again, only the first part of the output has been reproduced. It is recommended
+though to take a look at the rest of the help text as it provides a nice example
+how doctests can be used both for documentation purposes and for testing.
+
+As can be seen from the help text, we need at least one argument ``object`` which
+should be an object with an ``__array__`` method or a possibly nested sequence.
+Let us consider a first example::
+
+   >>> matrix = [[0, 1, 2],
+   ...           [3, 4, 5],
+   ...           [6, 7, 8]]
+   >>> myarray = np.array(matrix)
+   >>> myarray
+   array([[0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8]])
+   >>> type(myarray)
+   <class 'numpy.ndarray'>
+
+We have started with a list of lists which is a valid argument for ``np.array``.
+Printing out the result indicates indeed that we have obtained a NumPy array.
+Confirmation is obtained by asking for the type of ``myarray``.
+
+
+
 
 
 
