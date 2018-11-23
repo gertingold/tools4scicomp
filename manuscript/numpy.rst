@@ -44,6 +44,87 @@ through the scikit-learn package [#sklearn]_.
 We emphasize that the list of packages briefly described here, is not exhaustive
 and there exist more interesting Python packages useful in scientific applications.
 
+NumPy
+=====
+
+Python lists and matrices
+-------------------------
+
+It is rather typical in scientific applications to deal with homogeneous data,
+i.e. data of the same datatype, organized in arrays. An obvious example for
+one-dimensional arrays are vectors in their coordinate representation and
+matrices would naturally be stored in two-dimensional arrays. There also exist
+applications for even higher-dimensional arrays. The data representing a
+digital colour image composed of :math:`N\times M` pixels can be stored in an
+:math:`N\times M\times 3` array with three planes representing the three colour
+channels red, green, and blue as visualized in :numref:`rgbarray`. 
+
+.. _rgbarray:
+.. figure:: img/rgbarray.*
+   :width: 15em
+   :align: center
+
+   The data of a digital colour image composed of :math:`N\times M` pixels can be
+   represented as a :math:`N\times M\times 3` array where the three planes correspond
+   to the red, green, and blue channels.
+
+The first question to address is how one can stroe such data structures in Python and
+how can one make sure that the data can be processed fast. Among the standard datatypes
+available in Python, a natural candidate would be lists. In Python, lists are very
+flexible objects which allow to store element of all kinds of datatypes including lists.
+While this offers us in principle the possibility to represent multi-dimensional data,
+the flexibility comes with a significant computational overhead. As we will see later,
+homogeneous data can be handled more efficiently. Leaving the question of efficiency
+aside for a moment, we can ask whether list are suited at all to represent matrices.
+
+Let us consider a two-dimensional matrix
+
+.. math::
+
+   \mathsf{M} = \begin{pmatrix} 1.1 & 2.2 & 3.3\\ 4.4 & 5.5 & 6.6\\ 7.7 & 8.8 & 9.9\end{pmatrix}\,.
+
+It seems natural to store these data in a list of lists
+
+.. sourcecode:: python
+
+   >>> matrix = [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6], [7.7, 8.8, 9.9]]
+
+of which a single element can be accessed by first selecting the appropriate row and then
+the desired entry
+
+.. sourcecode:: python
+
+   >>> matrix[0]
+   [1.1, 2.2, 3.3]
+   >>> matrix[0][2]
+   3.3
+
+The only difference with respect to the common mathematical notation is that the indices start
+at 0 and not at 1. In order to access a single row in a way which makes the two-dimensional
+character of the matrix more transparent, we could use
+
+.. sourcecode:: python
+
+   >>> matrix[0][:]
+   [1.1, 2.2, 3.3]
+
+But does this also work for a column? Let us give it a try.
+
+.. sourcecode:: python
+
+   >>> matrix[:][0]
+   [1.1, 2.2, 3.3]
+   >>> matrix[:]
+   [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6], [7.7, 8.8, 9.9]]
+
+The result is rather disappointing because interchanging the two slices yields again the
+first row. The reason can be seen from the lower two lines. In the first step, we obtain
+again the full list and in the second step we access its first element, i.e. the first
+row, not the first column. Even though there are ways to extract a column from a list of
+lists, e.g. by means of a list comprehension, there is now consistent approach to extracting
+rows and columns from a list of lists. Our construction is certainly not a good one and
+we are in need of a new datatype.
+
 
 
 
