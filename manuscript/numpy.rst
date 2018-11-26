@@ -378,7 +378,74 @@ by 8 bytes. The two items are neighbors in memory. However, if we stay within th
 same column and want to move to the next row, we have to jump by 32 bytes in memory.
 
 To further illustrate the meaning of ``shape`` and ``strides`` we consider a second
-example.
+example. A linear arangement of six data in memory can be interpreted in three
+different ways as depicted in :numref:`strides`. In the uppermost example, ``strides``
+is set to ``(8,)``. The tuple ``strides`` tuple contains only one element and we
+are therefore dealing with a one-dimensional array. Assuming the datasize to be 8,
+the array consists of all six data elements. In the second case, ``strides`` are
+set to ``(24, 8)``. Accordingly, the matrix consists of two rows and three columns.
+Finally, in the bottom example with ``strides`` equal to ``(16, 8)``, the data
+are interpreted as a matrix consisting of two columns and three rows. Note that
+no rearrangement of data in memory is required in order to go from one matrix
+to another one. Only the way, how the position of a certain element in memory
+is obtained, changes when ``strides`` is modified. 
+
+.. _strides:
+.. figure:: img/strides.*
+   :width: 12cm
+   :align: center
+
+   Linear data in memory can be interpreted in different ways by appropriately
+   choosing the ``strides`` tuple.
+
+A two-dimensional matrix can easily be transposed. Behind the scenes the values
+in the ``strides`` tuple are interchanged::
+
+   >>> a = np.arange(9).reshape(3, 3)
+   >>> a
+   array([[0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8]])
+   >>> a.strides
+   (24, 8)
+   >>> a.T
+   array([[0, 3, 6],
+          [1, 4, 7],
+          [2, 5, 8]])
+   >>> a.T.strides
+   (8, 24)
+
+Strides are a powerful concept. However, one should be careful not to violate
+the boundaries of the data because otherwise memory might be interpreted in a
+meaningless way. In the following two examples, the first demonstrates an
+interesting way to create a special pattern of data. The second example, where
+one of the strides is only half of the datasize, shows how useless results
+can be produced::
+
+   >>> a = np.arange(16).reshape(4, 4)
+   >>> a
+   array([[ 0,  1,  2,  3],
+          [ 4,  5,  6,  7],
+          [ 8,  9, 10, 11],
+          [12, 13, 14, 15]])
+   >>> a.strides = (8, 8)
+   >>> a
+   array([[0, 1, 2, 3],
+          [1, 2, 3, 4],
+          [2, 3, 4, 5],
+          [3, 4, 5, 6]])
+   >>> a.strides = (8, 4)
+   >>> a
+   array([[          0,  4294967296,           1,  8589934592],
+          [          1,  8589934592,           2, 12884901888],
+          [          2, 12884901888,           3, 17179869184],
+          [          3, 17179869184,           4, 21474836480]])
+
+In the end, the user manipulating ``strides`` is responsible for all consequences
+which his or her action may have.
+
+Creating arrays
+---------------
 
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
