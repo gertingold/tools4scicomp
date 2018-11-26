@@ -447,6 +447,84 @@ which his or her action may have.
 Creating arrays
 ---------------
 
+We have seen in the previous section that an array can be created by providing ``np.array`` 
+with an object possessing an ``__array__`` method or a nested sequence. However, this
+requires to create the object or nested sequence in the first place. Often, more convenient
+methods exist. As we have pointed out earlier, when creating an array, one should have an
+idea of the desired size and usually also of the datatype to be stored in the array. Given
+this information, there exists a variety of methods to create an array depending on the
+specific needs.
+
+It is not unusual to start with an array filled with zeros. Let us create a :math:`2\times2` array::
+
+   >>> a = np.zeros((2, 2))
+   >>> a
+   array([[0., 0.],
+          [0., 0.]])
+   >>> a.dtype
+   dtype('float64')  
+
+As we can see, the default type is ``float64``. If we prefer an array of integers, we could specify
+the ``dtype``::
+
+   >>> a = np.zeros((2, 2), dtype=np.int)
+   >>> a
+   array([[0, 0],
+          [0, 0]])
+   >>> a.dtype
+   dtype('int64')
+
+As an alternative, one can create an empty array which should however not be confused with an array
+filled with zeros. An empty array will just claim the necessary amount of memory without doing anything
+to the data present in that piece of memory. This is fine if one is going to specify the content of all
+array data subsequently before using the array. Otherwise, one will deal with random data::
+
+   >>> np.empty((3, 3))
+   array([[6.94870988e-310, 6.94870988e-310, 7.89614591e+150],
+          [1.37038197e-013, 2.08399685e+064, 3.51988759e+016],
+          [8.23900250e+015, 7.32845376e+025, 1.71130458e+059]])
+
+An alternative to filling an array with zeros could be to fill it with ones or another value which
+can be obtained by multiplication::
+
+   >>> np.ones((2, 2))
+   array([[1., 1.],
+          [1., 1.]])
+   >>> 10*np.ones((2, 2))
+   array([[10., 10.],
+          [10., 10.]])
+
+As one can see in this example, the multiplication by a number acts on all elements of the array.
+This behavior is probably what one would expect at this point. We will see later, that we are
+making use at this point of a more general concept referred to as broadcasting.
+
+Often, one needs arrays with more structure than the one we have created so far. It is not uncommon,
+that the diagonal entries take a special form. An identity matrix can easily be created::
+
+   >>> np.identity(3)
+   array([[1., 0., 0.],
+          [0., 1., 0.],
+          [0., 0., 1.]])
+
+The result will always be a square matrix. A more general method to fill the diagonal or a shifted
+diagonal is provided by ``np.eye``::
+
+   >>> np.eye(2, 4)
+   array([[1., 0., 0., 0.],                                                                     
+          [0., 1., 0., 0.]])                                                                    
+   >>> np.eye(4, k=1)                                                                           
+   array([[0., 1., 0., 0.],                                                                     
+          [0., 0., 1., 0.],                                                                     
+          [0., 0., 0., 1.],                                                                     
+          [0., 0., 0., 0.]])                                                                    
+   >>> 2*np.eye(4)-np.eye(4, k=1)-np.eye(4, k=-1)                                              
+   array([[ 2., -1.,  0.,  0.],                                                                 
+          [-1.,  2., -1.,  0.],                                                                 
+          [ 0., -1.,  2., -1.],                                                                 
+          [ 0.,  0., -1.,  2.]])
+
+These examples show that ``np.eye`` does not expect a tuple specifying the shape.
+
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
 .. [#scipy] For details see the `SciPy API Reference <https://docs.scipy.org/doc/scipy/reference#api-reference>`_.
