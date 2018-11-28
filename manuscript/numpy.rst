@@ -698,12 +698,112 @@ that no interpolation is done which might blur the image.
 Indexing arrays
 ---------------
 
+One way of accessing sets of elements of an array makes use of slices which we know
+from Python lists. A slice is characterized by a ``start`` index, a ``stop`` index
+whose corresponding element is excluded, and ``step`` which indicates the stepsize.
+Negative indices are counted from the end of the corresponding array dimension and
+a negative value of ``step`` implies walking in the direction of decreasing indices.
 
+We start by a few examples of slicing for a one-dimensional array::
+
+   >>> a = np.arange(10)
+   >>> a
+   array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+   >>> a[:]
+   array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+   >>> a[1:4]
+   array([1, 2, 3])
+   >>> a[5:-2]
+   array([5, 6, 7])
+   >>> a[::2]
+   array([0, 2, 4, 6, 8])
+   >>> a[1::2]
+   array([1, 3, 5, 7, 9])
+   >>> a[::-1]
+   array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+
+The third input, i.e. ``a[:]`` leaves the ``start`` and ``stop`` values open so
+that all array elements are returned because by default ``step`` equals 1. In
+the next example, we recall that indices in an array as in a list start at 0.
+Therefore, we obtain the second up to the fourth element of the array. In the
+fifth input, the second element counted from the end of the array is not part
+of the result so that we obtain the numbers from 5 to 7. We could have used
+``a[5:8]`` instead. In the sixth input, ``start`` and ``stop`` values are again
+left open, so that the resulting array starts with 0 but then proceeds in steps
+of 2 according to the value of ``step`` given. In the following example,
+``start`` is set to 1 and we obtain the elements left out in the previous
+example. The last example inverts the sequence of array elements by specifying
+a ``step`` of -1.
+
+It is rather straightforward to extend the concept of slicing to higher
+dimensions and we again go through a number of examples to illustrate the
+idea. Note that in no case a new array is created in memory so that slicing
+is an efficient way of extracting a certain subset of array elements. Our
+base array is::
+
+   >>> a = np.arange(36).reshape(6, 6)
+   >>> a
+   array([[ 0,  1,  2,  3,  4,  5],
+          [ 6,  7,  8,  9, 10, 11],
+          [12, 13, 14, 15, 16, 17],
+          [18, 19, 20, 21, 22, 23],
+          [24, 25, 26, 27, 28, 29],
+          [30, 31, 32, 33, 34, 35]])
+
+In view of the two dimensions, we now need two slices separated by a comma,
+the first one for the rows and the second one for the columns. The full
+array is thus recovered by::
+
+   >>> a[:, :]
+   array([[ 0,  1,  2,  3,  4,  5],
+          [ 6,  7,  8,  9, 10, 11],
+          [12, 13, 14, 15, 16, 17],
+          [18, 19, 20, 21, 22, 23],
+          [24, 25, 26, 27, 28, 29],
+          [30, 31, 32, 33, 34, 35]])
+
+A sub-block can be extracted as follows::
+
+   >>> a[2:4, 3:6]
+   array([[15, 16, 17],
+          [21, 22, 23]])
+
+As already mentioned, the first slice pertains to the rows, so that we
+choose elements from the third and fourth row. The second slice refers
+to columns four to six so that we indeed end up with the output reproduced
+above.
+
+Sub-blocks do not need to be contiguous. We can even choose different
+values for ``step`` in different dimensions::
+
+   >>> a[::2, ::3]
+   array([[ 0,  3],
+          [12, 15],
+          [24, 27]])
+
+In this example, we have selected every second row and every third column.
+If we want to start with the third row, we could write::
+
+   >>> a[2::2, ::3]
+   array([[12, 15],
+          [24, 27]]) 
+
+The following example illustrates a case where only one slice is specified::
+
+   >>> a[2:4]
+   array([[12, 13, 14, 15, 16, 17],
+          [18, 19, 20, 21, 22, 23]])
+
+The first slice still applies to the row and the missing second slice is replaced
+by default by ``::`` representing all columns.
 
 .. _ufuncs:
 
 Universal functions
 -------------------
+
+Broadcasting
+------------
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
 .. [#scipy] For details see the `SciPy API Reference <https://docs.scipy.org/doc/scipy/reference#api-reference>`_.
