@@ -494,9 +494,10 @@ can be obtained by multiplication::
    array([[10., 10.],
           [10., 10.]])
 
-As one can see in this example, the multiplication by a number acts on all elements of the array.
-This behavior is probably what one would expect at this point. We will see later, that we are
-making use at this point of a more general concept referred to as broadcasting.
+As one can see in this example, the multiplication by a number acts on all
+elements of the array.  This behavior is probably what one would expect at this
+point. As we will see in :numref:`broadcasting`, we are here making use of a
+more general concept referred to as broadcasting.
 
 Often, one needs arrays with more structure than the one we have created so far. It is not uncommon,
 that the diagonal entries take a special form. An identity matrix can easily be created::
@@ -797,13 +798,198 @@ The following example illustrates a case where only one slice is specified::
 The first slice still applies to the row and the missing second slice is replaced
 by default by ``::`` representing all columns.
 
+The interpretation of the last example requires to make connection between the
+axis number and its meaning in terms of the array elements. In a two-dimensional
+array, the position of the indices follows the convention used in mathematics
+as shown in :numref:`axes`. This correctness of this interpretation can also
+be verified by means of operations which can act along a single axis as is the
+case for ``sum``::
+
+   >>> a.sum(axis=0)
+   array([ 90,  96, 102, 108, 114, 120])
+   >>> a.sum(axis=1)
+   array([ 15,  51,  87, 123, 159, 195])
+   >>> a.sum()
+   630
+
+In the first case, the summation is performed along the columns while in the second
+case the elements in a given row are added. If no axis is specified, all array
+elements are summed. 
+
+.. _axes:
+.. figure:: img/axes.*
+   :width: 15em
+   :align: center
+
+   In a two-dimensional array, the first index corresponding to axes 0 denotes
+   the row while the second index corresponding to axes 1 denotes the column.
+   This convention is consistent with the one used in mathematics.
+
+We illustrate the generalization to higher dimensions by considering a three-dimensional
+array::
+
+   >>> b = np.arange(24).reshape(2, 3, 4)
+   >>> b
+   array([[[ 0,  1,  2,  3],
+           [ 4,  5,  6,  7],
+           [ 8,  9, 10, 11]],
+   
+          [[12, 13, 14, 15],
+           [16, 17, 18, 19],
+           [20, 21, 22, 23]]])
+
+Interpreting the array in terms of nested lists, the outer level contains two two-dimensional
+arrays along axis 0 as displayed in :numref:`array3d`. Within the two-dimensional arrays, the
+outer level corresponds to axis 1 and the innermost level corresponds to axis 2.
+
+.. _array3d:
+.. figure:: img/array3d.*
+   :width: 15em
+   :align: center
+
+   A three-dimensional array with its three axes.
+
+Cutting along the three axes, we obtain the following two-dimenionsal arrays::
+
+   >>> b[0]
+   array([[ 0,  1,  2,  3],
+          [ 4,  5,  6,  7],
+          [ 8,  9, 10, 11]])
+   >>> b[:, 0]
+   array([[ 0,  1,  2,  3],
+          [12, 13, 14, 15]])
+   >>> b[:, :, 0]
+   array([[ 0,  4,  8],
+          [12, 16, 20]])
+
+These three arrays correspond to the front plane along axis 0, the upper plane along
+axis 1 and the left-most plane along axis 2, respectively. In the last example, an
+appropriate number of colons can simply be replaced by an ellipsis::
+
+   >>> b[..., 0]
+   array([[ 0,  4,  8],
+          [12, 16, 20]])
+
+In order to make the meaning of this notation unique, only one ellipsis is permitted,
+but it may appear even between indices like in the following example::
+
+   >>> c = np.arange(16).reshape(2, 2, 2, 2)
+   >>> c
+   array([[[[ 0,  1],
+            [ 2,  3]],
+   
+           [[ 4,  5],
+            [ 6,  7]]],
+   
+   
+          [[[ 8,  9],
+            [10, 11]],
+   
+           [[12, 13],
+            [14, 15]]]])
+   >>> c[0, ..., 0]
+   array([[0, 2],
+          [4, 6]])
+
+When selecting a column in a two-dimensional array, one in principle has two
+ways to do so. However, they are leading to different results::
+
+   >>> a[:, 0:1]
+   array([[ 0],
+          [ 6],
+          [12],
+          [18],
+          [24],
+          [30]])
+   >>> a[:, 0]
+   array([ 0,  6, 12, 18, 24, 30])
+
+In the first case, a two-dimensional array is produced where the second dimension
+happens to be of length 1. In the second case, the first column is explicitly selected
+and one ends up with a one-dimensional array. This example may lead to the question
+whether there is a way to convert a one-dimensional array into a two-dimensional array
+containing one column or one row. Such a conversion may be necessary in the context
+of broadcasting which we will discuss in :numref:`broadcasting`. The following example
+demonstrates how the dimension of an array can be increased by means of a ``newaxis``::
+
+   >>> d = np.arange(4)
+   >>> d
+   array([0, 1, 2, 3])
+   >>> d[:, np.newaxis]
+   array([[0],
+          [1],
+          [2],
+          [3]])
+   >>> d[:, np.newaxis].shape
+   (4, 1)
+   >>> d[np.newaxis, :]
+   array([[0, 1, 2, 3]])
+   >>> d[np.newaxis, :].shape
+   (1, 4)
+
+So far, we have selected subsets of array elements by means of slicing. Another option
+is the so-called fancy indexing where elements are specified by lists or arrays of
+integers or Booleans for each dimension of the array. Let us consider a few examples::
+
+   >>> a
+   array([[ 0,  1,  2,  3,  4,  5],
+          [ 6,  7,  8,  9, 10, 11],
+          [12, 13, 14, 15, 16, 17],
+          [18, 19, 20, 21, 22, 23],
+          [24, 25, 26, 27, 28, 29],
+          [30, 31, 32, 33, 34, 35]])
+   >>> a[[0, 2, 1], [1, 3, 5]]
+   array([ 1, 15, 11])
+
+The lists for axes 0 and 1 combine to yield the index pairs of the elements to be selected.
+In our example, these are ``a[0, 1]``, ``a[2, 3]``, and ``a[1, 5]``. As this example shows,
+the indices in one list do not need to increase. They rather have be to chosen as a function
+of the elements which shall be selected. In this example, there is no way how the two-dimensional
+form of the original array can be maintained and we simply obtain a one-dimensional array
+containing the three elements selected by the two lists.
+
+A two-dimensional array can be obtained from an originally two-dimensional array if entire
+rows or columns are selected like in the following example::
+
+   >>> a[:, [0, 3, 5]]
+   array([[ 0,  3,  5],
+          [ 6,  9, 11],
+          [12, 15, 17],
+          [18, 21, 23],
+          [24, 27, 29],
+          [30, 33, 35]])
+
+Here, we have only specified a list for axis 1 and chosen entire columns. Note that the
+chosen columns are not equidistant and thus cannot be obtained by slicing.
+
+Our last example uses fancy indexing with a boolean array. We create an array of random
+numbers and want to set all entries smaller than 0.5 to zero. After creating an array
+of random numbers from which we construct a Boolean area by comparing with 0.5. The
+resulting array is then used not to extract array elements but to set selected array
+elements to zero::
+
+   >>> randomarray = np.random.rand(10)
+   >>> randomarray
+   array([0.48644931, 0.13579493, 0.91986082, 0.38554513, 0.38398479,
+          0.61285717, 0.60428045, 0.01715505, 0.44574082, 0.85642709])
+   >>> indexarray = randomarray < 0.5
+   >>> indexarray
+   array([ True,  True, False,  True,  True, False, False,  True,  True,
+          False])
+   >>> randomarray[indexarray] = 0
+   >>> randomarray
+   array([0.        , 0.        , 0.91986082, 0.        , 0.        ,
+          0.61285717, 0.60428045, 0.        , 0.        , 0.85642709])
+
+.. _broadcasting:
+
+Broadcasting
+------------
+
 .. _ufuncs:
 
 Universal functions
 -------------------
-
-Broadcasting
-------------
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
 .. [#scipy] For details see the `SciPy API Reference <https://docs.scipy.org/doc/scipy/reference#api-reference>`_.
