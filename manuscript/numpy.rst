@@ -444,6 +444,8 @@ can be produced::
 In the end, the user manipulating ``strides`` is responsible for all consequences
 which his or her action may have.
 
+.. _creating_arrays:
+
 Creating arrays
 ---------------
 
@@ -1043,12 +1045,25 @@ of ``j`` starting at the square of ``j`` as non-primes. Finally, in line 11, fan
 indexing is used. The Boolean array ``is_prime`` indicates through the value ``True``
 which entries in the array ``integers`` should be printed.
 
-
-
 .. _broadcasting:
 
 Broadcasting
 ------------
+
+In the previous sections, we have seen examples where an operation involved a
+scalar value and an array. This was the case in :numref:`creating_arrays` where
+we multiplied an array created by ``np.ones`` with a number. Another example
+appeared in :numref:`indexing_arrays` where in our discussion of fancy indexing
+we compared an array with a single number. Even though NumPy behaved in a perfectly
+natural way, these examples are special cases of a more general concept, the 
+so-called broadcasting.
+
+.. _broadcast:
+.. figure:: img/broadcast.*
+   :width: 30em
+   :align: center
+
+   xxx
 
 .. _ufuncs:
 
