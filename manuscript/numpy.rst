@@ -1058,12 +1058,25 @@ we compared an array with a single number. Even though NumPy behaved in a perfec
 natural way, these examples are special cases of a more general concept, the 
 so-called broadcasting.
 
+An array can be broadcast to a larger array provided the shapes satisfy certain
+conditions. In order to obtain the same dimension as the one of the target
+array, dimensions of size 1 are prepended. Then, each component of the shape of
+the original array has to be equal to the corresponding component of the shape
+of the target array or the component has to equal 1. In :numref:`broadcast`, the
+target array has shape ``(3, 4)``. The arrays with shapes ``(1,)``, ``(4, )``,
+and ``(3, 1)`` satisfy this conditions and can be broadcast as shown in the figure.
+In contrast, this is not possible for an array of shape ``(3,)`` as is demonstrated
+in the figure. We emphasize the difference between the arrays of shape ``(3,)`` and
+``(3, 1)``. 
+
 .. _broadcast:
 .. figure:: img/broadcast.*
    :width: 30em
    :align: center
 
-   xxx
+   For appropriate shapes, the matrix elements in the highlighted cells can be
+   broadcast to create the full shape ``(3, 4)`` in this example. An array of
+   shape ``(3,)`` cannot be broadcast to shape ``(3, 4)``
 
 .. _ufuncs:
 
