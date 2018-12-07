@@ -981,6 +981,70 @@ elements to zero::
    array([0.        , 0.        , 0.91986082, 0.        , 0.        ,
           0.61285717, 0.60428045, 0.        , 0.        , 0.85642709])
 
+If instead of setting values below 0.5 to zero, we would have wanted to set them to 0.5,
+we could have avoided fancy indexing by using ``np.clip``.
+
+As an application of slicing and fancy indexing, we consider a NumPy
+implementation of the sieve of Eratosthenes to determine prime numbers. The
+principle is illustrated in :numref:`eratosthenes` where the steps required
+to determine all prime numbers below 50 are depicted. We start out with a list
+of integers up to 49. It is convenient to include 0 to be consistent with the
+fact that indexing starts at 0 in NumPy. A corresponding array ``is_prime`` is
+initialized with the Boolean value ``True``. In each iteration numbers found not
+be prime have their value set to ``False``. Initially, we mark 0 and 1 as non-primes.
+
+Now we iterate through the array and consider successively each prime number which
+we can find. The first one will be 2. Clearly, all multiples of 2 are not prime and
+we can cross them out. The next prime is 3, but now we can start crossing out multiples
+of 3 at 9. In general, for a prime number :math:`p`, we start crossing out multiples
+of :math:`p` at :math:`p^2` because all smaller multiples of :math:`p` have been crossed
+out before. The maximum number to be considered as candidate is the largest integer
+smaller or equal to the maximum integer to be considered. In our example, we consider
+integers up to 49 and thus the largest candidate is 7 which happens to be prime.
+
+.. _eratosthenes:
+.. figure:: img/eratosthenes.*
+   :width: 40em
+   :align: center
+
+   Iteration steps when the sieve of Eratosthenes is used to determine the prime numbers
+   below 50. For details see the main text.
+
+This algorithm can be implemented in the following way where we have chosen to
+print not only the final result but also the intermediate steps.
+
+.. code-block:: python
+   :linenos:
+
+   import math
+   import numpy as np
+   
+   nmax = 49
+   integers = np.arange(nmax+1)
+   is_prime = np.ones(nmax+1, dtype=bool)
+   is_prime[:2] = False
+   for j in range(2, int(math.sqrt(nmax))+1):
+       if is_prime[j]:
+           is_prime[j*j::j] = False
+       print(integers[is_prime])
+
+This script produces the following output::
+
+   [ 2  3  5  7  9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49]
+   [ 2  3  5  7 11 13 17 19 23 25 29 31 35 37 41 43 47 49]
+   [ 2  3  5  7 11 13 17 19 23 25 29 31 35 37 41 43 47 49]
+   [ 2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 49]
+   [ 2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 49]
+   [ 2  3  5  7 11 13 17 19 23 29 31 37 41 43 47]
+
+In line 6 of the Python code, we use ``np.ones`` with type ``bool`` to mark all
+entries as potential primes. In line 10, slicing is used to mark all multiples
+of ``j`` starting at the square of ``j`` as non-primes. Finally, in line 11, fancy
+indexing is used. The Boolean array ``is_prime`` indicates through the value ``True``
+which entries in the array ``integers`` should be printed.
+
+
+
 .. _broadcasting:
 
 Broadcasting
