@@ -1078,6 +1078,39 @@ in the figure. We emphasize the difference between the arrays of shape ``(3,)`` 
    broadcast to create the full shape ``(3, 4)`` in this example. An array of
    shape ``(3,)`` cannot be broadcast to shape ``(3, 4)``
 
+As the second image in :numref:`broadcast` shows, a scalar is broadcast to an
+array of the desired shape with all elements being equal. Multiplying an array
+with a scalar, we expect that each array element is multiplied by the scalar.
+As a consequence, the multiplication of two arrays is carried out element by element.
+In other words, a matrix multiplication cannot be done by means of the `*` operator::
+
+   >>> a = np.arange(4).reshape(2, 2)
+   >>> a
+   array([[0, 1],
+          [2, 3]])
+   >>> b = np.arange(4, 8).reshape(2, 2)
+   >>> b
+   array([[4, 5],
+          [6, 7]])
+   >>> a*b
+   array([[ 0,  5],
+          [12, 21]])
+
+The matrix multiplication can be achieved in a number of different ways::
+
+   >>> np.dot(a, b)
+   array([[ 6,  7],
+          [26, 31]])
+   >>> a.dot(b)
+   array([[ 6,  7],
+          [26, 31]])
+   >>> a @ b
+   array([[ 6,  7],
+          [26, 31]])
+
+The use of the `@` operator for the matrix multiplication requires at least
+Python 3.5 and NumPy 1.10.
+   
 .. _ufuncs:
 
 Universal functions
