@@ -1082,7 +1082,7 @@ As the second image in :numref:`broadcast` shows, a scalar is broadcast to an
 array of the desired shape with all elements being equal. Multiplying an array
 with a scalar, we expect that each array element is multiplied by the scalar.
 As a consequence, the multiplication of two arrays is carried out element by element.
-In other words, a matrix multiplication cannot be done by means of the `*` operator::
+In other words, a matrix multiplication cannot be done by means of the ``*`` operator::
 
    >>> a = np.arange(4).reshape(2, 2)
    >>> a
@@ -1108,13 +1108,66 @@ The matrix multiplication can be achieved in a number of different ways::
    array([[ 6,  7],
           [26, 31]])
 
-The use of the `@` operator for the matrix multiplication requires at least
+The use of the ``@`` operator for the matrix multiplication requires at least
 Python 3.5 and NumPy 1.10.
    
 .. _ufuncs:
 
 Universal functions
 -------------------
+
+The mathematical functions provided by the ``math`` and ``cmath`` modules from
+the Python standard library accept only single real or complex values but no
+arrays. For the latter purpose, NumPy and also the scientific library SciPy
+offer so-called universal functions::
+
+   >>> import math
+   >>> x = np.linspace(0, 2, 11)
+   >>> x
+   array([0. , 0.2, 0.4, 0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2. ])
+   >>> math.sin(x)
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   TypeError: only size-1 arrays can be converted to Python scalars
+   >>> np.sin(x)
+   array([0.        , 0.19866933, 0.38941834, 0.56464247, 0.71735609,
+          0.84147098, 0.93203909, 0.98544973, 0.9995736 , 0.97384763,
+          0.90929743])
+
+Universal functions can handle multi-dimensional arrays as well::
+
+   >>> x = np.array([[0, np.pi/2], [np.pi, 3/2*np.pi]])
+   >>> x
+   array([[0.        , 1.57079633],
+          [3.14159265, 4.71238898]])
+   >>> np.sin(x)
+   array([[ 0.0000000e+00,  1.0000000e+00],
+          [ 1.2246468e-16, -1.0000000e+00]])
+
+This example shows that the mathematical constant :math:`pi` is not only
+available from the ``math`` and ``cmath`` modules but also from the NumPy
+package. Many of the functions provided by the ``math`` module are available
+as universal functions in NumPy and NumPy offers a few universal functions not
+available as normal functions neither in ``math`` nor in ``cmath``. Details
+on the functions provided by NumPy are given in the section on `Mathematical functions <https://docs.scipy.org/doc/numpy/reference/routines.math.html>`_
+in the NumPy reference guide.
+
+While the universal functions in NumPy are mostly restricted to the common
+mathematical functions, special functions are available through the SciPy
+package.  Often but not always, these functions are implemented as universal
+functions as well.  As an example, we create a plot of the Airy function
+:math:`\mathrm{Ai}(x)` appearing e.g.  in the theory of the rainbow or the
+quantum mechanics in a linear potential and its derivative::
+
+   >>> x = np.linspace(-20, 5, 300)
+   >>> ai, aip, bi, bip = airy(x)
+   >>> plt.plot(x, ai)
+   [<matplotlib.lines.Line2D object at 0x7f62184e2278>]
+   >>> plt.plot(x, aip)
+   [<matplotlib.lines.Line2D object at 0x7f621bbb4518>]
+   >>> plt.show()
+
+
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
 .. [#scipy] For details see the `SciPy API Reference <https://docs.scipy.org/doc/scipy/reference#api-reference>`_.
