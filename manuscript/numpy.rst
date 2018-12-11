@@ -1358,6 +1358,80 @@ significant enough to seriously consider the use of universal functions.
    the time ratio imply a larger speed up gained by means of NumPy. The data
    have been obtained by a version of NumPy with MKL support.
 
+Linear algebra
+--------------
+
+Scientific problems which can be formulated in terms of vectors or matrices often
+require tools of linear algebra. Therefore, we will discuss a few of the more
+important functions NumPy has to offer in that domain. For more details we recommend
+to take a look at the `documentation of the numpy.linalg module <https://docs.scipy.org/doc/numpy/reference/routines.linalg.html>`_.
+
+As we have discussed earlier, the usual multiplication operator does
+element-wise multiplication and uses broadcasting where applicable. The multiplication
+of arrays can either be done by means of the ``dot`` method or the ``@`` operator::
+
+   >>> v1 = np.array([1, 2])
+   >>> v2 = np.array([3, 4])
+   >>> np.dot(v1, v2)
+   11
+   >>> m = np.array([[5, 6], [7, 8]])
+   >>> np.dot(m, v1)
+   array([17, 23])
+   >>> m @ v1
+   array([17, 23])
+
+For the following, we will need to load the ``numpy.linalg`` module first::
+
+   >>> import numpy.linalg as LA
+
+Here we have once more introduced a commonly used abbreviation. A vector can easily
+be normalized by means of the ``norm`` function::
+
+   >>> v = np.array([1, -2, 3])
+   >>> n = LA.norm(v)
+   >>> n**2
+   14.0
+   >>> v_normalized = v/n
+   >>> LA.norm(v_normalized)
+   1.0
+
+Applying the ``norm`` function to a multi-dimensional array will return the
+Frobenius or Hilbert-Schmid norm, i.e. the square root of the sum over the
+squares of all matrix elements.
+
+Some of the operations provided by the ``numpy.linalg`` module can be applied
+to a whole set of arrays. An example is the determinant which mathematically is
+defined only for two-dimensional arrays. For a three-dimensional array, determinants
+are calculated for each value of the index of axis 0::
+
+   >>> m = np.arange(12).reshape(3, 2, 2)
+   >>> m
+   array([[[ 0,  1],
+           [ 2,  3]],
+   
+          [[ 4,  5],
+           [ 6,  7]],
+   
+          [[ 8,  9],
+           [10, 11]]])
+   >>> LA.det(m)
+   array([-2., -2., -2.])
+   
+It is also possible to determine the inverse for several matrices at the same time.
+Trying to invert a non-invertible matrix will result in a ``numpy.linalg.linalg.LinAlgError``
+exception.
+
+An inhomogeneous system of linear equations ``ax=b`` with a matrix ``a`` and a vector
+``b`` can in principle be solved by inverting the matrix::
+
+   >>> a = np.array([[2, -1], [-3, 2]])
+   >>> b = np.array([1, 2])
+   >>> x = np.dot(LA.inv(a), b)
+   >>> x
+   array([4., 7.])
+   >>> np.dot(a, x)
+   array([1., 2.])
+
 
 
 
