@@ -1157,15 +1157,207 @@ mathematical functions, special functions are available through the SciPy
 package.  Often but not always, these functions are implemented as universal
 functions as well.  As an example, we create a plot of the Airy function
 :math:`\mathrm{Ai}(x)` appearing e.g.  in the theory of the rainbow or the
-quantum mechanics in a linear potential and its derivative::
+quantum mechanics in a linear potential::
 
+   >>> from scipy.special import airy
    >>> x = np.linspace(-20, 5, 300)
    >>> ai, aip, bi, bip = airy(x)
-   >>> plt.plot(x, ai)
+   >>> plt.plot(x, ai, label="Ai(x)")
    [<matplotlib.lines.Line2D object at 0x7f62184e2278>]
-   >>> plt.plot(x, aip)
+   >>> plt.plot(x, aip, label="Ai'(x)")
    [<matplotlib.lines.Line2D object at 0x7f621bbb4518>]
+   >>> plt.legend()
    >>> plt.show()
+
+There exist two types of Airy functions :math:`\mathrm{Ai}(x)` and :math:`\mathrm{Bi}(x)`
+which together with their derivatives are calculated by the ``airy`` function in one go.
+The Airy function :math:`\mathrm{Ai}(x)` and its derivative are displayed in :numref:`airy`.
+
+.. _airy:
+.. figure:: img/airy.*
+   :width: 20em
+   :align: center
+
+   Airy function :math:`\mathrm{Ai}(x)` and its derivative.
+
+Occasionally, one needs to create a two-dimensional plot of a function of two variables.
+In order to ensure that the resulting array is two-dimensional, the one-dimensional arrays
+for the two variables need to run along different axes. A convenient way to do so is the
+mesh grid. The function ``mgrid`` creates two two-dimensional arrays where in one array the
+values change along the column while in the other array they change along the rows::
+
+   >>> np.mgrid[0:2:0.5, 0:1:0.5]
+   array([[[0. , 0. ],
+           [0.5, 0.5],
+           [1. , 1. ],
+           [1.5, 1.5]],
+   
+          [[0. , 0.5],
+           [0. , 0.5],
+           [0. , 0.5],
+           [0. , 0.5]]])
+
+The slicing syntax corresponds to what we are used from the ``arange`` function. The equivalence
+of the ``linspace`` function can be obtained by making the third argument imaginary::
+
+   >>> np.mgrid[0:2:3j, 0:2:5j]
+   array([[[0. , 0. , 0. , 0. , 0. ],
+           [1. , 1. , 1. , 1. , 1. ],
+           [2. , 2. , 2. , 2. , 2. ]],
+   
+          [[0. , 0.5, 1. , 1.5, 2. ],
+           [0. , 0.5, 1. , 1.5, 2. ],
+           [0. , 0.5, 1. , 1.5, 2. ]]]) 
+
+A practical application produced by the following code is shown in :numref:`sinxy`::
+
+   >>> x, y = np.mgrid[-5:5:100j, -5:5:100j]
+   >>> plt.imshow(np.sin(x*y))
+   <matplotlib.image.AxesImage object at 0x7fde9176ea90>
+   >>> plt.show() 
+
+.. _sinxy:
+.. figure:: img/sinxy.*
+   :width: 20em
+   :align: center
+
+   Application of the mes grid in a two-dimensional representation of the function
+   :math:`\sin(xy)`.
+
+Making use of broadcasting, one can reduce the memory requirement by creating an open mesh grid
+instead::
+
+   >>> np.ogrid[0:2:3j, 0:1:5j]
+   [array([[0.],
+          [1.],
+          [2.]]), array([[0.  , 0.25, 0.5 , 0.75, 1.  ]])]
+
+The function ``ogrid`` returns two two-dimensional arrays where one dimension is of length 1.
+:numref:`bessel` shows an application to Bessel functions obtained by means of the following
+code::
+
+   >>> from scipy.special import jv
+   >>> nu, x = np.ogrid[0:10:41j, 0:20:100j]
+   >>> plt.imshow(jv(nu, x), origin='lower')
+   <matplotlib.image.AxesImage object at 0x7fde903736d8>
+   >>> plt.xlabel('$x$')
+   Text(0.5,0,'$x$')
+   >>> plt.ylabel(r'$\nu$')
+   Text(0,0.5,'$\\nu$')
+   >>> plt.show()
+
+.. _besselj:
+.. figure:: img/besselj.*
+   :width: 30em
+   :align: center
+
+   Two-dimensional plot of the family of Bessel functions :math:`J_\nu(x)` of order :math:`\nu`
+   created by means of an open mesh grid created by ``orid``.
+
+Instead of using the ``ogrid`` function, one can also construct the argument arrays by hand. In 
+this case, one has to take care of adding an additional axis in one of the two arrays as in the
+following example which results in :numref:`interference`::
+
+   >>> x = np.linspace(-40, 40, 500)
+   >>> y = x[:, np.newaxis]
+   >>> z = np.sin(np.hypot(x-10, y))+np.sin(np.hypot(x+10, y))
+   >>> plt.imshow(z)
+   <matplotlib.image.AxesImage object at 0x7fde92509278>
+   >>> plt.show()
+
+.. _interference:
+.. figure:: img/interference.*
+   :width: 20em
+   :align: center
+
+   Interference pattern created with argument arrays obtained by means of ``linspace`` and by
+   adding an additional axis in one of the two arrays. The function ``hypot`` determines the
+   distance of the point given by the two argument coordinates from the origin.
+
+So far, we have considered universal functions mostly as a convenient way to apply a function to
+an entire array. However, they can also make a significant contribution to speed up code. Let us
+first consider the execution speed for a scalar argument::
+
+   >>> import math
+   >>> import timeit
+   >>> x = 1
+   >>> timeit.repeat('math.sin(x)', number=1, globals=globals())
+   [1.927599987538997e-05, 2.9330003599170595e-06, 2.7239993869443424e-06]
+   >>> timeit.repeat('np.sin(x)', number=1, globals=globals())
+   [4.134400023758644e-05, 1.068599976861151e-05, 8.730000445211772e-06]
+   >>> timeit.repeat('math.sin(x)', globals=globals())
+   [0.14687219699953857, 0.10604840399992099, 0.10069769399979123]
+   >>> timeit.repeat('np.sin(x)', globals=globals())
+   [1.2971382370005813, 1.2119426230001409, 1.2095572039997933]
+
+In the first case, the sine is evaluated only once while the second case, the default value
+of one million executions of the function is chosen. In each case, three runs are performed
+to get an idea of the statistical fluctuations. One should not pay too much attention to the
+exact ratio between the runs using ``math.sin`` and ``np.sin`` as they may also on the
+hardware used. However, these examples demonstrate that one loses performance when applying
+NumPy universal functions to a scalar value. Universal functions create an overhead which only
+pays off if they are applied to not too small arrays.
+
+The following script compares the runtime between a for loop evaluating the sine function taken
+from the ``math`` module and a direct evaluation of the sine taken from NumPy for different
+array sizes::
+
+   import math
+   import matplotlib.pyplot as plt
+   import numpy as np
+   import time
+   
+   def sin_math(nmax):
+       xvals = np.linspace(0, 2*np.pi, nmax)
+       start = time.time()
+       for x in xvals:
+           y = math.sin(x)
+       return time.time()-start
+   
+   def sin_numpy(nmax):
+       xvals = np.linspace(0, 2*np.pi, nmax)
+       start = time.time()
+       yvals = np.sin(xvals)
+       return time.time()-start
+   
+   maxpower = 26
+   nvals = 2**np.arange(0, maxpower+1)
+   tvals = np.empty_like(nvals)
+   for nr, nmax in enumerate(nvals):
+       tvals[nr] = sin_math(nmax)/sin_numpy(nmax)
+   plt.rc('text', usetex=True)
+   plt.xscale('log')
+   plt.yscale('log')
+   plt.xlabel('$n_\mathrm{max}$', fontsize=20)
+   plt.ylabel('$t_\mathrm{math}/t_\mathrm{numpy}$', fontsize=20)
+   plt.plot(nvals, tvals, 'o')
+   plt.show()
+
+The results are presented in :numref:`ufruntime` and depend on various factors
+including the hardware and details of the software environment. The data should
+therefore give a rough indication of the speedup and should not be taken too
+literally. The first point to note is that even for an array of size 1, NumPy
+is faster than the sine function taken from the ``math`` module. This seems to
+contradict our previous result on a scalar argument, but can be explained by
+the presence of the for loop in the ``sin_math`` function which results in an
+overhead even if the for loop is strictly speaking unnecessary. Then, for
+arrays of an intermediate size, a speed up of roughly a factor of 7 is observed.
+Interestingly, for array sizes beyond a few times :math:`10^4`, the speed up
+reaches values of around 100. This behavior can be explained by the use of the
+Anaconda distribution where NumPy is compiled to support Intel's math kernel
+library (MKL). Even without this effect, a speed up between 5 and 10 may be
+significant enough to seriously consider the use of universal functions.
+
+.. _ufruntime:
+.. figure:: img/uf_runtime.*
+   :width: 20em
+   :align: center
+
+   Runtime comparison between the sine function taken from the ``math`` module
+   and from the NumPy package as a function of the array size. Larger values of
+   the time ratio imply a larger speed up gained by means of NumPy. The data
+   have been obtained by a version of NumPy with MKL support.
+
 
 
 
