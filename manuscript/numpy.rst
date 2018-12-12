@@ -1432,7 +1432,66 @@ An inhomogeneous system of linear equations ``ax=b`` with a matrix ``a`` and a v
    >>> np.dot(a, x)
    array([1., 2.])
 
+In the last command, we verified that the solution obtained one line above is
+indeed correct. Solving inhomogeneous systems of linear equations by inversion
+is however not very efficient and NumPy offers an alternative way based on an LU
+decomposition::
 
+   >>> LA.solve(a, b)
+   array([4., 7.])
+
+As we have seen above for the determinant, the function ``solve`` also allows
+to solve several inhomogeneous systems of linear equations in one function
+call.
+
+A frequent task in scientific applications is to solve an eigenvalue problem.
+The function ``eig`` determines the right eigenvectors and the associated
+eigenvalues for arbitrary square matrices::
+
+   >>> a = np.array([[1, 3], [4, -1]])
+   >>> evals, evecs = LA.eig(a)
+   >>> evals
+   array([ 3.60555128, -3.60555128])
+   >>> evecs
+   array([[ 0.75499722, -0.54580557],
+          [ 0.65572799,  0.83791185]])
+   >>> for n in range(evecs.shape[0]):
+   ...     print(np.dot(a, evecs[:, n]), evals[n]*evecs[:, n])
+   ...
+   [2.72218119 2.36426089] [2.72218119 2.36426089]
+   [ 1.96792999 -3.02113415] [ 1.96792999 -3.02113415]
+
+In the for loop, we compare the product of matrix and eigenvector with
+the corresponding product of eigenvalue and eigenvector and can verify
+that the results are indeed correct. In the matrix of eigenvectors, the
+eigenvectors are given by the columns.
+
+Occasionally, it is sufficient to know the eigenvalues. In order to reduce
+the compute time, one can then replace ``eig`` by ``eigvals``::
+
+   >>> LA.eigvals(a)
+   array([ 3.60555128, -3.60555128])
+
+In many applications, the matrices appearing in eigenvalue problems are
+either symmetric of Hermitian. For these cases, NumPy provides the functions
+``eigh`` and ``eigvalsh``. One advantage is that it suffices to store only
+half of the matrix elements. More importantly, these specialized functions are
+much faster::
+
+   >>> import timeit
+   >>> a = np.random.random(250000).reshape(500, 500)
+   >>> a = a+a.T
+   >>> timeit.repeat('LA.eig(a)', number=100, globals=globals())
+   [13.307299479999529, 13.404196323999713, 13.798628489999828]
+   >>> timeit.repeat('LA.eigh(a)', number=100, globals=globals())
+   [1.8066274120001253, 1.7375857540000652, 1.739574907000133]
+
+In the third line, we have made sure that the initial random matrix is turned
+into a symmetric matrix by adding its transpose. In this example, we observe a
+speedup of about a factor of 7. 
+
+SciPy
+=====
 
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
