@@ -1493,6 +1493,43 @@ speedup of about a factor of 7.
 SciPy
 =====
 
+The functions offered through the SciPy package cover many tasks typically
+encountered in the numerical treatment of scientific problems. Here, we can
+only give an impression of the potential of SciPy by discussing a few examples.
+It is highly recommended to take a look at the `SciPy API reference <https://docs.scipy.org/doc/scipy/reference/#api-reference>`_.
+
+As a first example, we consider the linear regression of noisy data. In a first
+step, we create data on a line with normally distributed noise added on top::
+
+   >>> x = np.linspace(0, 10, 101)
+   >>> y = 2*x + 1 + np.random.normal(0, 1, 101)
+
+Now, we can use the ``linregress`` function from the statistical functions module of SciPy
+to do a least-squares regression of the noisy data::
+
+   >>> from scipy.stats import linregress
+   >>> slope, intercept, rvalue, pvalue, stderr = linregress(x, y)
+   >>> plt.plot(x, y, 'o')
+   >>> plt.plot(x, slope*x + intercept)
+   >>> plt.show()
+   >>> print(rvalue, stderr)
+   0.9853966954685487 0.0350427823008272
+
+Here ``rvalue`` refers to the correlation coefficient and ``stderr`` is the
+standard error of the estimated gradient. The graph containing the noisy data
+and the linear fit is shown in :numref:`linregress`.
+
+.. _linregress:
+.. figure:: img/linregress.*
+   :width: 20em
+   :align: center
+
+   Noisy data (blue points) and result of the linear regression (orange line)
+   obtained by means of ``scipy.stats.linregress``.
+
+Fitting of data cannot always be reduced to linear regression. Then we can resort
+to the ``curve_fit`` function from the optimization module of SciPy.
+
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
 .. [#scipy] For details see the `SciPy API Reference <https://docs.scipy.org/doc/scipy/reference#api-reference>`_.
