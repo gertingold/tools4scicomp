@@ -1528,7 +1528,36 @@ and the linear fit is shown in :numref:`linregress`.
    obtained by means of ``scipy.stats.linregress``.
 
 Fitting of data cannot always be reduced to linear regression. Then we can resort
-to the ``curve_fit`` function from the optimization module of SciPy.
+to the ``curve_fit`` function from the optimization module of SciPy::
+
+   >>> from scipy.optimize import curve_fit
+   >>> def fitfunc(x, a, b):
+   ...     return a*np.sin(x+b)
+   ...
+   >>> x = np.linspace(0, 10, 101)
+   >>> y = 2*np.sin(x+0.5) + np.random.normal(0, 1, 101)
+   >>> plt.plot(x, y, 'o')
+   >>> popt, pcov = curve_fit(fitfunc, x, y)
+   >>> popt
+   array([2.08496412, 0.43937489])
+   >>> plt.plot(x, popt[0]*np.sin(x+popt[1]))
+   >>> plt.show()
+
+In order to fit to a general function, one needs to provide ``curve_fit`` with
+a function, called ``fitfunc`` here, which depends on the variable as well as a
+set of parameters. In our example, we have chosen two parameters ``a`` and
+``b`` but we are in principle not limited to this number. However, as the
+number of parameters increases, the fit tends to become less reliable. The fit
+values for the parameters are returned in the array ``popt`` together with the
+covariance matrix for the parameters ``pcov``. The outcome of the fit is shown
+in :numref:`curvefit`.
+
+.. _curvefit:
+.. figure:: img/curvefit.*
+   :width: 20em
+   :align: center
+
+   Fit of a noisy sine function by means of ``scipy.optimize.curve_fit``.
 
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
