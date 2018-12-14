@@ -1559,6 +1559,37 @@ in :numref:`curvefit`.
 
    Fit of a noisy sine function by means of ``scipy.optimize.curve_fit``.
 
+Occasionally, a root search is required. As an example, we consider the determination
+of the ground state energy in a finite potential well.
+
+   >>> from scipy.optimize import brentq
+   >>> def f(energy, potentialstrength):
+   ...     sqrt_1me = np.sqrt(1-energy)
+   ...     return (np.sqrt(energy)*np.cos(potentialstrength*sqrt_1me)
+   ...             -sqrt_1me*np.sin(potentialstrength*sqrt_1me))
+   ...
+   >>> alpha = 1
+   >>> x0, r = brentq(f, a=0, b=1, args=alpha, full_output=True)
+   >>> x0
+   >>> 0.45375316586032827
+   >>> r
+          converged: True
+              flag: 'converged'
+    function_calls: 7
+        iterations: 6
+              root: 0.45375316586032827)
+   >>> x = np.linspace(0, 1, 400)
+   >>> plt.plot(x, f(x, alpha))
+   >>> plt.plot(x0, 0, 'o')
+   >>> plt.show()
+
+.. _brentq:
+.. figure:: img/brentq.*
+   :width: 20em
+   :align: center
+
+   Determination of the ground state energy in a finite potential well of depth
+   :math:`\alpha=1` by means of ``scipy.optimize.brentq``.
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
 .. [#scipy] For details see the `SciPy API Reference <https://docs.scipy.org/doc/scipy/reference#api-reference>`_.
