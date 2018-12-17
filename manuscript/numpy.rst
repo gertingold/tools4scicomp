@@ -738,6 +738,45 @@ of 2 according to the value of ``step`` given. In the following example,
 example. The last example inverts the sequence of array elements by specifying
 a ``step`` of -1.
 
+The use of ``a[:]`` deserves a bit more attention. In the case of a list, it
+would yield a shallow copy of the original list. For an array, the behavior
+is somewhat different. Let us first consider an alias::
+
+   >>> b = a
+   >>> b
+   array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+   >>> id(a), id(b)
+   (140493158678656, 140493158678656)
+   >>> b[0] = 42
+   >>> a
+   array([42,  1,  2,  3,  4,  5,  6,  7,  8,  9])
+
+In this case, ``b`` is simply an alias for ``a`` and refers to the same object.
+A modification of elements of ``b`` will also be visible in ``a``. Now, let us
+consider a slice comprising all elements::
+
+   >>> a = np.arange(10)
+   >>> b = a[:]
+   >>> b
+   array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+   >>> id(a), id(b)
+   (140493155003008, 140493155003168)
+   >>> b[0] = 42
+   >>> a
+   array([42,  1,  2,  3,  4,  5,  6,  7,  8,  9])
+
+Now a new object is generated, but it refers to the same piece of memory. A modification
+of elements in ``b`` will still be visible in ``a``. In order to really obtain a copy
+of an array, one applies the ``copy`` function::
+
+   >>> a = np.arange(10)
+   >>> b = np.copy(a)
+   >>> b[0] = 42
+   >>> a
+   array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+   >>> b
+   array([42,  1,  2,  3,  4,  5,  6,  7,  8,  9])
+
 It is rather straightforward to extend the concept of slicing to higher
 dimensions and we again go through a number of examples to illustrate the
 idea. Note that in no case a new array is created in memory so that slicing
