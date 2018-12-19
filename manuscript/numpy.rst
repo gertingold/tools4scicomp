@@ -1599,13 +1599,29 @@ in :numref:`curvefit`.
    Fit of a noisy sine function by means of ``scipy.optimize.curve_fit``.
 
 Occasionally, a root search is required. As an example, we consider the determination
-of the ground state energy in a finite potential well.
+of the ground state energy in a finite potential well. The eigenvalue condition for a
+symmetric eigenstate reads
+
+.. math::
+
+   \sqrt{\epsilon}\cos(\alpha\sqrt{1-\epsilon})-\sqrt{1-\epsilon}\sin(\alpha\sqrt{1-\epsilon})=0\,,
+
+where :math:`\epsilon` is the energy in units of the well depth and :math:`\alpha` is a
+measure of the potential strength combining the well depth and its width. One way of
+solving this nonlinear equation for :math:`\epsilon` is by means of the ``brentq`` function,
+which needs at least the function of which the root should be determined as well as the
+bounds of an intervall in which the function changes its sign. If the potential well is
+sufficiently shallow, i.e. if :math.``\alpha`` is sufficiently small, the left-hand side
+contains only one root as can be seen from the blue line in :numref:`brentq`. In our example,
+the function requires an additional argument :math:`\alpha` which also needs to be given to
+``brentq``. Finally, in order to know how many iterations are need, we set ``full_output`` to
+``True``.
 
    >>> from scipy.optimize import brentq
-   >>> def f(energy, potentialstrength):
+   >>> def f(energy, alpha):
    ...     sqrt_1me = np.sqrt(1-energy)
-   ...     return (np.sqrt(energy)*np.cos(potentialstrength*sqrt_1me)
-   ...             -sqrt_1me*np.sin(potentialstrength*sqrt_1me))
+   ...     return (np.sqrt(energy)*np.cos(alpha*sqrt_1me)
+   ...             -sqrt_1me*np.sin(alpha*sqrt_1me))
    ...
    >>> alpha = 1
    >>> x0, r = brentq(f, a=0, b=1, args=alpha, full_output=True)
@@ -1622,6 +1638,9 @@ of the ground state energy in a finite potential well.
    >>> plt.plot(x0, 0, 'o')
    >>> plt.show()
 
+As the output indicates, the root is found within 6 iterations. The resulting root is depicted
+in :numref:`brentq` as an orange dot.
+
 .. _brentq:
 .. figure:: img/brentq.*
    :width: 20em
@@ -1629,6 +1648,8 @@ of the ground state energy in a finite potential well.
 
    Determination of the ground state energy in a finite potential well of depth
    :math:`\alpha=1` by means of ``scipy.optimize.brentq``.
+
+
 
 .. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
 .. [#scipy] For details see the `SciPy API Reference <https://docs.scipy.org/doc/scipy/reference#api-reference>`_.
