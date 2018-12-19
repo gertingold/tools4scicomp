@@ -697,6 +697,7 @@ that no interpolation is done which might blur the image.
 
    Graphical representation of an array filled with random numbers.
 
+.. _indexing_arrays:
 
 Indexing arrays
 ---------------
@@ -1272,7 +1273,7 @@ instead::
           [2.]]), array([[0.  , 0.25, 0.5 , 0.75, 1.  ]])]
 
 The function ``ogrid`` returns two two-dimensional arrays where one dimension is of length 1.
-:numref:`bessel` shows an application to Bessel functions obtained by means of the following
+:numref:`besselj` shows an application to Bessel functions obtained by means of the following
 code::
 
    >>> from scipy.special import jv
@@ -1535,7 +1536,7 @@ SciPy
 The functions offered through the SciPy package cover many tasks typically
 encountered in the numerical treatment of scientific problems. Here, we can
 only give an impression of the potential of SciPy by discussing a few examples.
-It is highly recommended to take a look at the `SciPy API reference <https://docs.scipy.org/doc/scipy/reference/#api-reference>`_.
+It is highly recommended to take a look at the `SciPy API Reference`_.
 
 As a first example, we consider the linear regression of noisy data. In a first
 step, we create data on a line with normally distributed noise added on top::
@@ -1651,8 +1652,11 @@ in :numref:`brentq` as an orange dot.
 
 
 
-.. [#numpy] For details see the `NumPy Reference <https://docs.scipy.org/doc/numpy/reference/>`_.
-.. [#scipy] For details see the `SciPy API Reference <https://docs.scipy.org/doc/scipy/reference#api-reference>`_.
+.. _SciPy API Reference: https://docs.scipy.org/doc/scipy/reference#api-reference
+.. _NumPy Reference: https://docs.scipy.org/doc/numpy/reference
+
+.. [#numpy] For details see the `NumPy Reference`_.
+.. [#scipy] For details see the `SciPy API Reference`_.
 .. [#matplotlib] See the `matplotlib gallery <https://matplotlib.org/gallery/index.html>`_ to
             obtain an idea of the possibilities offered by matplotlib.
 .. [#jupyter] For details see the `homepage of the Jupyter project <https://jupyter.org/>`_.
