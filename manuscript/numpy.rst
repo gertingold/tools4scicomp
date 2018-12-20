@@ -1639,8 +1639,8 @@ the function requires an additional argument :math:`\alpha` which also needs to 
    >>> plt.plot(x0, 0, 'o')
    >>> plt.show()
 
-As the output indicates, the root is found within 6 iterations. The resulting root is depicted
-in :numref:`brentq` as an orange dot.
+As the output indicates, the root is found within 6 iterations. The resulting
+root is depicted in :numref:`brentq` as an orange dot.
 
 .. _brentq:
 .. figure:: img/brentq.*
@@ -1650,7 +1650,154 @@ in :numref:`brentq` as an orange dot.
    Determination of the ground state energy in a finite potential well of depth
    :math:`\alpha=1` by means of ``scipy.optimize.brentq``.
 
+Finally, we consider a more complex example which involves optimization and the
+solution of a coupled set of differential equations. The physical problem to be
+studied numerically is the fall of a chain where the equations of motion are
+derived in W. Tomaszweski, P. Pieranski, and J.-C. Geminard, Am. J. Phys. **74**,
+776 (2006) [#ajpdoi]_ and account for damping inside the chain. For the initial
+configuration of the chain, we take a chain hanging in equilibrium where the
+two ends are at equal height and at a given horizontal distance. In the continuum
+limit, the chain follows a catenary, but in the discrete case treated here, we
+obtain the equilibrium configuration by optimizing the potential energy. This
+is done in the method ``equilibrium`` of our ``Chain`` class. The method 
+essentially consists of a call to the ``minimize`` function taken from the ``optimize``
+module of SciPy. It optimizes the potential energy defined in the ``f_energy`` method.
+In addition, we have to account for two constraints corresponding to the horizontal
+and vertical direction and implemented through the methods ``x_constraint`` and
+``y_constraint``. An example of the result of this opimization procedure is 
+depicted in :numref:`hangingchain` for a chain made of 9 links.
 
+.. code-block:: python
+
+   import numpy as np
+   import numpy.linalg as LA
+   import matplotlib.pyplot as plt
+   from matplotlib.animation import FuncAnimation
+   from scipy.optimize import minimize
+   from scipy.integrate import solve_ivp
+   
+   class Chain:
+       def __init__(self, nlinks, length, damping):
+           if nlinks < length:
+               raise ValueError('length requirement cannot be fulfilled with '
+                                'the given number of links')
+           self.nlinks = nlinks
+           self.length = length
+           self.m = self.matrix_m()
+           self.a = self.vector_a()
+           self.damping = (-2*np.identity(self.nlinks, dtype=np.float64)
+                             +np.eye(self.nlinks, k=1)
+                             +np.eye(self.nlinks, k=-1))
+           self.damping[0, 0] = -1
+           self.damping[self.nlinks-1, self.nlinks-1] = -1
+           self.damping = damping*self.damping
+   
+       def x_constraint(self, phi):
+           return np.sum(np.cos(phi))-self.length
+   
+       def y_constraint(self, phi):
+           return np.sum(np.sin(phi))
+   
+       def f_energy(self, phi):
+           return np.sum(np.arange(self.nlinks, 0, -1)*np.sin(phi))
+   
+       def equilibrium(self):
+           result = minimize(self.f_energy, np.linspace(-0.1, 0.1, self.nlinks),
+                             method='SLSQP',
+                             constraints=[{'type': 'eq', 'fun': self.x_constraint},
+                                          {'type': 'eq', 'fun': self.y_constraint}])
+           return result.x
+   
+       def plot_equilibrium(self):
+           phis = chain.equilibrium()
+           x = np.zeros(chain.nlinks+1)
+           x[1:] = np.cumsum(np.cos(phis))
+           y = np.zeros(chain.nlinks+1)
+           y[1:] = np.cumsum(np.sin(phis))
+           plt.plot(x, y)
+           plt.plot(x, y, 'o')
+           plt.axes().set_aspect('equal')
+           plt.show()
+   
+       def matrix_m(self):
+           m = np.fromfunction(lambda i, j: self.nlinks-np.maximum(i, j)-0.5,
+                               (self.nlinks, self.nlinks), dtype=np.float64)
+           m = m-np.identity(self.nlinks)/6
+           return m
+   
+       def vector_a(self):
+           a = np.arange(self.nlinks, 0, -1)-0.5
+           return a
+   
+       def diff(self, t, y):
+           momenta = y[:self.nlinks]
+           angles = y[self.nlinks:]
+           d_angles = momenta
+           ci = np.cos(angles)
+           cij = np.cos(angles[:,np.newaxis]-angles)
+           sij = np.sin(angles[:,np.newaxis]-angles)
+           mcinv = LA.inv(self.m*cij)
+           d_momenta = -np.dot(self.m*sij, momenta*momenta)
+           d_momenta = d_momenta+np.dot(self.damping, momenta)
+           d_momenta = d_momenta-self.a*ci
+           d_momenta = np.dot(mcinv, d_momenta)
+           d = np.empty_like(y)
+           d[:self.nlinks] = d_momenta
+           d[self.nlinks:] = d_angles
+           return d
+   
+       def solve_eq_of_motion(self, time_i, time_f, nt):
+           y0 = np.zeros(2*self.nlinks, dtype=np.float64)
+           y0[self.nlinks:] = self.equilibrium()
+           self.solution = solve_ivp(self.diff, (time_i, time_f), y0, method='Radau',
+                                     t_eval=np.linspace(time_i, time_f, nt))
+   
+       def plot_dynamics(self):
+           for i in range(self.solution.y.shape[1]):
+               phis = self.solution.y[:, i][self.nlinks:]
+               x = np.zeros(self.nlinks+1)
+               x[1:] = np.cumsum(np.cos(phis))
+               y = np.zeros(self.nlinks+1)
+               y[1:] = np.cumsum(np.sin(phis))
+               plt.plot(x, y, 'b')
+           plt.axes().set_aspect('equal')
+           plt.show()
+   
+   chain = Chain(200, 150, 0.003)
+   chain.solve_eq_of_motion(0, 40, 50)
+   chain.plot_dynamics()
+
+.. _hangingchain:
+.. figure:: img/hanging_chain.*
+   :width: 18em
+   :align: center
+
+   Chain consisting of 9 links hanging in its equlibrium position with a
+   horizontal distance of the ends equivalent to the length of 7 links.
+
+In a second step, the equation of motion for the chain links is solved in the
+``solve_eq_of_motion`` method by means of ``solve_ivp`` taken from the
+``integrate`` module of SciPy. We need to express the second order equations of
+motion in terms of first-order differential equations which can always be
+achieved by doubling the number of degrees of freedom by means of auxiliary
+variables. The main ingredient then is the function called ``diff`` in our
+example which for a given set of variables returns the time derivatives for
+these variables. Furthermore, ``solve_ivp`` needs to know the time interval on
+which the solution is to be determined together with the time values for which
+a solution is requested as well as the initial configuration. Finally, out of
+the various solvers, we choose ``Radau`` which implements an implicit
+Runge-Kutta method of Radau IIA family of order 5. :numref:`fallingchain`
+displays a stroboscopic plot of the chain during is first half period swinging
+from the right to the left.
+
+.. _fallingchain:
+.. figure:: img/falling_chain.*
+   :width: 18em
+   :align: center
+
+   Stroboscopic image of a falling chain consisting of 200 elements starting out from
+   its equilibrium state in the upper right during its first half period swinging to
+   the left.
 
 .. _SciPy API Reference: https://docs.scipy.org/doc/scipy/reference#api-reference
 .. _NumPy Reference: https://docs.scipy.org/doc/numpy/reference
@@ -1664,3 +1811,4 @@ in :numref:`brentq` as an orange dot.
 .. [#sympy] For details see the `sympy homepage <https://www.sympy.org/>`_.
 .. [#skimage] For details see the `scikit-image homepage <https://scikit-image.org>`_.
 .. [#sklearn] For details see the `scikit-learn homepage <https://https://scikit-learn.org>`_.
+.. [#ajpdoi] `doi:10.1119/1.2204074 <https://doi.org/10.1119/1.2204074>`_.
