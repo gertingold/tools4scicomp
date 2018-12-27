@@ -202,6 +202,106 @@ which can be used according to the specific needs.
 The ``timeit`` module
 =====================
 
+Short isolated pieces of code can conveniently be analyzed by functions provided
+by the ``timeit`` module. By default, the average code execution time will be determined
+on the basis of one million of runs. As a first example, let us determine the execution
+time for the evaluation of the square of 0.5::
+
+   >>> import timeit
+   >>> timeit.timeit('0.5**2')
+   0.02171438499863143
+
+The result is given in seconds. In view of one million of code executions, we obtain
+an execution time of 22 nanoseconds. If we want to use an argument, we cannot define
+it in the outer scope::
+
+   >>> x = 0.5
+   >>> timeit.timeit('x**2')
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+     File "/opt/anaconda3/lib/python3.6/timeit.py", line 233, in timeit
+       return Timer(stmt, setup, timer, globals).timeit(number)
+     File "/opt/anaconda3/lib/python3.6/timeit.py", line 178, in timeit
+       timing = self.inner(it, self.timer)
+     File "<timeit-src>", line 6, in inner
+   NameError: name 'x' is not defined
+
+Instead, we can pass the global namespace through the ``globals`` argument::
+
+   >>> x = 0.5
+   >>> timeit.timeit('x**2', globals=globals())
+   0.103586286000791
+
+As an alternative, one can explicitly assign the variable ``x`` in the second
+argument intended for setup code. Its execution time is not taken into account::
+
+   >>> timeit.timeit('x**2', 'x=0.5')
+   0.08539198899961775
+
+If we want to compare with the ``pow`` function of the ``math`` module, we have to
+add the import statement to the setup code as well::
+
+   >>> timeit.timeit('math.pow(x, 2)', 'import math; x=0.5')
+   0.2346674630025518
+
+A more complex example of the use of the ``timeit`` module compares the
+evaluation of a trigonometric function by means of a NumPy universal function
+with the use of the corresponding function of the ``math`` module::
+
+   import math
+   import timeit
+   import numpy as np
+   import matplotlib.pyplot as plt
+   
+   def f_numpy(nmax):
+       x = np.linspace(0, np.pi, nmax)
+       result = np.sin(x)
+   
+   def f_math(nmax):
+       dx = math.pi/(nmax-1)
+       result = [math.sin(n*dx) for n in range(nmax)]
+   
+   x = []
+   y = []
+   for n in np.logspace(0.31, 6, 300):
+       nint = int(n)
+       t_numpy = timeit.timeit('f_numpy(nint)', number=10, globals=globals())
+       t_math = timeit.timeit("f_math(nint)", number=10, globals=globals())
+       x.append(nint)
+       y.append(t_math/t_numpy)
+   
+   plt.rc('text', usetex=True)
+   plt.plot(x, y, 'o')
+   plt.xscale('log')
+   plt.xlabel('vector size', fontsize=20)
+   plt.ylabel(r'$t_\mathrm{math}/t_\mathrm{numpy}$', fontsize=20)
+   plt.show()
+
+The result is displayed in :numref:`timeit_numpy`.
+
+.. _timeit_numpy:
+.. figure:: img/timeit_numpy.*
+   :width: 20em
+   :align: center
+
+   Comparison of execution times of the sine functions taken from the NumPy
+   package and from the ``math`` module for a range of vector sizes.
+
+We close this section with two remarks. If one wants to assess the fluctuations of the
+measure execution times, one can replace the ``timeit`` function by the ``repeat`` function::
+
+   >>> x = 0.5
+   >>> timeit.repeat('x**2', repeat=10, globals=globals())
+   [0.1035151930009306, 0.07390781700087246, 0.06162133299949346,
+    0.05376200799946673, 0.05260805999932927, 0.05276966699966579,
+    0.05227632500100299, 0.052304120999906445, 0.0523306600007345,
+    0.05286436900132685]
+
+For users of the IPython shell or the Jupyter notebook, the magics ``%timeit`` and ``%%timeit``
+provide a simple way to time the execution of a single line of code or a code cell, respectively.
+These magics choose a reasonable number of repetitions to obtain good statistics within a
+reasonable amount of time.
+
 .. [#cupy] For more information, see the `CuPy homepage <https://cupy.chainer.org>`_.
 .. [#cython] For more information, see `Cython – C-Extensions for Python
              <https://cython.org/>`_. 
