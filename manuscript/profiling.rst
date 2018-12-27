@@ -302,6 +302,172 @@ provide a simple way to time the execution of a single line of code or a code ce
 These magics choose a reasonable number of repetitions to obtain good statistics within a
 reasonable amount of time.
 
+The ``cProfile`` module
+=======================
+
+The ``timeit`` module discussed in the previous section is useful to determine the 
+execution time of one-liners or very short code segments. It is not very useful though
+to determine the compute-time intensive parts of a bigger program. If the program is
+nicely modularized in functions and methods, the ``cProfile`` module will be of help.
+It determines, how much time is spent in the individual functions and methods and thereby
+gives valuable information about which parts will benefit from code optimization.
+
+We consider as a specific example the quantum mechanical time evolution of a
+narrow Gaussian wave packet initially localized at the center of an infinite
+potential well [#carpets]_. The initial state is decomposed in the
+appropriately truncated eigenbasis of the potential well. Once the coefficients
+of the expansion are known, it is straightforward to determine the state at any
+later time. The time evolution of the probability density is shown in
+:numref:`carpet`.
+
+.. _carpet:
+.. figure:: img/carpet.*
+   :width: 35em
+   :align: center
+
+   Time evolution of the probability density of an initial Gaussian wave packet
+   positioned at the center of an infinite potential well. Brighter colors imply
+   larger probability densities.
+
+This figure has been obtained by means of the following Python script called 
+``carpet.py``.
+
+.. code-block:: python
+   :linenos:
+
+   from math import cos, exp, pi, sin, sqrt
+   from cmath import exp as cexp
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from matplotlib import cm
+
+   class InfiniteWell:
+       def __init__(self, width, nbase, nint):
+           self.width = width
+           self.nbase = nbase
+           self.nint = nint
+           self.coeffs = []
+
+       def eigenfunction(self, n, x):
+           if n % 2:
+               return sqrt(2/self.width)*sin((n+1)*pi*x/self.width)
+           return sqrt(2/self.width)*cos((n+1)*pi*x/self.width)
+
+       def get_coeffs(self, psi):
+           self.coeffs = []
+           for n in range(self.nbase):
+               f = lambda x: psi(x)*self.eigenfunction(n, x)
+               c = trapezoidal(f, -0.5*self.width, 0.5*self.width, self.nint)
+               self.coeffs.append(c)
+
+       def psi(self, x, t):
+           if not self.coeffs:
+               self.get_coeffs(psi0)
+           psit = 0
+           for n, c in enumerate(self.coeffs):
+               psit = psit + c*cexp(-1j*(n+1)**2*t)*self.eigenfunction(n, x)
+           return psit
+
+   def trapezoidal(func, a, b, nint):
+       delta = (b-a)/nint
+       integral = 0.5*(func(a)+func(b))
+       for k in range(1, nint):
+           integral = integral+func(a+k*delta)
+       return delta*integral
+
+   def psi0(x):
+       sigma = 0.005
+       return exp(-x**2/(2*sigma))/(pi*sigma)**0.25
+
+   w = InfiniteWell(width=2, nbase=100, nint=1000)
+   x = np.linspace(-0.5*w.width, 0.5*w.width, 500)
+   ntmax = 1000
+   z = np.zeros((500, ntmax))
+   for n in range(ntmax):
+       t = 0.25*pi*n/(ntmax-1)
+       y = np.array([abs(w.psi(x, t))**2 for x in x])
+       z[:, n] = y
+   z = z/np.max(z)
+   plt.rc('text', usetex=True)
+   plt.imshow(z, cmap=cm.hot)
+   plt.xlabel('$t$', fontsize=20)
+   plt.ylabel('$x$', fontsize=20)
+   plt.show()
+
+This code is by no means optimal. After all, we want to discuss strategies to find
+out where most of the compute time is spent and what we can do to improve the situation.
+Before doing so, let us get a general idea of how the code works.
+
+First, we need to decompose the initial wave function into the basis functions.
+The initial wave function is the Gaussian defined in the function ``psi0`` in
+lines 41-43.  The integration is carried out very simply according to the
+trapezoidal rule as defined in function ``trapezoidal`` in lines 34-39.
+Everything related to the basis functions is collected in the class
+``InfiniteWell``. During the instantiation, we have to define the total width
+of the well ``wicth``, the number of basis states ``nbase``, and the number of
+integration points ``nint`` to be used when determining the coefficients. The
+value of the eigenfunction corresponding to eigenvalue ``n`` at position ``x``
+is obtained by means of the method ``eigenfunction`` defined in line 14-17.
+Whenever the wave function at a given point ``x`` and a given time ``t`` is to
+be calculated, method ``psi`` defined in lines 26-32 first checks whether the
+coefficients have already been determined.  Otherwise, they are calculated by
+means of the method ``get_coeffs`` defined in lines 19-24. In line 28, we have
+for simplicity hardcoded the function for the initial state. The code from line
+45 to the end serves to calculate the time evolution and to render the image
+shown in :numref:`carpet`. In this version of the code, we deliberately do not
+make use of NumPy except to obtain the image. Of course, NumPy would provide
+a significant speedup right away and one would probably never write the code
+in the way shown here. But it provides a good starting point to learn about
+run-time analysis. Where does the code spend most of its time?
+
+To address this question, we make use of the ``cProfile`` module contained in the
+Python standard library. Among the various ways of using this module, we choose
+one which avoids having to change our script::
+
+   % python -m cProfile -o carpet.prof carpet.py
+
+This command runs the script ``carpet.py`` under the control of the ``cProfile`` module.
+The option ``-o carpet.prof`` indicates that the results of this profiling run are
+stored in the file ``carpet.prof``. This binary file allows to analyze the obtained
+data in various ways by means of the ``pstats`` module. Let us try it out::
+
+   >>> import pstats
+   >>> p = pstats.Stats('carpet.prof')
+   >>> p.sort_stats('time').print_stats(15)
+   Thu Dec 27 17:34:50 2018    carpet.prof
+   
+            201999355 function calls (201992896 primitive calls) in 666.749 seconds
+   
+      Ordered by: internal time
+      List reduced from 3695 to 15 due to restriction <15>
+   
+      ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    50100100  231.457    0.000  364.891    0.000 carpet.py:14(eigenfunction)
+      500000  196.077    0.000  658.832    0.001 carpet.py:26(psi)
+    50000000   96.882    0.000   96.882    0.000 {built-in method cmath.exp}
+    50100101   62.425    0.000   62.425    0.000 {built-in method math.sqrt}
+    25050064   35.555    0.000   35.555    0.000 {built-in method math.cos}
+    25050064   35.453    0.000   35.453    0.000 {built-in method math.sin}
+           1    3.437    3.437    4.284    4.284 {built-in method exec_}
+        1000    1.556    0.002  660.896    0.661 carpet.py:52(<listcomp>)
+      502454    0.511    0.000    0.511    0.000 {built-in method builtins.abs}
+      100100    0.388    0.000    1.469    0.000 carpet.py:22(<lambda>)
+           6    0.362    0.060    0.362    0.060 {method 'poll' of 'select.poll' objects}
+      100100    0.302    0.000    0.436    0.000 carpet.py:42(psi0)
+           2    0.173    0.087    0.173    0.087 {built-in method statusBar}
+         100    0.157    0.002    1.626    0.016 carpet.py:35(trapezoidal)
+      100101    0.134    0.000    0.134    0.000 {built-in method math.exp}
+   
+After having imported the ``pstats`` module, we load our profiling file
+``carpet.prof`` to obtain a statistics object ``p``. The data can then be
+sorted with the ``sort_stats`` method according to different criteria. Here, we
+have chosen the time spent in a function. Since the list is potentially very
+long, we have restricted the output to 15 entries by means of the
+``print_stats`` method.
+
+Line oriented run-time analysis
+===============================
+
 .. [#cupy] For more information, see the `CuPy homepage <https://cupy.chainer.org>`_.
 .. [#cython] For more information, see `Cython – C-Extensions for Python
              <https://cython.org/>`_. 
@@ -311,3 +477,9 @@ reasonable amount of time.
               community as the author of the typesetting system TeX.
 .. [#knuth_quote] D.\ E. Knuth, Computing Surveys **6**, 261 (1974). The quote
               can be found on page 268.
+.. [#carpets] For more details, see e.g. W. Kinzel, `Bilder elementarer Quantenmechanik
+              <https://doi.org/10.1002/phbl.19950511215>`_, Phys. Bl. **51**, 1190 (1995)
+              and I. Marzoli, F. Saif, I. Bialynicki-Birula,
+              O. M. Friesch, A. E. Kaplan, W. P. Schleich, `Quantum carpets made
+              simple <http://www.physics.sk/aps/pubs/1998/aps_1998_48_3_323.pdf>`_,
+              Acta Phys. Slov. **48**, 323 (1998).
