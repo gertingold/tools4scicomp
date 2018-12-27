@@ -68,6 +68,140 @@ It can then be very reassuring if one can rely on a comprehensive test suite
 Before discussing techniques for timing code execution, we will discuss a few
 potential pitfalls.
 
+Some pitfalls in run-time analysis
+==================================
+
+A simple approach to performing a run-time analysis of code could consist in taking
+the time before and after the code is executed. The ``time`` module in the Python
+standard library offers the possibility to determine the current time::
+
+   >>> import time
+   >>> time.ctime()
+   'Thu Dec 27 11:13:33 2018'
+
+While this result is nicely readable, it is not well suited to calculate time differences.
+For this purpose, the seconds passed since the beginning of the epoch are better suited.
+On Unix systems, the epoch starts on January, 1970 at 00:00:00 UTC::
+
+   >>> time.time()
+   1545905769.0189064
+
+Now, it is straightforward to determine the time elapsed during the execution of a
+piece of code. The following code repeats the execution several times to convey an
+idea of the fluctuations to be expected.
+
+.. code-block:: python
+
+   import time
+
+   for _ in range(10):
+       sum_of_ints = 0
+       start = time.time()
+       for n in range(1000000):
+           sum_of_ints = sum_of_ints + 1
+       end = time.time()
+       print(f'{end-start:5.3f}s', end='  ')
+
+Executing this code yields::
+
+   0.142s  0.100s  0.093s  0.093s  0.093s  0.093s  0.092s  0.091s  0.091s  0.091s
+
+Duing a second run on the same hardware, we obtained::
+
+   0.131s  0.095s  0.085s  0.085s  0.088s  0.085s  0.084s  0.085s  0.085s  0.085s
+
+While these numbers give an idea of the execution time, they should not be taken too
+literally. In particular, it makes sense to average over several loops. This is 
+facilitated by the ``timeit`` module in the Python standard library which we will
+discuss in the following section.
+
+When performing run-time analysis as just described, one should be aware that a
+computer may be occupied by other tasks as well. In general, the total elapsed
+time will thus differ from the time actually needed to execute a specific piece
+of code. The ``time`` module therefore provides two functions. In addition to
+the ``time`` function which records the wall clock time, there exist a
+``process_time`` function which counts the time attributed to the specific
+process running our Python script. The following example demonstrates the
+difference by intentionally letting the program pause for a second once in a
+while. Note, that although the execution of ``time.sleep`` occurs within the
+process under consideration, the time needed is ignored by ``process_time``.
+Therefore, we can use ``time.sleep`` to simulate other activities of the computer,
+even if it is done in a somewhat inappropriate way.
+
+.. code-block:: python
+
+   import time
+
+   sum_of_ints = 0
+   start = time.time()
+   start_proc = time.process_time()
+   for n in range(10):
+       for m in range(100000):
+           sum_of_ints = sum_of_ints + 1
+       time.sleep(1)
+   end = time.time()
+   end_proc = time.process_time()
+   print(f'total time:   {end-start:5.3f}s')
+   print(f'process time: {end_proc-start_proc:5.3f}s')
+
+In a run on the same hardware as used before, we find the following result::
+
+   total time:   10.207s
+   process time: 0.197s
+
+The difference basically consists of the ten seconds spent while the code was
+sleeping.
+
+One should also be aware that enclosing the code in question in a function will
+lead to an additional contribution to the execution time. This particularly poses
+a problem if the execution of the code itself requires only little time. We compare
+the two scripts
+
+.. code-block:: python
+
+   import time
+
+   sum_of_ints = 0
+   start_proc = time.process_time()
+   for n in range(10000000):
+       sum_of_ints = sum_of_ints + 1
+   end_proc = time.process_time()
+   print(f'process time: {end_proc-start_proc:5.3f}s')
+
+and
+
+.. code-block:: python
+
+   import time
+
+   def increment_by_one(x):
+       return x+1
+
+   sum_of_ints = 0
+   start_proc = time.process_time()
+   for n in range(10000000):
+       increment_by_one(sum_of_ints)
+   end_proc = time.process_time()
+   print(f'process time: {end_proc-start_proc:5.3f}s')
+
+
+Tht first script takes on average over 10 runs 0.9 seconds while the second script
+takes 1.1 seconds and thus runs about 20% slower.
+
+Independently of the methods used and even if one of the methods discussed later is
+employed, a run-time analysis will always influence the execution of the code. The
+measured run time therefore will be larger than without doing any timing. However,
+we should still be able to identify the parts of the code which take most of the time.
+
+A disadvantage of the methods discussed so far consists in the fact that they require
+a modification of the code. Usually, it is desirable to avoid such modifications as
+much as possible. In the following sections, we will present a few timing techniques
+which can be used according to the specific needs.
+
+
+The ``timeit`` module
+=====================
+
 .. [#cupy] For more information, see the `CuPy homepage <https://cupy.chainer.org>`_.
 .. [#cython] For more information, see `Cython – C-Extensions for Python
              <https://cython.org/>`_. 
