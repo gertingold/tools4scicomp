@@ -9,8 +9,8 @@ Lecture notes »Tools for Scientific Computing«
    git
    testing
    numpy
-   graphics
    profiling
    documenting
    parallel
+   graphics
    appendix
