@@ -1,3 +1,5 @@
+.. _scientific_libraries:
+
 *****************************************
 Scientific computing with NumPy and SciPy
 *****************************************
