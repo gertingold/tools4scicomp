@@ -1,3 +1,5 @@
+__pycache__/
+
 # Sphinx documentation
 manuscript/_build/
 manuscript/_static/
