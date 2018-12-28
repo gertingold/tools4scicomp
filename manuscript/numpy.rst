@@ -1317,29 +1317,7 @@ following example which results in :numref:`interference`::
    distance of the point given by the two argument coordinates from the origin.
 
 So far, we have considered universal functions mostly as a convenient way to apply a function to
-an entire array. However, they can also make a significant contribution to speed up code. Let us
-first consider the execution speed for a scalar argument::
-
-   >>> import math
-   >>> import timeit
-   >>> x = 1
-   >>> timeit.repeat('math.sin(x)', number=1, globals=globals())
-   [1.927599987538997e-05, 2.9330003599170595e-06, 2.7239993869443424e-06]
-   >>> timeit.repeat('np.sin(x)', number=1, globals=globals())
-   [4.134400023758644e-05, 1.068599976861151e-05, 8.730000445211772e-06]
-   >>> timeit.repeat('math.sin(x)', globals=globals())
-   [0.14687219699953857, 0.10604840399992099, 0.10069769399979123]
-   >>> timeit.repeat('np.sin(x)', globals=globals())
-   [1.2971382370005813, 1.2119426230001409, 1.2095572039997933]
-
-In the first case, the sine is evaluated only once while the second case, the default value
-of one million executions of the function is chosen. In each case, three runs are performed
-to get an idea of the statistical fluctuations. One should not pay too much attention to the
-exact ratio between the runs using ``math.sin`` and ``np.sin`` as they may also on the
-hardware used. However, these examples demonstrate that one loses performance when applying
-NumPy universal functions to a scalar value. Universal functions create an overhead which only
-pays off if they are applied to not too small arrays.
-
+an entire array. However, they can also make a significant contribution to speed up code.
 The following script compares the runtime between a for loop evaluating the sine function taken
 from the ``math`` module and a direct evaluation of the sine taken from NumPy for different
 array sizes::
