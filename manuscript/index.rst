@@ -12,5 +12,4 @@ Lecture notes »Tools for Scientific Computing«
    profiling
    documenting
    parallel
-   graphics
    appendix
