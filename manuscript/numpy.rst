@@ -1263,7 +1263,7 @@ A practical application produced by the following code is shown in :numref:`sinx
    :width: 20em
    :align: center
 
-   Application of the mes grid in a two-dimensional representation of the function
+   Application of the mesh grid in a two-dimensional representation of the function
    :math:`\sin(xy)`.
 
 Making use of broadcasting, one can reduce the memory requirement by creating an open mesh grid
