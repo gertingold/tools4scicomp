@@ -721,9 +721,23 @@ in the complex exponential function so that a significant amount of time must be
 elsewhere in the function. At this point, the ``cProfile`` module is not of much help as
 it only works on the function level.
 
-::
+Fortunately, there is a line profiling tool available. However, it is not part of the
+Anaconda distribution and needs to be installed separately. The package is called
+``line_profiler`` and can be found on the `Python package index (PyPI) <https://pypi.org/>`_.
+It can be installed either into a virtual environment or in a conda environment.
+
+Line profiling adds some overhead to the code execution and it makes sense to limit
+it to the most important function or a few of them. This can easily be done by decorating
+the function in question with ``@profile``. Since we know that the ``psi`` method constitutes
+the bottleneck of our calculation, we only decorate that method. Running the line profiler
+on our script called carpet.py is done by [#kern]_::
 
    $ kernprof -l -v carpet.py
+
+Here, the option ``-l`` requests the line-by-line profiler and ``-v`` allows to immediately
+view the results in addition to storing them in a file with extension ``lprof``. We obtain
+the following result::
+
    Wrote profile results to carpet.py.lprof
    Timer unit: 1e-06 s
    
@@ -745,6 +759,11 @@ it only works on the function level.
        36  50000000  168606042.0      3.4     55.1              psit = psit + c*ef*cexp(-1j*(n+1)**2*t)
        37    500000    1212643.0      2.4      0.4          return psit
 
+The timing information only refers to the function on which the line profiler is run.
+We can see here that the for loop is responsible for a significant portion of the
+execution time. Making use of NumPy arrays can improve the performance of the code
+dramatically as we have seen at the end of the previous section.
+
 .. [#cupy] For more information, see the `CuPy homepage <https://cupy.chainer.org>`_.
 .. [#cython] For more information, see `Cython – C-Extensions for Python
              <https://cython.org/>`_. 
@@ -760,3 +779,5 @@ it only works on the function level.
               O. M. Friesch, A. E. Kaplan, W. P. Schleich, `Quantum carpets made
               simple <http://www.physics.sk/aps/pubs/1998/aps_1998_48_3_323.pdf>`_,
               Acta Phys. Slov. **48**, 323 (1998).
+.. [#kern] The command name ``kernprof`` makes reference to the author of the package
+           Robert Kern.
