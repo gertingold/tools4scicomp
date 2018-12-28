@@ -465,8 +465,285 @@ have chosen the time spent in a function. Since the list is potentially very
 long, we have restricted the output to 15 entries by means of the
 ``print_stats`` method.
 
+Let us take a look at the information provided by the run-time statistics. Each
+line corresponds to one of the 15 most time-consuming functions and methods out
+of a total of 3695. The total time of about 667 seconds is mostly spent in the
+function ``psi`` listed in the second line. There are actually two times given
+here. The total time (``tottime``) of 196 seconds counts only the time actually
+spent inside the function. The time required to execute functions called from
+``psi`` are not counted. In contrast, these times count towards the cumulative
+time (``cumtime``). An important part of the difference can be explained by the
+evaluation of the eigenfunctions as listed in the first line.
+
+Since we have sorted according to ``time``, which actually corresponds to ``tottime``,
+the first line lists the method consuming most of the time. Even though the time
+needed per call is so small that it is given as 0.000 seconds, this function is
+called very often. In the column ``ncalls`` the corresponding value is listed as
+50100100. In such as situation, it makes sense to check whether this number can be
+understood.
+
+In a first step, the expansion coefficients need to be determined. We use 100 basis
+functions as specified by ``nbase`` and 1001 nodes which is one more than the value
+of ``nint``. This results in a total of 100100 evaluations of eigenfunctions, actually
+less than a percent of the total number of evaluations of eigenfunctions. In order
+to determine the data displayed in :numref:`carpet`, we evaluate 100 eigenfunctions on
+a grid of size 500×1000, resulting in a total of 50000000 evaluations.
+
+These considerations show that we do not need to bother with improving the code
+determining the expansion coefficients. However, the situation might be quite
+different if we would not want to calculate data for a relatively large grid.
+Thinking a bit more about it, we realize that the number of 50000000
+evaluations for the time evolution is much too big. After all, we are
+evaluating the eigenfunctions at 500 different positions and we are considering
+100 eigenfunctions, resulting in only 50000 evaluations.  For each of the 1000
+time values, we are unnecessarily recalculating eigenfunctions for the same arguments.
+Avoiding this waste of compute time could speed up our script significantly.
+
+There are basically two ways to do so. We could restructure our program in such
+a way that we evaluate the grid for constant position along the time direction.
+Then, we just need to keep the values of the 100 eigenfunctions at a given
+position.  If we want to have the freedom to evaluate the wave function at a
+given position and time on a certain grid, we could also store the values of
+all eigenfunctions at all positions on the grid in a cache for later reuse.
+This is an example of trading compute time against memory.  We will implement
+the latter idea in the next version of our script listed below.
+
+.. code-block:: python
+   :linenos:
+
+   from math import cos, exp, pi, sin, sqrt
+   from cmath import exp as cexp
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from matplotlib import cm
+
+   class InfiniteWell:
+       def __init__(self, width, nbase, nint):
+           self.width = width
+           self.nbase = nbase
+           self.nint = nint
+           self.coeffs = []
+           self.eigenfunction_cache = {}
+
+       def eigenfunction(self, n, x):
+           if n % 2:
+               return sqrt(2/self.width)*sin((n+1)*pi*x/self.width)
+           return sqrt(2/self.width)*cos((n+1)*pi*x/self.width)
+
+       def get_coeffs(self, psi):
+           self.coeffs = []
+           for n in range(self.nbase):
+               f = lambda x: psi(x)*self.eigenfunction(n, x)
+               c = trapezoidal(f, -0.5*self.width, 0.5*self.width, self.nint)
+               self.coeffs.append(c)
+
+       def psi(self, x, t):
+           if not self.coeffs:
+               self.get_coeffs(psi0)
+           if not x in self.eigenfunction_cache:
+               self.eigenfunction_cache[x] = [self.eigenfunction(n, x)
+                                              for n in range(self.nbase)]
+           psit = 0
+           for n, (c, ef) in enumerate(zip(self.coeffs, self.eigenfunction_cache[x])):
+               psit = psit + c*ef*cexp(-1j*(n+1)**2*t)
+           return psit
+
+   def trapezoidal(func, a, b, nint):
+       delta = (b-a)/nint
+       integral = 0.5*(func(a)+func(b))
+       for k in range(1, nint):
+           integral = integral+func(a+k*delta)
+       return delta*integral
+
+   def psi0(x):
+       sigma = 0.005
+       return exp(-x**2/(2*sigma))/(pi*sigma)**0.25
+
+   w = InfiniteWell(width=2, nbase=100, nint=1000)
+   x = np.linspace(-0.5*w.width, 0.5*w.width, 500)
+   ntmax = 1000
+   z = np.zeros((500, ntmax))
+   for n in range(ntmax):
+       t = 0.25*pi*n/(ntmax-1)
+       y = np.array([abs(w.psi(x, t))**2 for x in x])
+       z[:, n] = y
+   z = z/np.max(z)
+   plt.rc('text', usetex=True)
+   plt.imshow(z, cmap=cm.hot)
+   plt.xlabel('$t$', fontsize=20)
+   plt.ylabel('$x$', fontsize=20)
+   plt.show()
+
+Now, we check in method ``psi`` whether the eigenfunction cache already contains
+data for a given position ``x``. If this is not the case, the required values are
+calculated and the cache is updated.
+
+As a result of this modification of the code, the profiling data change considerably::
+
+            52108308 function calls (52101855 primitive calls) in 183.611 seconds
+   
+      Ordered by: internal time
+      List reduced from 3604 to 15 due to restriction <15>
+   
+      ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      500000   95.555    0.000  171.246    0.000 carpet.py:27(psi)
+    50000000   73.505    0.000   73.505    0.000 {built-in method cmath.exp}
+           1    3.338    3.338    3.763    3.763 {built-in method exec_}
+        1000    1.796    0.002  173.546    0.174 carpet.py:56(<listcomp>)
+       48/46    1.403    0.029    1.415    0.031 {built-in method _imp.create_dynamic}
+           2    1.178    0.589    1.178    0.589 {built-in method statusBar}
+         288    0.811    0.003    0.811    0.003 {method 'read' of '_io.FileIO' objects}
+      150100    0.663    0.000    1.063    0.000 carpet.py:15(eigenfunction)
+           1    0.652    0.652    0.701    0.701 /opt/anaconda3/lib/python3.6/site-packages/matplotlib/backends/backend_qt5.py:104(_create_qApp)
+      501286    0.507    0.000    0.507    0.000 {built-in method builtins.abs}
+      100100    0.427    0.000    1.602    0.000 carpet.py:23(<lambda>)
+      100100    0.320    0.000    0.458    0.000 carpet.py:46(psi0)
+      150101    0.193    0.000    0.193    0.000 {built-in method math.sqrt}
+         100    0.161    0.002    1.763    0.018 carpet.py:39(trapezoidal)
+        1413    0.149    0.000    0.149    0.000 {built-in method posix.stat}
+
+We observe a speed-up of a factor of 3.6 by investing about 500×100×8 bytes of
+memory, i.e. roughly 400 kB. The exact value will be slightly different because
+we have stored the data in a dictionary and not in an array, but clearly we are
+not talking about a huge amount of memory. The time needed to evaluate the
+eigenfunctions has dropped so much that it can be neglected compared to the
+time required by the method ``psi`` and the evaluation of the complex
+exponential function.
+
+The compute could be reduced further by caching the values of the complex exponential
+functions. In fact, we unnecessarily recalculate each value 500 times. However, there
+are still almost 96 seconds left which are spent in the rest of the ``psi`` method. 
+We will see in the following section how one can find out which line of the code is
+responsible for this important contribution to the total run time.
+
+Before doing so, we want to present a version of the code designed to profit from
+NumPy from the very beginning
+
+.. code-block:: python
+
+   from math import sqrt
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from matplotlib import cm
+
+   class InfiniteWell:
+       def __init__(self, width, nbase, nint):
+           self.width = width
+           self.nbase = nbase
+           self.nint = nint
+
+       def eigenfunction(self, x):
+           assert x.ndim == 1
+           normalization = sqrt(2/self.width)
+           args = (np.arange(self.nbase)[:, np.newaxis]+1)*np.pi*x/self.width
+           result = np.empty((self.nbase, x.size))
+           result[0::2, :] = normalization*np.cos(args[0::2])
+           result[1::2, :] = normalization*np.sin(args[1::2])
+           return result
+
+       def get_coeffs(self, psi):
+           self.coeffs = trapezoidal(lambda x: psi(x)*self.eigenfunction(x),
+                                     -0.5*self.width, 0.5*self.width, self.nint)
+
+       def psi(self, x, t):
+           try:
+               coeffs = self.coeffs[:, np.newaxis]
+           except AttributeError:
+               self.get_coeffs(psi0)
+               coeffs = self.coeffs[:, np.newaxis]
+           eigenvals = np.arange(self.nbase)[:, np.newaxis]
+           tvals = t[:, np.newaxis, np.newaxis]
+           psit = np.sum(coeffs * self.eigenfunction(x)
+                         * np.exp(-1j*(eigenvals+1)**2*tvals), axis= -2)
+           return psit
+
+   def trapezoidal(func, a, b, nint):
+       delta = (b-a)/nint
+       x = np.linspace(a, b, nint+1)
+       integrand = func(x)
+       integrand[..., 0] = 0.5*integrand[..., 0]
+       integrand[..., -1] = 0.5*integrand[..., -1]
+       return delta*np.sum(integrand, axis=-1)
+
+   def psi0(x):
+       sigma = 0.005
+       return np.exp(-x**2/(2*sigma))/(np.pi*sigma)**0.25
+
+   w = InfiniteWell(width=2, nbase=100, nint=1000)
+   x = np.linspace(-0.5*w.width, 0.5*w.width, 500)
+   t = np.linspace(0, np.pi/4, 1000)
+   z = np.abs(w.psi(x, t))**2
+   z = z/np.max(z)
+   plt.rc('text', usetex=True)
+   plt.imshow(z.T, cmap=cm.hot)
+   plt.xlabel('$t$', fontsize=20)
+   plt.ylabel('$x$', fontsize=20)
+   plt.show()
+
+The structure of the code is essentially unchanged, but we are making use of
+universal functions in several places. In the method ``psi``, a three-dimensional
+array is used with axis 0 to 2 given by time, eigenvalue, and position. A run-time
+analysis yields the following result::
+
+            404245 function calls (397745 primitive calls) in 4.229 seconds
+   
+      Ordered by: internal time
+      List reduced from 3722 to 15 due to restriction <15>
+   
+      ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+           1    1.537    1.537    2.389    2.389 {built-in method exec_}
+           1    0.342    0.342    0.404    0.404 carpet_4.py:25(psi)
+           6    0.332    0.055    0.332    0.055 {method 'poll' of 'select.poll' objects}
+           2    0.146    0.073    0.146    0.073 {built-in method statusBar}
+       47/45    0.075    0.002    0.084    0.002 {built-in method _imp.create_dynamic}
+         392    0.060    0.000    0.060    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+           1    0.048    0.048    4.231    4.231 carpet_4.py:1(<module>)
+   25525/25521    0.038    0.000    0.048    0.000 {built-in method builtins.isinstance}
+         286    0.038    0.000    0.038    0.000 {built-in method marshal.loads}
+   1216/1161    0.028    0.000    0.205    0.000 {built-in method builtins.__build_class__}
+          14    0.025    0.002    0.132    0.009 /opt/anaconda3/lib/python3.6/site-packages/matplotlib/font_manager.py:1255(findfont)
+           1    0.023    0.023    0.025    0.025 /opt/anaconda3/lib/python3.6/site-packages/matplotlib/backends/backend_qt5.py:104(_create_qApp)
+          73    0.023    0.000    0.023    0.000 {built-in method io.open}
+        1452    0.022    0.000    0.022    0.000 {built-in method posix.stat}
+        3051    0.022    0.000    0.052    0.000 <frozen importlib._bootstrap_external>:57(_path_join)
+
+Since the run time obtained by profiling is longer than the actual run time,
+we have timed the first version of the script against the NumPy version, resulting
+in an speed up by a factor of 90.
+
+
 Line oriented run-time analysis
 ===============================
+
+In the second version of the script discussed in the previous section, we had seen that
+by far most of the time was spent in the method ``psi``. Almost half of the time was spent
+in the complex exponential function so that a significant amount of time must be spent
+elsewhere in the function. At this point, the ``cProfile`` module is not of much help as
+it only works on the function level.
+
+::
+
+   $ kernprof -l -v carpet.py
+   Wrote profile results to carpet.py.lprof
+   Timer unit: 1e-06 s
+   
+   Total time: 306.266 s
+   File: carpet.py
+   Function: psi at line 27
+   
+   Line #      Hits         Time  Per Hit   % Time  Line Contents
+   ==============================================================
+       27                                               @profile
+       28                                               def psi(self, x, t):
+       29    500000    1171076.0      2.3      0.4          if not self.coeffs:
+       30         1     348711.0 348711.0      0.1              self.get_coeffs(psi0)
+       31    500000    1435067.0      2.9      0.5          if not x in self.eigenfunction_cache:
+       32       500       1256.0      2.5      0.0              self.eigenfunction_cache[x] = [self.eigenfunction(n, x)
+       33       500     105208.0    210.4      0.0                                             for n in range(self.nbase)]
+       34    500000    1190160.0      2.4      0.4          psit = 0
+       35  50500000  132196091.0      2.6     43.2          for n, (c, ef) in enumerate(zip(self.coeffs, self.eigenfunction_cache[x])):
+       36  50000000  168606042.0      3.4     55.1              psit = psit + c*ef*cexp(-1j*(n+1)**2*t)
+       37    500000    1212643.0      2.4      0.4          return psit
 
 .. [#cupy] For more information, see the `CuPy homepage <https://cupy.chainer.org>`_.
 .. [#cython] For more information, see `Cython – C-Extensions for Python
