@@ -46,7 +46,7 @@ through the scikit-learn package [#sklearn]_.
 We emphasize that the list of packages briefly described here, is not exhaustive
 and there exist more interesting Python packages useful in scientific applications.
 A recommended source of information on the Python scientific ecosystem are the
-`Scipy lecture notes <https://www.scipy-lectures.org/>`_.
+`SciPy lecture notes <https://www.scipy-lectures.org/>`_.
 
 NumPy
 =====
@@ -255,9 +255,9 @@ the actual data, an array obviously needs a number of metadata in order to know
 how to interpret the content of the memory space attributed to the area. These
 metadata are a powerful concept because they make it possible to change the
 interpretation of the data without copying them, thereby contributing to the
-efficiency of Numpy arrays.
+efficiency of NumPy arrays.
 
-It is useful to get some basic insight into how a Numpy array works. In order
+It is useful to get some basic insight into how a NumPy array works. In order
 to analyze the metadata, we use a short function enabling us to list the 
 attributes of an array.
 
@@ -380,7 +380,7 @@ by 8 bytes. The two items are neighbors in memory. However, if we stay within th
 same column and want to move to the next row, we have to jump by 32 bytes in memory.
 
 To further illustrate the meaning of ``shape`` and ``strides`` we consider a second
-example. A linear arangement of six data in memory can be interpreted in three
+example. A linear arrangement of six data in memory can be interpreted in three
 different ways as depicted in :numref:`strides`. In the uppermost example, ``strides``
 is set to ``(8,)``. The tuple ``strides`` tuple contains only one element and we
 are therefore dealing with a one-dimensional array. Assuming the datasize to be 8,
@@ -591,7 +591,7 @@ final value are part of the array. Instead of the stepwidth, the number of point
    >>> np.linspace(1, 2, 11)
    array([1. , 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2. ])
 
-A common mistake is to assume that the last argument gives the number of intervalls which,
+A common mistake is to assume that the last argument gives the number of intervals which,
 however, is not the case. Thus, there is some danger that one is off by one in the last
 argument. Sometimes it is useful to ask for the stepwidth::
 
@@ -893,7 +893,7 @@ outer level corresponds to axis 1 and the innermost level corresponds to axis 2.
 
    A three-dimensional array with its three axes.
 
-Cutting along the three axes, we obtain the following two-dimenionsal arrays::
+Cutting along the three axes, we obtain the following two-dimensional arrays::
 
    >>> b[0]
    array([[ 0,  1,  2,  3],
@@ -1294,7 +1294,7 @@ code::
    :align: center
 
    Two-dimensional plot of the family of Bessel functions :math:`J_\nu(x)` of order :math:`\nu`
-   created by means of an open mesh grid created by ``orid``.
+   created by means of an open mesh grid created by ``ogrid``.
 
 Instead of using the ``ogrid`` function, one can also construct the argument arrays by hand. In 
 this case, one has to take care of adding an additional axis in one of the two arrays as in the
@@ -1591,7 +1591,7 @@ where :math:`\epsilon` is the energy in units of the well depth and :math:`\alph
 measure of the potential strength combining the well depth and its width. One way of
 solving this nonlinear equation for :math:`\epsilon` is by means of the ``brentq`` function,
 which needs at least the function of which the root should be determined as well as the
-bounds of an intervall in which the function changes its sign. If the potential well is
+bounds of an interval in which the function changes its sign. If the potential well is
 sufficiently shallow, i.e. if :math.``\alpha`` is sufficiently small, the left-hand side
 contains only one root as can be seen from the blue line in :numref:`brentq`. In our example,
 the function requires an additional argument :math:`\alpha` which also needs to be given to
@@ -1644,7 +1644,7 @@ essentially consists of a call to the ``minimize`` function taken from the ``opt
 module of SciPy. It optimizes the potential energy defined in the ``f_energy`` method.
 In addition, we have to account for two constraints corresponding to the horizontal
 and vertical direction and implemented through the methods ``x_constraint`` and
-``y_constraint``. An example of the result of this opimization procedure is 
+``y_constraint``. An example of the result of this optimization procedure is 
 depicted in :numref:`hangingchain` for a chain made of 9 links.
 
 .. code-block:: python
@@ -1752,7 +1752,7 @@ depicted in :numref:`hangingchain` for a chain made of 9 links.
    :width: 18em
    :align: center
 
-   Chain consisting of 9 links hanging in its equlibrium position with a
+   Chain consisting of 9 links hanging in its equilibrium position with a
    horizontal distance of the ends equivalent to the length of 7 links.
 
 In a second step, the equation of motion for the chain links is solved in the
