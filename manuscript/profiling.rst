@@ -10,7 +10,7 @@ time-consuming code and the question arises how its performance can be
 improved. There exist a variety of different kinds of approaches. One could for
 example choose to make use of more powerful hardware or distribute the task on
 numerous compute nodes of a compute cluster. Even though today, human resources
-tend to be more costly than hardware resourse, the latter should not be wasted
+tend to be more costly than hardware resource, the latter should not be wasted
 by very inefficient code.
 
 In certain cases, speed can be improved by making use of graphical processors (GPU)
@@ -35,15 +35,15 @@ compilers analyze the code before its first execution and create machine code
 allowing to run the code faster in subsequent calls.
 
 While some of the methods just mentioned can easily be implemented, others may
-require a signficant investment of time. One therefore needs to assess whether
+require a significant investment of time. One therefore needs to assess whether
 the gain in compute time really exceeds the cost in developer time. It is worth
-following the advice of the emminent computer scientist Donald E. Knuth
+following the advice of the eminent computer scientist Donald E. Knuth
 [#dek_tex]_ who wrote already 45 years ago [#knuth_quote]_
 
    There is no doubt that the grail of efficiency leads to abuse. Programmers
    waste enormous amounts of time thinking about, or worrying about, the speed
    of noncritical parts of their programs, and these attempts at efficiency
-   actually have a strong negative impact when debugging and maintentance are
+   actually have a strong negative impact when debugging and maintenance are
    considered. We *should* forget about small efficiencies, say about 97 % of the
    time: premature optimization is the root of all evil.
 
@@ -106,7 +106,7 @@ Executing this code yields::
 
    0.142s  0.100s  0.093s  0.093s  0.093s  0.093s  0.092s  0.091s  0.091s  0.091s
 
-Duing a second run on the same hardware, we obtained::
+Doing a second run on the same hardware, we obtained::
 
    0.131s  0.095s  0.085s  0.085s  0.088s  0.085s  0.084s  0.085s  0.085s  0.085s
 
@@ -404,7 +404,7 @@ lines 41-43.  The integration is carried out very simply according to the
 trapezoidal rule as defined in function ``trapezoidal`` in lines 34-39.
 Everything related to the basis functions is collected in the class
 ``InfiniteWell``. During the instantiation, we have to define the total width
-of the well ``wicth``, the number of basis states ``nbase``, and the number of
+of the well ``width``, the number of basis states ``nbase``, and the number of
 integration points ``nint`` to be used when determining the coefficients. The
 value of the eigenfunction corresponding to eigenvalue ``n`` at position ``x``
 is obtained by means of the method ``eigenfunction`` defined in line 14-17.
