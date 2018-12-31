@@ -30,5 +30,5 @@ Open the command line in the directory of the manuscript
 
 ```sphinx-build -M latexpdf . _build```
 
-The compiled .tex file can be found in 
+The compiled .pdf file can be found in 
 `./manuscript/_build/latex/tools4scicomp.pdf`.
