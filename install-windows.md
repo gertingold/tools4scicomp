@@ -18,7 +18,7 @@ If the code `import sphinx` does not raise a
 with the section *compile the script*.
 
 If `sphinx` is not installed run the code 
-`pip install sphinx` (or `conda install sphinx if you have 
+`pip install sphinx` (or `conda install sphinx` if you have 
 python installed via anaconda. To find out if you are using 
 conda type `conda list` in the command line. If there is an 
 error you are *not* using anaconda).
