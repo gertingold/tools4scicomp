@@ -13,7 +13,7 @@ To check whether sphinx is installed open the command line
 (Windows + R, type `cmd`). Now start the python console by 
 typing in `python`.
 
-If the code `import sphinx` does not raise an 
+If the code `import sphinx` does not raise a 
 `ModuleNotFoundError` sphinx is installed. You can go on 
 with the section *compile the script*.
 
