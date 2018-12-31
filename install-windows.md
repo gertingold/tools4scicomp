@@ -9,8 +9,9 @@ installation instructions.
 ## Install sphinx
 
 If you do not have sphinx installed please install sphinx.
-To check whether open the command line (Windows + R, type 
-`cmd`). Now start the python console by typing in `python`.
+To check whether sphinx is installed open the command line 
+(Windows + R, type `cmd`). Now start the python console by 
+typing in `python`.
 
 If the code `import sphinx` does not raise an 
 `ModuleNotFoundError` sphinx is installed. You can go on 
