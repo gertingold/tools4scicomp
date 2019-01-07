@@ -1186,7 +1186,7 @@ Universal functions can handle multi-dimensional arrays as well::
    array([[ 0.0000000e+00,  1.0000000e+00],
           [ 1.2246468e-16, -1.0000000e+00]])
 
-This example shows that the mathematical constant :math:`pi` is not only
+This example shows that the mathematical constant :math:`\pi` is not only
 available from the ``math`` and ``cmath`` modules but also from the NumPy
 package. Many of the functions provided by the ``math`` module are available
 as universal functions in NumPy and NumPy offers a few universal functions not
