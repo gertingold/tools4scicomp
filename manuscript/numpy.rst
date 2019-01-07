@@ -1652,7 +1652,6 @@ depicted in :numref:`hangingchain` for a chain made of 9 links.
    import numpy as np
    import numpy.linalg as LA
    import matplotlib.pyplot as plt
-   from matplotlib.animation import FuncAnimation
    from scipy.optimize import minimize
    from scipy.integrate import solve_ivp
    
