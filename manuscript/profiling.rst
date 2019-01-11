@@ -21,7 +21,7 @@ on NVIDIA GPUs.
 
 On the software side, an option is to make use of optimized code provided by
 numerical libraries like NumPy and SciPy discussed in
-:numref:`scientific_libraries`. Sometimes, it can make sense to to implement
+:numref:`scientific_libraries`. Sometimes, it can make sense to implement
 particularly time-consuming parts in the programming language C for which 
 highly optimizing compilers are available. This approach does not necessarily
 require to write proper C code. One can make use of Cython [#cython]_ instead,
