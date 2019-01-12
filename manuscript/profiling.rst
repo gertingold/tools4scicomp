@@ -479,7 +479,7 @@ Since we have sorted according to ``time``, which actually corresponds to ``tott
 the first line lists the method consuming most of the time. Even though the time
 needed per call is so small that it is given as 0.000 seconds, this function is
 called very often. In the column ``ncalls`` the corresponding value is listed as
-50100100. In such as situation, it makes sense to check whether this number can be
+50100100. In such a situation, it makes sense to check whether this number can be
 understood.
 
 In a first step, the expansion coefficients need to be determined. We use 100 basis
