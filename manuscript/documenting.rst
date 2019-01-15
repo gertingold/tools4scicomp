@@ -76,45 +76,105 @@ in the browser.
 The documentation generator *Sphinx* is based on reStructuredText. Therefore, we
 will now discuss some of the more important aspects of this markup language.
 
-::
+Within a text, parts can be emphasized or even strongly emphasized by enclosing
+them in one or two stars, respectively. Inline literals are enclosed in a pairs
+of back-quotes. It is important that these constructs should be delimited by 
+characters which could also be used otherwise to delimit words like a whitespace
+or a punctuation character. If a whitespace is used but should not appear in the
+output, it needs to be escaped by means of a backslash. The text to which the
+markup is applied may not start or end with a whitespace. The following example
+gives an illustration. ::
 
    Text can be *emphasized*, usually as italics, or even **strongly emphasized**,
    usually as boldface. It is also possible of insert ``inline literals`` which
    will usually be represented as monospaced text.
 
    This is another paragraph showing how to embed an inline literal while
-   suppressing the surrounding blanks: re\ ``structured``\ Text
+   suppressing the surrounding blanks: re\ ``structured``\ Text.
 
-results in
+will be represented as
 
    Text can be *emphasized*, usually as italics, or even **strongly emphasized**,
    usually as boldface. It is also possible of insert ``inline literals`` which
    will usually be represented as monospaced text.
 
    This is another paragraph showing how to embed an inline literal while
-   suppressing the surrounding blanks: re\ ``structured``\ Text
+   suppressing the surrounding blanks: re\ ``structured``\ Text.
 
-::
+This example also shows that paragraphs are separated by a blank line. On a
+higher level, text is sectioned into parts, chapters, sections etc. A hierarchy
+is established by adorning titles in a systematic way. To this end, an
+underline or an underline together with an overline is added to the corresponding
+title. An underline or overline is at least as long as the title and contains only
+identical non-alphanumeric printable ASCII characters. It is recommended to choose
+among the characters ``= - ` : . ' " ~ ^ _ * + #``. Note even though in this way
+one can define a large number of different sectioning levels, in practice this number
+may be limited. For example, in HTML the number of different headings is limited to
+six. An example of sectioning of a text could look as follows::
 
-   * first item
+   ============
+   Introduction
+   ============
+
+   A first section
+   ===============
+
+   Here comes some text ...
+
+   A second section
+   ================
+   More text...
+
+   A subsection
+   ------------
+   And so on...
+
+As this example indicates, an empty line can be put after a title but this is not
+mandatory.
+
+Lists, either as bullet-point lists or as enumerated lists, can easily be obtained
+in reStructuredText. In a bullet-point list, the items are indicated by a few characters
+including ``* + - • ‣``. If the following text runs over several lines, it needs
+to be consistently indented. Sublists need to be separated from the surrounding list
+by empty lines. The following example illustrates the use of bullet-point lists:
+
+.. code-block:: none
+
+   * This is the text for the first item which runs over several lines. Make
+     sure that the text is consistently indented.
+
+     Further paragraphs in an item can be added provided the indentation
+     is consistent.
    * second item
 
      * a subitem
 
    * third item
 
-results in 
+This code results in
 
-   * first item
+   * This is the text for the first item which runs over several lines. Make
+     sure that the text is consistently indented.
+
+     Further paragraphs in an item can be added provided the indentation
+     is consistent.
    * second item
 
-      * a subitem
+     * A subitem is obtained by indenting the corresponding entry.
 
    * third item
 
-::
+An enumerated list can be numbered explicitly by numbers, alphabet characters in
+uppercase or lowercase, or Roma numerals. It is also possible to autonumber a 
+list by means of ``#``. The following example deliberately assigns the number 5
+ot the first item. In the following, autonumbering is used. For the last label,
+the number 2 is enforced. The formatting of the actual output depends on the 
+converter responsible for the transformation from reStructuredText to the output
+format. The following code
 
-   #. first item with automatic numbering
+.. code-block:: none
+
+   5. first item with automatic numbering
    #. second item
 
       #. subitem
@@ -124,13 +184,59 @@ results in
 
 results in
 
-   #. first item with automatic numbering
+   5. first item with automatic numbering
    #. second item
 
       #. subitem
       #. another subitem
 
    2. another item forced to be labelled by 2
+
+For scientific applications, one might want to include mathematical expressions.
+This can be done by means of the *math* role for inline mathematical expressions
+and the *math* directive for displayed mathematical expressions. In both cases,
+the mathematical expression is entered in LaTeX format. The following code
+
+.. code-block:: none
+
+   Einstein found the famous formula :math:`E=mc^2` which describes the
+   equivalence of energy and mass.
+
+   .. math::
+
+      \int_{-\infty}^\infty \mathrm{d}x \mathrm{e}^{-x^2} = \sqrt{\pi}
+
+will result in the output:
+
+   Einstein found the famous formula :math:`E=mc^2` which describes the
+   equivalence of energy and mass.
+
+   .. math::
+
+      \int_{-\infty}^\infty \mathrm{d}x \mathrm{e}^{-x^2} = \sqrt{\pi}
+
+There exists also a directive to include images:
+
+.. code-block:: none
+
+   .. image:: img/example.png
+      :width: 100
+      :height: 100
+      :align: center
+
+The name of the image file to be included needs to be specified. Here, the
+file happens to exist in a subdirectory of the present directory. We have 
+also specified the size and the alignment of the figure, resulting in the
+following output:
+
+.. image:: img/example.png
+      :width: 100
+      :height: 100
+      :align: center
+
+links, footnotes
+
+
 
 .. [#docreSt] More information on reStructuredText can be found in the documentation
    of the docutils project at `<http://docutils.sourceforge.net/rst.html>`_.
