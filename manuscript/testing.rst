@@ -57,6 +57,8 @@ In this chapter, we will be concerned with unit testing and mainly cover two app
 The first one are doctests which are implemented in Python within the doc strings of a 
 function or method. The second approach are unit tests based on asserts using ``py.test``.
 
+.. _doctests:
+
 Doctests
 ========
 
