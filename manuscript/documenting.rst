@@ -190,6 +190,32 @@ results in
 
    2. another item forced to be labelled by 2
 
+We have already seen how to produce inline literals which may be useful to
+mark for example keywords. To display multiline code, the *code* directive
+is appropriate. The following example makes use of the possiblity to add
+linenumbers.
+
+.. code-block:: none
+
+   .. code:: python
+
+      nmax = 10
+      sum = 0
+      for n in range(1, nmax+1):
+          sum = sum+n**2
+      print(nmax, sum)
+
+Since it is indicated that the code is written in Python, the syntax of the
+code can be highlighted.
+
+   .. code:: python
+
+      nmax = 10
+      sum = 0
+      for n in range(1, nmax+1):
+          sum = sum+n**2
+      print(nmax, sum)
+
 For scientific applications, one might want to include mathematical
 expressions.  This can be done by means of the *math* role (``:math:``) for
 inline mathematical expressions and the *math* directive (``math::``) for
@@ -233,8 +259,70 @@ following output:
       :height: 100
       :align: center
 
-links, footnotes
+The ``figure`` directive can be used to add a figure caption. The caption text
+needs to be indented to indicate that it belongs to the figure directive.
 
+.. code-block:: none
+
+   .. figure:: img/example.png
+      :height: 50
+      :width: 100
+
+      A graphics can be distorted by specifying ``height`` and ``width``.
+
+This code results in :numref:`example`, which by means of the *Sphinx* LaTeX builder
+is created as a floating object.
+
+.. _example:
+.. figure:: img/example.png
+   :height: 50
+   :width: 100
+
+   A graphics can be distorted by specifying ``height`` and ``width``.
+
+Occasionally, one may want to include a link to a web resource. In a documentation, this
+might be desirable to refer to a publication where an algorithm or the theoretical basis
+of the code has been described. As an example, we present various ways to link to the
+seminal paper by Cooley and Tukey on the fast Fourier transformation. The numbering allows
+us to refer more easily to the three different versions and plays no role with respect to
+the links.
+
+.. code-block:: none
+
+   #. J. W. Cooley and J. W. Tukey, *An algorithm for the machine calculation
+      of complex Fourier series*,
+      `Math. Comput. 19, 297–301 (1965) <https://doi.org/10.2307/2003354>`_
+
+   #. J. W. Cooley and J. W. Tukey, *An algorithm for the machine calculation
+      of complex Fourier series*,
+      Math. Comput. **19**, 297–301 (1965) `<https://doi.org/10.2307/2003354>`_
+
+   #. J. W. Cooley and J. W. Tukey, *An algorithm for the machine calculation
+      of complex Fourier series*,
+      Math. Comput. **19**, 297–301 (1965) https://doi.org/10.2307/2003354
+
+results in the output
+
+#. J. W. Cooley and J. W. Tukey, *An algorithm for the machine calculation of complex Fourier series*,
+   `Math. Comput. 19, 297–301 (1965) <https://doi.org/10.2307/2003354>`_
+
+#. J. W. Cooley and J. W. Tukey, *An algorithm for the machine calculation of complex Fourier series*,
+   Math. Comput. **19**, 297–301 (1965) `<https://doi.org/10.2307/2003354>`_
+
+#. J. W. Cooley and J. W. Tukey, *An algorithm for the machine calculation of complex Fourier series*,
+   Math. Comput. **19**, 297–301 (1965) https://doi.org/10.2307/2003354
+
+The first case represents the most comprehensive way to represent a link. The pair of back apostrophes
+encloses the text and the link delimited by a less-than and greater-than sign. The text will be shown
+in the output with the link associated with it. The underscore at the very end indicates that this is
+an outgoing link. In contrast to the two other variants, the volume number (19) can be set as boldface
+as nesting of the markup is not possible. 
+
+The second alternative explicitly displays the URL since no text is given. The same effect is obtained
+in the third variant by simply putting a URL which can be recognized as such. 
+
+
+footnotes
 
 
 .. [#docreSt] More information on reStructuredText can be found in the documentation
