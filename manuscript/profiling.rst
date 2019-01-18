@@ -698,7 +698,7 @@ analysis yields the following result::
        47/45    0.075    0.002    0.084    0.002 {built-in method _imp.create_dynamic}
          392    0.060    0.000    0.060    0.000 {method 'reduce' of 'numpy.ufunc' objects}
            1    0.048    0.048    4.231    4.231 carpet_4.py:1(<module>)
-   25525/25521    0.038    0.000    0.048    0.000 {built-in method builtins.isinstance}
+ 25525/25521    0.038    0.000    0.048    0.000 {built-in method builtins.isinstance}
          286    0.038    0.000    0.038    0.000 {built-in method marshal.loads}
    1216/1161    0.028    0.000    0.205    0.000 {built-in method builtins.__build_class__}
           14    0.025    0.002    0.132    0.009 /opt/anaconda3/lib/python3.6/site-packages/matplotlib/font_manager.py:1255(findfont)
@@ -707,9 +707,12 @@ analysis yields the following result::
         1452    0.022    0.000    0.022    0.000 {built-in method posix.stat}
         3051    0.022    0.000    0.052    0.000 <frozen importlib._bootstrap_external>:57(_path_join)
 
-Since the run time obtained by profiling is longer than the actual run time,
-we have timed the first version of the script against the NumPy version, resulting
-in an speed up by a factor of 90.
+Since the run time obtained by profiling is longer than the actual run time, we
+have measured the latter for the first version of the script and the NumPy
+version, resulting in an speed up by a factor of 90. Even though this
+improvement is impressive, the code given above could be improved even further.
+However, as this is not the main purpose of the chapter, we rather turn our
+attention to how one can do profiling on a line-by-line basis.
 
 
 Line oriented run-time analysis
