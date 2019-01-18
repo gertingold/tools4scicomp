@@ -506,7 +506,7 @@ position.  If we want to have the freedom to evaluate the wave function at a
 given position and time on a certain grid, we could also store the values of
 all eigenfunctions at all positions on the grid in a cache for later reuse.
 This is an example of trading compute time against memory.  We will implement
-the latter idea in the next version of our script listed below.
+the latter idea in the next version of our script listed below. [#lru_cache]_
 
 .. code-block:: python
    :linenos:
@@ -779,5 +779,10 @@ dramatically as we have seen at the end of the previous section.
               O. M. Friesch, A. E. Kaplan, W. P. Schleich, `Quantum carpets made
               simple <http://www.physics.sk/aps/pubs/1998/aps_1998_48_3_323.pdf>`_,
               Acta Phys. Slov. **48**, 323 (1998).
+.. [#lru_cache] An alternative approach to caching would consist in using the
+              ``functools.lru_cache`` decorator. However, in our specific case it
+              turns out that the overhead introduced by the ``lru_cache`` has a
+              significant impact on the performance. The situation might be different
+              if it is more time consuming to obtain the results to be cached.
 .. [#kern] The command name ``kernprof`` makes reference to the author of the package
            Robert Kern.
