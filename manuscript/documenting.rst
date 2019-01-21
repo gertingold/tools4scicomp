@@ -86,7 +86,7 @@ markup is applied may not start or end with a whitespace. The following example
 provides an illustration. ::
 
    Text can be *emphasized*, usually as italics, or even **strongly emphasized**,
-   usually as boldface. It is also possible of insert ``inline literals`` which
+   usually as boldface. It is also possible to insert ``inline literals`` which
    will usually be represented as monospaced text.
 
    This is another paragraph showing how to embed an inline literal while
@@ -95,7 +95,7 @@ provides an illustration. ::
 will be represented as [#sphinxLatexRepr]_
 
    Text can be *emphasized*, usually as italics, or even **strongly emphasized**,
-   usually as boldface. It is also possible of insert ``inline literals`` which
+   usually as boldface. It is also possible to insert ``inline literals`` which
    will usually be represented as monospaced text.
 
    This is another paragraph showing how to embed an inline literal while
