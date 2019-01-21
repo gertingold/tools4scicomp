@@ -216,6 +216,38 @@ code can be highlighted.
           sum = sum+n**2
       print(nmax, sum)
 
+Another possibility to typeset code is the use of two colons. If the colons
+follow the preceding text immediately, a single colon will be displayed at the
+end of the text::
+
+   The following script displays "hello world" three times::
+
+      for _ in range(3):
+          print('Hello world!')
+
+Note the indentation of the code block which indicates which part of the text
+should be considered as code. The output is as follows:
+
+   The following script displays "hello world" three times::
+
+      for _ in range(3):
+          print('Hello world!')
+
+The colon in the output can be avoided if the colons are separated from the
+text by a blank::
+
+   The following script displays "hello world" three times. ::
+
+      for _ in range(3):
+          print('Hello world!')
+
+Now, the output looks as follows:
+
+   The following script displays "hello world" three times. ::
+
+      for _ in range(3):
+          print('Hello world!')
+
 For scientific applications, one might want to include mathematical
 expressions.  This can be done by means of the *math* role (``:math:``) for
 inline mathematical expressions and the *math* directive (``math::``) for
