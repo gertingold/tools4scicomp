@@ -166,29 +166,33 @@ This code results in
 
 An enumerated list can be numbered explicitly by numbers, alphabet characters
 in uppercase or lowercase, or Roman numerals. It is also possible to autonumber
-a list by means of ``#``. The following example deliberately assigns the number
-5 to the first item. In the following example, autonumbering is used. For the
-last label, the number 2 is enforced. The following code
+a list by means of ``#``. The sublist of the second item demonstrates two
+aspects. The first subitem specifies that lowercase letters should be used for
+enumeration and, in addition, the sublist should start with a letter other than
+"a".  Once autonumbering has started, fixing a subsequent label would lead to
+the start of a new list.
+
+The following code
 
 .. code-block:: none
 
-   5. first item with automatic numbering
+   #. first item with automatic numbering
    #. second item
 
-      #. subitem
+      p. subitem
       #. another subitem
 
-   2. another item forced to be labelled by 2
+   #. another item
 
 results in
 
-   5. first item with automatic numbering
+   #. first item with automatic numbering
    #. second item
 
-      #. subitem
+      p. subitem
       #. another subitem
 
-   2. another item forced to be labelled by 2
+   #. another item
 
 We have already seen how to produce inline literals which may be useful to
 mark for example keywords. To display multiline code, the *code* directive
