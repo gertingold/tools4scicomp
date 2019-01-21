@@ -767,6 +767,12 @@ We can see here that the for loop is responsible for a significant portion of th
 execution time. Making use of NumPy arrays can improve the performance of the code
 dramatically as we have seen at the end of the previous section.
 
+By using the option ``-v``, we were able to immediately see the result of the profiling run.
+In addition, a file ``carpet.py.lprof`` has been created. It is possible to obtain the
+profiling result from it later by means of::
+
+   python -m line_profiler carpet.py.lprof
+
 .. [#cupy] For more information, see the `CuPy homepage <https://cupy.chainer.org>`_.
 .. [#cython] For more information, see `Cython – C-Extensions for Python
              <https://cython.org/>`_. 
