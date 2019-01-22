@@ -539,6 +539,51 @@ a few builtin themes which represent a simple way to change the look and feel of
 the HTML output. Third-party themes can be found at https://sphinx-themes.org/ and
 there is also the possibility to create one's own customized theme.
 
+If the LaTeX output needs to be customized, the dictionary ``latex_elements`` is the
+place to look for. The configuration file created by ``sphinx-quickstart`` provides
+a structure which is commented out, but might be useful if one needs to customize certain
+aspects. For example, if one wants to typeset for A4 paper and would like to have floats
+preferentially placed on the top of the page, one might set the dictionary as follows::
+
+   latex_elements = {
+        # The paper size ('letterpaper' or 'a4paper').
+        #
+        'papersize': 'a4paper',
+   
+        # The font size ('10pt', '11pt' or '12pt').
+        #
+        # 'pointsize': '10pt',
+   
+        # Additional stuff for the LaTeX preamble.
+        #
+        # 'preamble': '',
+   
+        # Latex figure (float) alignment
+        #
+        'figure_align': 'tbp',
+   }
+
+An interesting entry is also ``'preamble'`` where all information can be specified which
+would normally go in the preamble of a LaTeX document, i.e. between the ``documentclass``
+statement and the ``\begin{document}`` line. Note, however, that the use of backslashes
+common in LaTeX documents might require to specify the string as raw string by placing
+an ``r`` in front of it. A number of parameters specified by the Sphinx style file can be
+modified in an entry with key ``'sphinxsetup'``. If the outline of the box enclosing code
+should be removed and a background color different from white should be used, one
+might specify::
+
+    'sphinxsetup': '''verbatimwithframe=false,
+                      VerbatimColor={named}{AliceBlue},
+                   '''
+
+This definition is used for the present document. Details about which
+parameters can be changed in this way and about other entries which can be
+added to the dictionary ``latex_elements`` can be found in the section `LaTeX
+customization <https://www.sphinx-doc.org/en/master/latex.html>`_ of the Sphinx
+documentation. Finally, it may be useful to know that in the list ``latex_documents``
+several properties of the document are specified like the title and author appearing
+on the cover page of the documentation.
+
 .. _autogeneration:
 
 Autogeneration of a documentation
