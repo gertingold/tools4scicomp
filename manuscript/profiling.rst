@@ -335,51 +335,51 @@ This figure has been obtained by means of the following Python script called
 .. code-block:: python
    :linenos:
 
+
    from math import cos, exp, pi, sin, sqrt
    from cmath import exp as cexp
    import numpy as np
    import matplotlib.pyplot as plt
    from matplotlib import cm
-
+   
    class InfiniteWell:
-       def __init__(self, width, nbase, nint):
+       def __init__(self, psi0, width, nbase, nint):
            self.width = width
            self.nbase = nbase
            self.nint = nint
-           self.coeffs = []
-
+           self.coeffs = self.get_coeffs(psi0)
+   
        def eigenfunction(self, n, x):
            if n % 2:
                return sqrt(2/self.width)*sin((n+1)*pi*x/self.width)
            return sqrt(2/self.width)*cos((n+1)*pi*x/self.width)
-
+   
        def get_coeffs(self, psi):
-           self.coeffs = []
+           coeffs = []
            for n in range(self.nbase):
                f = lambda x: psi(x)*self.eigenfunction(n, x)
                c = trapezoidal(f, -0.5*self.width, 0.5*self.width, self.nint)
-               self.coeffs.append(c)
-
+               coeffs.append(c)
+           return coeffs
+   
        def psi(self, x, t):
-           if not self.coeffs:
-               self.get_coeffs(psi0)
            psit = 0
            for n, c in enumerate(self.coeffs):
                psit = psit + c*cexp(-1j*(n+1)**2*t)*self.eigenfunction(n, x)
            return psit
-
+   
    def trapezoidal(func, a, b, nint):
        delta = (b-a)/nint
        integral = 0.5*(func(a)+func(b))
        for k in range(1, nint):
            integral = integral+func(a+k*delta)
        return delta*integral
-
+   
    def psi0(x):
        sigma = 0.005
        return exp(-x**2/(2*sigma))/(pi*sigma)**0.25
-
-   w = InfiniteWell(width=2, nbase=100, nint=1000)
+   
+   w = InfiniteWell(psi0=psi0, width=2, nbase=100, nint=1000)
    x = np.linspace(-0.5*w.width, 0.5*w.width, 500)
    ntmax = 1000
    z = np.zeros((500, ntmax))
@@ -398,27 +398,27 @@ This code is by no means optimal. After all, we want to discuss strategies to fi
 out where most of the compute time is spent and what we can do to improve the situation.
 Before doing so, let us get a general idea of how the code works.
 
-First, we need to decompose the initial wave function into the basis functions.
 The initial wave function is the Gaussian defined in the function ``psi0`` in
-lines 41-43.  The integration is carried out very simply according to the
-trapezoidal rule as defined in function ``trapezoidal`` in lines 34-39.
-Everything related to the basis functions is collected in the class
-``InfiniteWell``. During the instantiation, we have to define the total width
-of the well ``width``, the number of basis states ``nbase``, and the number of
-integration points ``nint`` to be used when determining the coefficients. The
-value of the eigenfunction corresponding to eigenvalue ``n`` at position ``x``
-is obtained by means of the method ``eigenfunction`` defined in line 14-17.
-Whenever the wave function at a given point ``x`` and a given time ``t`` is to
-be calculated, method ``psi`` defined in lines 26-32 first checks whether the
-coefficients have already been determined.  Otherwise, they are calculated by
-means of the method ``get_coeffs`` defined in lines 19-24. In line 28, we have
-for simplicity hardcoded the function for the initial state. The code from line
-45 to the end serves to calculate the time evolution and to render the image
-shown in :numref:`carpet`. In this version of the code, we deliberately do not
-make use of NumPy except to obtain the image. Of course, NumPy would provide
-a significant speedup right away and one would probably never write the code
-in the way shown here. But it provides a good starting point to learn about
-run-time analysis. Where does the code spend most of its time?
+lines 40-42.  Everything related to the basis functions is collected in the
+class ``InfiniteWell``. During the instantiation, we define the initial wave
+function ``psi0``, the total width of the well ``width``, the number of basis
+states ``nbase``, and the number of integration points ``nint`` to be used when
+determining the coefficients. The expansion coefficients of the initial state
+are determined in ``get_coeffs`` defined in lines 19-25 and called from line
+12. The value of the eigenfunction corresponding to eigenvalue ``n`` at
+position ``x`` is obtained by means of the method ``eigenfunction`` defined
+in line 14-17.  The integration is carried out very simply according to the
+trapezoidal rule as defined in function ``trapezoidal`` in lines 33-38.
+The wave function at a given point ``x`` and a given time ``t`` is
+calculated by method ``psi`` defined in lines 27-31.  The code from line 44
+to the end serves to calculate the time evolution and to render the image
+shown in :numref:`carpet`.
+
+In this version of the code, we deliberately do not make use of NumPy except to
+obtain the image.  Of course, NumPy would provide a significant speedup right
+away and one would probably never write the code in the way shown here. But it
+provides a good starting point to learn about run-time analysis. Where does the
+code spend most of its time?
 
 To address this question, we make use of the ``cProfile`` module contained in the
 Python standard library. Among the various ways of using this module, we choose
@@ -434,29 +434,30 @@ data in various ways by means of the ``pstats`` module. Let us try it out::
    >>> import pstats
    >>> p = pstats.Stats('carpet.prof')
    >>> p.sort_stats('time').print_stats(15)
-   Thu Dec 27 17:34:50 2018    carpet.prof
-   
-            201999355 function calls (201992896 primitive calls) in 666.749 seconds
-   
-      Ordered by: internal time
-      List reduced from 3695 to 15 due to restriction <15>
-   
-      ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-    50100100  231.457    0.000  364.891    0.000 carpet.py:14(eigenfunction)
-      500000  196.077    0.000  658.832    0.001 carpet.py:26(psi)
-    50000000   96.882    0.000   96.882    0.000 {built-in method cmath.exp}
-    50100101   62.425    0.000   62.425    0.000 {built-in method math.sqrt}
-    25050064   35.555    0.000   35.555    0.000 {built-in method math.cos}
-    25050064   35.453    0.000   35.453    0.000 {built-in method math.sin}
-           1    3.437    3.437    4.284    4.284 {built-in method exec_}
-        1000    1.556    0.002  660.896    0.661 carpet.py:52(<listcomp>)
-      502454    0.511    0.000    0.511    0.000 {built-in method builtins.abs}
-      100100    0.388    0.000    1.469    0.000 carpet.py:22(<lambda>)
-           6    0.362    0.060    0.362    0.060 {method 'poll' of 'select.poll' objects}
-      100100    0.302    0.000    0.436    0.000 carpet.py:42(psi0)
-           2    0.173    0.087    0.173    0.087 {built-in method statusBar}
-         100    0.157    0.002    1.626    0.016 carpet.py:35(trapezoidal)
-      100101    0.134    0.000    0.134    0.000 {built-in method math.exp}
+   Tue Jan 22 17:04:46 2019    carpet.prof
+
+         202073424 function calls (202065686 primitive calls) in 633.175 seconds
+
+   Ordered by: internal time
+   List reduced from 3684 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+ 50100100  232.867    0.000  354.468    0.000 carpet.py:14(eigenfunction)
+   500000  184.931    0.000  623.191    0.001 carpet.py:27(psi)
+ 50000000   84.417    0.000   84.417    0.000 {built-in method cmath.exp}
+ 50100101   55.301    0.000   55.301    0.000 {built-in method math.sqrt}
+ 25050064   33.170    0.000   33.170    0.000 {built-in method math.cos}
+ 25050064   33.129    0.000   33.129    0.000 {built-in method math.sin}
+        1    3.326    3.326    4.341    4.341 {built-in method exec_}
+     1000    1.878    0.002  625.763    0.626 carpet.py:50(<listcomp>)
+   503528    0.699    0.000    0.699    0.000 {built-in method builtins.abs}
+     1430    0.372    0.000    0.372    0.000 {method 'read' of '_io.BufferedReader' objects}
+   100100    0.348    0.000    1.386    0.000 carpet.py:22(<lambda>)
+        2    0.300    0.150    0.300    0.150 {built-in method statusBar}
+   100100    0.294    0.000    0.413    0.000 carpet.py:40(psi0)
+      100    0.154    0.002    1.540    0.015 carpet.py:33(trapezoidal)
+   100101    0.119    0.000    0.119    0.000 {built-in method math.exp}
+
    
 After having imported the ``pstats`` module, we load our profiling file
 ``carpet.prof`` to obtain a statistics object ``p``. The data can then be
@@ -518,11 +519,11 @@ the latter idea in the next version of our script listed below. [#lru_cache]_
    from matplotlib import cm
 
    class InfiniteWell:
-       def __init__(self, width, nbase, nint):
+       def __init__(self, psi0, width, nbase, nint):
            self.width = width
            self.nbase = nbase
            self.nint = nint
-           self.coeffs = []
+           self.coeffs = self.get_coeffs(psi0)
            self.eigenfunction_cache = {}
 
        def eigenfunction(self, n, x):
@@ -531,15 +532,14 @@ the latter idea in the next version of our script listed below. [#lru_cache]_
            return sqrt(2/self.width)*cos((n+1)*pi*x/self.width)
 
        def get_coeffs(self, psi):
-           self.coeffs = []
+           coeffs = []
            for n in range(self.nbase):
                f = lambda x: psi(x)*self.eigenfunction(n, x)
                c = trapezoidal(f, -0.5*self.width, 0.5*self.width, self.nint)
-               self.coeffs.append(c)
+               coeffs.append(c)
+           return coeffs
 
        def psi(self, x, t):
-           if not self.coeffs:
-               self.get_coeffs(psi0)
            if not x in self.eigenfunction_cache:
                self.eigenfunction_cache[x] = [self.eigenfunction(n, x)
                                               for n in range(self.nbase)]
@@ -559,7 +559,7 @@ the latter idea in the next version of our script listed below. [#lru_cache]_
        sigma = 0.005
        return exp(-x**2/(2*sigma))/(pi*sigma)**0.25
 
-   w = InfiniteWell(width=2, nbase=100, nint=1000)
+   w = InfiniteWell(psi0=psi0, width=2, nbase=100, nint=1000)
    x = np.linspace(-0.5*w.width, 0.5*w.width, 500)
    ntmax = 1000
    z = np.zeros((500, ntmax))
@@ -580,27 +580,29 @@ calculated and the cache is updated.
 
 As a result of this modification of the code, the profiling data change considerably::
 
-            52108308 function calls (52101855 primitive calls) in 183.611 seconds
+   Tue Jan 22 17:10:33 2019    carpet.prof
+   
+            52205250 function calls (52197669 primitive calls) in 185.581 seconds
    
       Ordered by: internal time
-      List reduced from 3604 to 15 due to restriction <15>
+      List reduced from 3670 to 15 due to restriction <15>
    
       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-      500000   95.555    0.000  171.246    0.000 carpet.py:27(psi)
-    50000000   73.505    0.000   73.505    0.000 {built-in method cmath.exp}
-           1    3.338    3.338    3.763    3.763 {built-in method exec_}
-        1000    1.796    0.002  173.546    0.174 carpet.py:56(<listcomp>)
-       48/46    1.403    0.029    1.415    0.031 {built-in method _imp.create_dynamic}
-           2    1.178    0.589    1.178    0.589 {built-in method statusBar}
-         288    0.811    0.003    0.811    0.003 {method 'read' of '_io.FileIO' objects}
-      150100    0.663    0.000    1.063    0.000 carpet.py:15(eigenfunction)
-           1    0.652    0.652    0.701    0.701 /opt/anaconda3/lib/python3.6/site-packages/matplotlib/backends/backend_qt5.py:104(_create_qApp)
-      501286    0.507    0.000    0.507    0.000 {built-in method builtins.abs}
-      100100    0.427    0.000    1.602    0.000 carpet.py:23(<lambda>)
-      100100    0.320    0.000    0.458    0.000 carpet.py:46(psi0)
-      150101    0.193    0.000    0.193    0.000 {built-in method math.sqrt}
-         100    0.161    0.002    1.763    0.018 carpet.py:39(trapezoidal)
-        1413    0.149    0.000    0.149    0.000 {built-in method posix.stat}
+      500000   97.612    0.000  177.453    0.000 carpet.py:28(psi)
+    50000000   79.415    0.000   79.415    0.000 {built-in method cmath.exp}
+        1000    2.162    0.002  180.342    0.180 carpet.py:54(<listcomp>)
+           1    1.176    1.176    2.028    2.028 {built-in method exec_}
+      503528    0.732    0.000    0.732    0.000 {built-in method builtins.abs}
+      150100    0.596    0.000    0.954    0.000 carpet.py:15(eigenfunction)
+      100100    0.353    0.000    1.349    0.000 carpet.py:23(<lambda>)
+        1430    0.323    0.000    0.323    0.000 {method 'read' of '_io.BufferedReader' objects}
+           2    0.301    0.151    0.301    0.151 {built-in method statusBar}
+      100100    0.278    0.000    0.396    0.000 carpet.py:44(psi0)
+      150101    0.171    0.000    0.171    0.000 {built-in method math.sqrt}
+         100    0.140    0.001    1.489    0.015 carpet.py:37(trapezoidal)
+      100101    0.119    0.000    0.119    0.000 {built-in method math.exp}
+       75064    0.095    0.000    0.095    0.000 {built-in method math.sin}
+       75064    0.093    0.000    0.093    0.000 {built-in method math.cos}
 
 We observe a speed-up of a factor of 3.6 by investing about 500×100×8 bytes of
 memory, i.e. roughly 400 kB. The exact value will be slightly different because
@@ -625,13 +627,15 @@ NumPy from the very beginning
    import numpy as np
    import matplotlib.pyplot as plt
    from matplotlib import cm
-
+   
    class InfiniteWell:
-       def __init__(self, width, nbase, nint):
+       def __init__(self, psi0, width, nbase, nint):
            self.width = width
            self.nbase = nbase
            self.nint = nint
-
+           self.coeffs = trapezoidal(lambda x: psi0(x)*self.eigenfunction(x),
+                                     -0.5*self.width, 0.5*self.width, self.nint)
+   
        def eigenfunction(self, x):
            assert x.ndim == 1
            normalization = sqrt(2/self.width)
@@ -640,23 +644,15 @@ NumPy from the very beginning
            result[0::2, :] = normalization*np.cos(args[0::2])
            result[1::2, :] = normalization*np.sin(args[1::2])
            return result
-
-       def get_coeffs(self, psi):
-           self.coeffs = trapezoidal(lambda x: psi(x)*self.eigenfunction(x),
-                                     -0.5*self.width, 0.5*self.width, self.nint)
-
+   
        def psi(self, x, t):
-           try:
-               coeffs = self.coeffs[:, np.newaxis]
-           except AttributeError:
-               self.get_coeffs(psi0)
-               coeffs = self.coeffs[:, np.newaxis]
+           coeffs = self.coeffs[:, np.newaxis]
            eigenvals = np.arange(self.nbase)[:, np.newaxis]
            tvals = t[:, np.newaxis, np.newaxis]
            psit = np.sum(coeffs * self.eigenfunction(x)
                          * np.exp(-1j*(eigenvals+1)**2*tvals), axis= -2)
            return psit
-
+   
    def trapezoidal(func, a, b, nint):
        delta = (b-a)/nint
        x = np.linspace(a, b, nint+1)
@@ -664,12 +660,12 @@ NumPy from the very beginning
        integrand[..., 0] = 0.5*integrand[..., 0]
        integrand[..., -1] = 0.5*integrand[..., -1]
        return delta*np.sum(integrand, axis=-1)
-
+   
    def psi0(x):
        sigma = 0.005
        return np.exp(-x**2/(2*sigma))/(np.pi*sigma)**0.25
-
-   w = InfiniteWell(width=2, nbase=100, nint=1000)
+   
+   w = InfiniteWell(psi0=psi0, width=2, nbase=100, nint=1000)
    x = np.linspace(-0.5*w.width, 0.5*w.width, 500)
    t = np.linspace(0, np.pi/4, 1000)
    z = np.abs(w.psi(x, t))**2
@@ -685,27 +681,30 @@ universal functions in several places. In the method ``psi``, a three-dimensiona
 array is used with axis 0 to 2 given by time, eigenvalue, and position. A run-time
 analysis yields the following result::
 
-            404245 function calls (397745 primitive calls) in 4.229 seconds
+   Tue Jan 22 17:12:41 2019    carpet.prof
+   
+            457912 function calls (450291 primitive calls) in 4.644 seconds
    
       Ordered by: internal time
-      List reduced from 3722 to 15 due to restriction <15>
+      List reduced from 3682 to 15 due to restriction <15>
    
       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-           1    1.537    1.537    2.389    2.389 {built-in method exec_}
-           1    0.342    0.342    0.404    0.404 carpet_4.py:25(psi)
-           6    0.332    0.055    0.332    0.055 {method 'poll' of 'select.poll' objects}
-           2    0.146    0.073    0.146    0.073 {built-in method statusBar}
-       47/45    0.075    0.002    0.084    0.002 {built-in method _imp.create_dynamic}
-         392    0.060    0.000    0.060    0.000 {method 'reduce' of 'numpy.ufunc' objects}
-           1    0.048    0.048    4.231    4.231 carpet_4.py:1(<module>)
- 25525/25521    0.038    0.000    0.048    0.000 {built-in method builtins.isinstance}
-         286    0.038    0.000    0.038    0.000 {built-in method marshal.loads}
-   1216/1161    0.028    0.000    0.205    0.000 {built-in method builtins.__build_class__}
-          14    0.025    0.002    0.132    0.009 /opt/anaconda3/lib/python3.6/site-packages/matplotlib/font_manager.py:1255(findfont)
-           1    0.023    0.023    0.025    0.025 /opt/anaconda3/lib/python3.6/site-packages/matplotlib/backends/backend_qt5.py:104(_create_qApp)
-          73    0.023    0.000    0.023    0.000 {built-in method io.open}
-        1452    0.022    0.000    0.022    0.000 {built-in method posix.stat}
-        3051    0.022    0.000    0.052    0.000 <frozen importlib._bootstrap_external>:57(_path_join)
+           1    1.707    1.707    2.543    2.543 {built-in method exec_}
+           1    0.410    0.410    0.481    0.481 carpet.py:23(psi)
+        1430    0.284    0.000    0.284    0.000 {method 'read' of '_io.BufferedReader' objects}
+           2    0.276    0.138    0.276    0.138 {built-in method statusBar}
+         407    0.074    0.000    0.074    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+       48/46    0.056    0.001    0.061    0.001 {built-in method _imp.create_dynamic}
+       35469    0.049    0.000    0.053    0.000 {built-in method builtins.isinstance}
+         284    0.048    0.000    0.048    0.000 {built-in method marshal.loads}
+           1    0.039    0.039    0.040    0.040 {built-in method show}
+           2    0.036    0.018    0.210    0.105 /opt/anaconda3/lib/python3.7/site-packages/matplotlib/font_manager.py:1198(_findfont_cached)
+     418/185    0.028    0.000    0.099    0.001 /opt/anaconda3/lib/python3.7/sre_parse.py:475(_parse)
+       23838    0.028    0.000    0.028    0.000 {method 'lower' of 'str' objects}
+          63    0.027    0.000    0.027    0.000 {built-in method io.open}
+       21637    0.025    0.000    0.025    0.000 {method 'startswith' of 'str' objects}
+   1169/1101    0.025    0.000    0.200    0.000 {built-in method builtins.__build_class__}
+
 
 Since the run time obtained by profiling is longer than the actual run time, we
 have measured the latter for the first version of the script and the NumPy
