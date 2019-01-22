@@ -1,3 +1,5 @@
+.. _profiling:
+
 *****************
 Run-time analysis
 *****************
