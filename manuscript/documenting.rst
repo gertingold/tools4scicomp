@@ -589,7 +589,203 @@ on the cover page of the documentation.
 Autogeneration of a documentation
 ---------------------------------
 
-Google style docstrings [#googledocstring]_ and NumPy style docstrings [#numpydocstring]_
+With *Sphinx* it is possible to autogenerate documentation from docstrings. Before discussing
+how docstrings can be formatted for use by *Sphinx*, we make a few general remarks on docstrings.
+Recommendations about how a docstring should look like are given in :pep:`257`. [#pep]_ 
+We here focus on the keypoints pertinent to docstrings of methods and functions. The first line
+of the docstring should be a phrase ending in a period. It should be written as a command like
+"do something" instead of a description like "does something". This phrase should not exceed
+one line and it should be separated from the rest of the docstring by one empty line. Then,
+in particular the arguments of the function or method and the return value(s) should be explained.
+Or course, further information deemed useful can be given in addition.
+
+In order to demonstrate the autogeneration of documentation from docstrings, we take as an
+example the last script for the quantum carpet discussed in :numref:`profiling`. We have
+partially supplied the code with docstrings which now looks as follows::
+
+   from math import sqrt
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from matplotlib import cm
+   
+   class InfiniteWell:
+       """Quantum carpet for infinitely deep potential well.
+   
+       This class allows to determine the time evolution of an
+       initial state in an infinitely deep potential well.
+   
+       :param func psi0: initial wave function
+       :param float width: width of the potential well
+       :param int nbase: number of basis states
+       :param int nint: number of intervals used in the integration routine
+       """
+   
+       def __init__(self, psi0, width, nbase, nint):
+           self.width = width
+           self.nbase = nbase
+           self.nint = nint
+           self.coeffs = trapezoidal(lambda x: psi0(x)*self.eigenfunction(x),
+                                     -0.5*self.width, 0.5*self.width, self.nint)
+   
+       def eigenfunction(self, x):
+           """Determine set of eigenfunction values at position ``x``
+   
+           The basis set is limited by the number of eigenstates given by 
+           ``self.nbase``.
+   
+           :param x: position at which the eigenfunctions are to be determined
+           :type x: float or numpy.ndarray
+           :return: array of eigenfunction values
+           :rtype: numpy.ndarray
+           :raises AssertionError: if the dimension of ``x`` does not equal 1
+           """
+           assert x.ndim == 1
+           normalization = sqrt(2/self.width)
+           args = (np.arange(self.nbase)[:, np.newaxis]+1)*np.pi*x/self.width
+           result = np.empty((self.nbase, x.size))
+           result[0::2, :] = normalization*np.cos(args[0::2])
+           result[1::2, :] = normalization*np.sin(args[1::2])
+           return result
+   
+       def psi(self, x, t):
+           coeffs = self.coeffs[:, np.newaxis]
+           eigenvals = np.arange(self.nbase)[:, np.newaxis]
+           tvals = t[:, np.newaxis, np.newaxis]
+           psit = np.sum(coeffs * self.eigenfunction(x)
+                         * np.exp(-1j*(eigenvals+1)**2*tvals), axis= -2)
+           return psit
+   
+   def trapezoidal(func, a, b, nint):
+       delta = (b-a)/nint
+       x = np.linspace(a, b, nint+1)
+       integrand = func(x)
+       integrand[..., 0] = 0.5*integrand[..., 0]
+       integrand[..., -1] = 0.5*integrand[..., -1]
+       return delta*np.sum(integrand, axis=-1)
+   
+   def psi0(x):
+       """Determine Gaussian wave function.
+   
+       :param float x: position at which the wave function is determined
+       :return: value of wave function at position ``x``
+       :rtype: float
+       """
+       sigma = 0.005
+       return np.exp(-x**2/(2*sigma))/(np.pi*sigma)**0.25
+   
+   if __name__ == '__main__':
+       w = InfiniteWell(psi0=psi0, width=2, nbase=100, nint=1000)
+       x = np.linspace(-0.5*w.width, 0.5*w.width, 500)
+       t = np.linspace(0, np.pi/4, 1000)
+       z = np.abs(w.psi(x, t))**2
+       z = z/np.max(z)
+       plt.rc('text', usetex=True)
+       plt.imshow(z.T, cmap=cm.hot)
+       plt.xlabel('$t$', fontsize=20)
+       plt.ylabel('$x$', fontsize=20)
+       plt.show()
+
+In addition to the docstrings, this code makes sure that the last part is not executed
+when this script is imported, because in order to access the docstrings, *Sphinx* will
+import the script. Execution of the last part in our case will simply cost time but 
+in general can have more serious side effects. Note that the script can only be imported,
+if it is in the search path defined in the *Sphinx* configuration file. This usually
+requires to uncomment the three lines ::
+
+   import os
+   import sys
+   sys.path.insert(0, os.path.abspath('.'))
+
+and to adjust the argument of ``os.path.abspath`` according to the place where the
+script to be imported can be found.
+
+The docstrings are written in reStructuredText and admittedly are not easy to
+read. We will discuss a solution to this problem shortly. For the moment,
+however, we will keep this form of the docstrings.
+
+Now let us add the following code in one of our reStructuredText files which are part of
+the documentation::
+
+   .. automodule:: carpet
+      :members:
+      :undoc-members:
+
+This code will only function correctly, if the ``autodoc`` extension is loaded, i.e.
+the list ``extensions`` in the *Sphinx* configuration file contains the entry ``'sphinx.ext.autodoc'``.
+The argument ``carpet`` of the ``automodule`` directive implies that the file ``carpet.py``
+will be imported. The autogenerated documentation will list all documented as well as
+all undocumented members. The generated output will look as follows:
+
+   class carpet.InfiniteWell(psi0, width, nbase, nint)
+   
+      Quantum carpet for infinitely deep potential well.
+   
+      This class allows to determine the time evolution of an initial
+      state in an infinitely deep potential well.
+   
+      Parameters:
+         * **psi0** (*func*) -- initial wave function
+   
+         * **width** (*float*) -- width of the potential well
+   
+         * **nbase** (*int*) -- number of basis states
+   
+         * **nint** (*int*) -- number of intervals used in the
+           integration routine
+   
+      eigenfunction(x)
+   
+         Determine set of eigenfunction values at position ``x``
+   
+         The basis set is limited by the number of eigenstates given by
+         ``self.nbase``.
+   
+         Parameters:
+            **x** (*float or numpy.ndarray*) -- position at which the
+            eigenfunctions are to be determined
+   
+         Returns:
+            array of eigenfunction values
+   
+         Return type:
+            numpy.ndarray
+   
+         Raises:
+            **AssertionError** -- if the dimension of ``x`` does not equal
+            1
+   
+      psi(x, t)
+   
+   carpet.psi0(x)
+   
+      Determine Gaussian wave function.
+   
+      Parameters:
+         **x** (*float*) -- position at which the wave function is
+         determined
+   
+      Returns:
+         value of wave function at position ``x``
+   
+      Return type:
+         float
+   
+   carpet.trapezoidal(func, a, b, nint)
+
+If the line containing ``:undoc-members:`` were left out in the ``automodule`` directive,
+the output would contain only the documented class and methods. The listed methods could
+be restricted by giving the appropriate names after ``:members:``.
+
+As already mentioned, the docstrings given above are not particularly easy to read. There
+are two standards for docstrings which are handled by *Sphinx*, provided the extension
+``napoleon`` is loaded. The list ``extensions`` in the *Sphinx* configuration file then
+should contain the string ``'sphinx.ext.napoleon'``. The two standards for docstrings
+are the Google style docstring [#googledocstring]_ and NumPy style docstring [#numpydocstring]_.
+We will focus our discussion of these two standards to the method ``eigenfunction`` in the
+quantum carpet script.
+
+
+
 
 .. [#docreSt] More information on reStructuredText can be found in the documentation
    of the docutils project at `<http://docutils.sourceforge.net/rst.html>`_.
@@ -601,6 +797,8 @@ Google style docstrings [#googledocstring]_ and NumPy style docstrings [#numpydo
 .. [#sphinxversion] The following discussion is based on version 1.8.2 of *Sphinx* but
        should mostly apply to all recent versions of *Sphinx*.
 .. [#mathjax] For more information see https://www.mathjax.org/.
-.. [#googledocstring] https://google.github.io/styleguide/pyguide.html#functions-and-methods,
-       https://google.github.io/styleguide/pyguide.html#comments-in-classes
-.. [#numpydocstring] https://numpydoc.readthedocs.io/en/latest/format.html
+.. [#googledocstring] For a complete description see
+       https://google.github.io/styleguide/pyguide.html#functions-and-methods and
+       https://google.github.io/styleguide/pyguide.html#comments-in-classes.
+.. [#numpydocstring] For details see https://numpydoc.readthedocs.io/en/latest/format.html.
+.. [#pep] PEP is short for Python Enhancement Proposal.
