@@ -1,3 +1,5 @@
+.. _documenting:
+
 *********************
 Documentation of code
 *********************
