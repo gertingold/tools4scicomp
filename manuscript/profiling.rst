@@ -304,6 +304,8 @@ provide a simple way to time the execution of a single line of code or a code ce
 These magics choose a reasonable number of repetitions to obtain good statistics within a
 reasonable amount of time.
 
+.. _cProfile:
+
 The ``cProfile`` module
 =======================
 
