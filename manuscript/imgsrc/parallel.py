@@ -58,7 +58,7 @@ for nr, ndiv in enumerate((2, 4, 8, 16, 32)):
     nrproc, start, ende, data = mandelbrot(xmin, xmax, width, ymin, ymax, height,
                       npts, ndiv, niter)
     offset = -(nrproc+1.2)*cellheight*nr
-    cnvs.text(-0.2, offset+2*cellheight, "$n=%s$" % ndiv,
+    cnvs.text(-0.2, offset+2*cellheight, "$n=%s$" % ndiv**2,
               [text.halign.right, text.valign.middle])
     cnvs.stroke(path.line(0, -0.2*cellheight+offset, 0,
         (nrproc+0.2)*cellheight+offset))
