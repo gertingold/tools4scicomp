@@ -46,6 +46,6 @@ These lecture notes present material covered in a one-semester method course
 of a two-hour lecture and four-hour practical work per week. The material is
 thus intended for a total of 30 hours of lectures.
 
-The sources of the lecture notes are publically available on Github at 
+The sources of the lecture notes are publicly available on Github at 
 https://github.com/gertingold/tools4scicomp. Suggestions for improvements
 through Github issues or pull request are welcome.
