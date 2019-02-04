@@ -101,7 +101,7 @@ arbitrary number of arguments including keyword arguments. Whenever the
 decorated function is executed, it will print a message including the arguments
 with which the function was called. In addition, the starting time is stored.
 Then, the original function, in our case ``factorial``, is run and when it
-returns, the elapsed time is determined. Beforing quitting, the result 
+returns, the elapsed time is determined. Before quitting, the result 
 together with the elapsed time are printed.
 
 Running the script, we obtain the following output::
