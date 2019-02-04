@@ -41,7 +41,7 @@ as larger text set in boldface. A widespread markup language is the HyperText
 Markup Language HTML used for markup of webpages. A pair of tags ``<LI>`` and
 ``</LI>`` would indicate in HTML that the enclosed text represents an item in
 a list. An example of a markup language commonly found in a scientific context
-is LaTeX. Here, ``x`` and ``$x$`` will be typset differently because the dollar
+is LaTeX. Here, ``x`` and ``$x$`` will be typeset differently because the dollar
 signs in the second case indicate that the character ``x`` is meant to be a
 mathematical variable which usually is typeset in an italic font.
 
@@ -198,7 +198,7 @@ results in
 
 We have already seen how to produce inline literals which may be useful to
 mark for example keywords. To display multiline code, the *code* directive
-is appropriate. The following example makes use of the possiblity to add
+is appropriate. The following example makes use of the possibility to add
 linenumbers.
 
 .. code-block:: none
@@ -386,7 +386,7 @@ illustration.
 Here, the text of the link has to agree with the text of the chapter or section.
 
 The discussion of reStructuredText in this section did not attempt to cover all possibilities provided
-by this markup langugage. For more details, it is recommended to consult the
+by this markup language. For more details, it is recommended to consult the
 `documentation <http://docutils.sourceforge.net/rst.html>`_.
 
 Sphinx documentation generator
@@ -477,7 +477,7 @@ material in HTML.
 
 Depending on the operating system(s) on which output is generated for the *Sphinx* project,
 one typically chooses either the ``Makefile`` for Un*x operating systems or a 
-Windows comand file for Windows operating systems or even both if more than one operating
+Windows command file for Windows operating systems or even both if more than one operating
 system is being used.
 
 .. code-block:: none
