@@ -58,3 +58,4 @@ for nr, matrix in enumerate((r'$\begin{{pmatrix}}{} & {}\\{} & {}\\{} & {}\end{{
     c.text(xoff, 6*nr+yoff, '\\Large '+m, [text.halign.center, text.valign.middle])
 
 c.writePDFfile()
+c.writeGSfile(device="png16m", resolution=300)

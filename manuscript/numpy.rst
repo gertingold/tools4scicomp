@@ -394,7 +394,7 @@ is obtained, changes when ``strides`` is modified.
 
 .. _strides:
 .. figure:: img/strides.*
-   :width: 12cm
+   :width: 30em
    :align: center
 
    Linear data in memory can be interpreted in different ways by appropriately
