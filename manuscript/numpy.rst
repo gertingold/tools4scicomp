@@ -344,7 +344,7 @@ is cast to a more flexible one. For strings, the size of each entry will be dete
 the longest string.
 
 Probably the most interesting attributes of an array are ``shape`` and ``strides`` because
-the allow us to reinterprete the data of the original one-dimensional array in different
+the allow us to reinterpret the data of the original one-dimensional array in different
 ways without the need to copy from memory to memory. Let us first try to understand the meaning
 of the tuples ``(16,)`` for ``shape`` and ``(8,)`` for ``strides``. Both tuples have the same
 size which equals one because the considered array is one-dimensional. Therefore, ``shape`` does
