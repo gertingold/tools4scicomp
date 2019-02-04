@@ -1664,7 +1664,7 @@ The tag is now also visible on the project's webpage as shown in :numref:`gitlab
    :align: center
 
    After a tag has been pushed to the remote repository, it can be used on the
-   project's webpag to navigate to the commit associated with the tag.
+   project's webpage to navigate to the commit associated with the tag.
 
 Detached head state
 -------------------
