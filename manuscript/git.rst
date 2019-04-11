@@ -82,8 +82,8 @@ between team members about who is doing what.
 More modern version control systems are designed to favor collaboration within
 a team. There exist two different approaches: centralized version control
 systems on the one hand and distributed version control systems on the other
-hand. The version control system Git which we are going to discuss in more
-detail in this chapter is a distributed version control system. In order to
+hand. The version control system Git, which we are going to discuss in more
+detail in this chapter, is a distributed version control system. In order to
 better understand some of its aspects, it is useful to contrast it with a
 centralized version control system like Subversion.
 
@@ -111,7 +111,7 @@ here, exchange code versions via the internet with a central server. At any
 moment of time, the server contains a definite set of files, i.e. a revision
 which is numbered sequentially as indicated in the right part of :numref:`cvcs`.
 From one revision to the next, files can change or remain unchanged and files
-can be added or removed. The prize to pay for this simple sequential history 
+can be added or removed. The price to pay for this simple sequential history 
 is that an internet connection and a working server is needed in order to
 create a new revision. A developer cannot create new revisions of the code
 while working off-line, an important drawback of centralized version control
@@ -910,7 +910,7 @@ present in the master branch, we decide to delete the branch ``dev``::
 
 An attempt to delete a branch which was not fully merged, will be rejected. This
 could be the case if the idea developed in a branch turns out not to be a good
-idea after all. The, deletion of the branch can be forced by replacing the option
+idea after all. The deletion of the branch can be forced by replacing the option
 ``-d`` by ``-D``.
 
 In general, one cannot expect a merge to run as smoothly as in our example. Frequently,
