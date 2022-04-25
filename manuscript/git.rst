@@ -234,20 +234,30 @@ Furthermore, Git provides a number of guides which can be read in a terminal win
 A list of available guides can easily be obtained::
 
    $ git help -g
+
    The common Git guides are:
-   
-      attributes   Defining attributes per path
-      everyday     Everyday Git With 20 Commands Or So
-      glossary     A Git glossary
-      ignore       Specifies intentionally untracked files to ignore
-      modules      Defining submodule properties
-      revisions    Specifying revisions and ranges for Git
-      tutorial     A tutorial introduction to Git (for version 1.5.1 or newer)
-      workflows    An overview of recommended workflows with Git
+      attributes          Defining attributes per path
+      cli                 Git command-line interface and conventions
+      core-tutorial       A Git core tutorial for developers
+      cvs-migration       Git for CVS users
+      diffcore            Tweaking diff output
+      everyday            A useful minimum set of commands for Everyday Git
+      glossary            A Git Glossary
+      hooks               Hooks used by Git
+      ignore              Specifies intentionally untracked files to ignore
+      modules             Defining submodule properties
+      namespaces          Git namespaces
+      repository-layout   Git Repository Layout
+      revisions           Specifying revisions and ranges for Git
+      submodules          Mounting one repository inside another
+      tutorial            A tutorial introduction to Git
+      tutorial-2          A tutorial introduction to Git: part two
+      workflows           An overview of recommended workflows with Git
    
    'git help -a' and 'git help -g' list available subcommands and some
    concept guides. See 'git help <command>' or 'git help <concept>'
    to read about a specific subcommand or concept.
+   See 'git help git' for an overview of the system.
 
 For a detailed discussion of Git, the book *Pro Git* by Scott Chacon and Ben
 Straub is highly recommended. Its second edition is available in printed form
