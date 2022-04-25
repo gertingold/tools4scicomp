@@ -279,7 +279,7 @@ The directory is hidden to avoid that it is accidentally deleted.
 .. attention::
 
    Never delete the directory ``.git`` unless you really want to. You will
-   loose the complete history of your project if you did not backup the project
+   lose the complete history of your project if you did not backup the project
    directory or synchronized your work with a GitLab server or GitHub. Removing
    the project directory will remove the subdirectory ``.git`` as well. 
 
@@ -289,7 +289,7 @@ The newly created directory contains a number of files and subdirectories::
    .  ..  branches  config  description  HEAD  hooks  info  objects  refs
 
 Refrain from modifying anything here as you might mess up files and in this
-way loose parts or all of your work.
+way lose parts or all of your work.
 
 After having initialized your project, you should let Git know about your name
 and your email address by using the following commands::
