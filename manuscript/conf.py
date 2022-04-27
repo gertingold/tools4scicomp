@@ -117,6 +117,7 @@ htmlhelp_basename = 'tools4scicomp'
 
 # -- Options for LaTeX output ---------------------------------------------
 
+latex_engine = 'lualatex'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     'papersize': 'a4paper',
