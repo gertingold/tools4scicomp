@@ -360,18 +360,19 @@ previous section. Then, Git would report the following status::
    $ git status
    On branch master
 
-   Initial commit
+   No commits yet
 
    nothing to commit (create/copy files and use "git add" to track)
 
-The output first tells us that we are on a branch called ``master``. Later, we
-will discuss the concept of branches and it will be useful to know this
-possibility of finding out the current branch. For the moment, we can ignore
-this line. Furthermore, Git informs us that we not committed anything yet so 
-that the upcoming commit would be the initial one. However, since we have not
-created any files, there is nothing to commit. As promised earlier, Git tries
-to be helpful and adds some information about what we could do. Obviously, we
-first have to create a file in the project directory.
+The output first tells us that we are on a branch called ``master``
+[#github_master_main]_. Later, we will discuss the concept of branches and it
+will be useful to know this possibility of finding out the current branch. For
+the moment, we can ignore this line. Furthermore, Git informs us that we not
+committed anything yet so that the upcoming commit would be the initial one.
+However, since we have not created any files, there is nothing to commit. As
+promised earlier, Git tries to be helpful and adds some information about what
+we could do. Obviously, we first have to create a file in the project
+directory.
 
 So let us go ahead and create a very simple Python file:
 
@@ -383,14 +384,13 @@ Now, the status reflects the fact that a new file ``hello.py``  exists::
 
    $ git status
    On branch master
-   
-   Initial commit
-   
+
+   No commits yet
+
    Untracked files:
      (use "git add <file>..." to include in what will be committed)
-   
            hello.py
-   
+
    nothing added to commit but untracked files present (use "git add" to track)
 
 Git has detected the presence of a new file but it is an untracked file which
@@ -404,11 +404,10 @@ to the repository. Let us also check the status after adding the file::
    $ git status
    On branch master
 
-   Initial commit
+   No commits yet
 
    Changes to be committed:
      (use "git rm --cached <file>..." to unstage)
-
            new file:   hello.py
 
 Note that Git tells us how we could revert the step of adding a file in case of
@@ -429,21 +428,19 @@ new script could read
 
 The status now has changed to::
 
-      $ git status
-      On branch master
-      
-      Initial commit
-      
-      Changes to be committed:
-        (use "git rm --cached <file>..." to unstage)
-      
-              new file:   hello.py
-      
-      Changes not staged for commit:
-        (use "git add <file>..." to update what will be committed)
-        (use "git checkout -- <file>..." to discard changes in working directory)
-      
-              modified:   hello.py
+   $ git status
+   On branch master
+
+   No commits yet
+
+   Changes to be committed:
+     (use "git rm --cached <file>..." to unstage)
+           new file:   hello.py
+
+   Changes not staged for commit:
+     (use "git add <file>..." to update what will be committed)
+     (use "git restore <file>..." to discard changes in working directory)
+           modified:   hello.py
 
 It reflects the fact that now there are two versions of our script ``hello.py``.
 The section "Changes to be committed" lists the file or files in the staging area.
@@ -463,17 +460,16 @@ by a longer explanatory text. If a single-line commit message suffices, one can
 give the message as a command line argument::
 
    $ git commit -m 'simple hello world script added'
-   [master (root-commit) 39977af] simple hello world script added
+   [master (root-commit) a5b522b] simple hello world script added
     1 file changed, 1 insertion(+)
     create mode 100644 hello.py
    $ git status
    On branch master
    Changes not staged for commit:
      (use "git add <file>..." to update what will be committed)
-     (use "git checkout -- <file>..." to discard changes in working directory)
- 
+     (use "git restore <file>..." to discard changes in working directory)
            modified:   hello.py
- 
+
    no changes added to commit (use "git add" and/or "git commit -a")
 
 Checking the status, we see that our two-line script is still unstaged. We could
@@ -482,27 +478,26 @@ we can carry out this procedure in one single step. However, this is only possib
 if we do not wish to commit more than one file::
 
    $ git commit -a -m 'repetition of hello world implemented'
-   [master 572e27b] repetition of hello world implemented
+   [master 011ce76] repetition of hello world implemented
     1 file changed, 2 insertions(+), 1 deletion(-)
-   $ git status
+   (base) gli@gli-tp14-1:~/git_example$ git status
    On branch master
    nothing to commit, working tree clean
 
 Now, we have committed two versions of our script as can easily be verified::
 
    $ git log
-   commit 572e27bcb96441c19ee9dca948d0ac24f81eee79
+   commit 011ce76b848d6428e900373f177b1f6b2595a524 (HEAD -> master)
    Author: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
-   Date:   Wed Sep 26 11:17:43 2018 +0200
-
+   Date:   Wed Apr 27 15:31:01 2022 +0200
+   
        repetition of hello world implemented
-
-   commit d4a783b4a9f91a02f1a4ae127c07e6f47f8281e6
+   
+   commit a5b522b125baa24f823df389b1b40f28b3a42bee
    Author: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
-   Date:   Wed Sep 26 11:17:23 2018 +0200
-
+   Date:   Wed Apr 27 15:28:41 2022 +0200
+   
        simple hello world script added
-
 
 As we had discussed in :numref:`cvcs-vs-dvcs` the concept of distributed
 version control systems does not allow for sequential revision numbers. Our two
@@ -534,7 +529,7 @@ though as the development of the code progresses.
 
 At the end of this section on the basic workflow, we point out one issue which
 in a sense could already be addressed in the initial setting up of the repository,
-but which can motivate only now. Having our previous versions safely stored in
+but which we can motivate only now. Having our previous versions safely stored in
 the repository, we might be brave enough to refactor our script by defining a
 function to repeatedly printing a given text. Doing so, we end up with two files
 
@@ -564,19 +559,15 @@ We verify that the scripts do what they are supposed to do ::
 Everything works fine so that we add the two files to the staging area and
 check the status before committing. ::
 
-   $ git add hello.py
-   $ git add repeat.py
    $ git status
    On branch master
    Changes to be committed:
-     (use "git reset HEAD <file>..." to unstage)
-
+     (use "git restore --staged <file>..." to unstage)
            modified:   hello.py
            new file:   repeat.py
-
+   
    Untracked files:
      (use "git add <file>..." to include in what will be committed)
-
            __pycache__/
 
 Everything looks fine except for the fact that there is an untracked directory
@@ -618,10 +609,10 @@ Suppose that we have also committed the refactored version of our script as well
 as the ``.gitignore`` file. The history of our repository then looks as follows::
 
    $ git log --oneline --graph --decorate --all
-   * cf870a6 (HEAD -> master) .gitignore for Python added
-   * c4b2a9e hello world script refactored
-   * 572e27b repetition of hello world implemented
-   * d4a783b simple hello world script added
+   * aac6d17 (HEAD -> master) .gitignore for Python added
+   * 98628ce hello world script refactored
+   * 011ce76 repetition of hello world implemented
+   * a5b522b simple hello world script added
 
 Before discussing the output, let us briefly comment on the options used in the
 ``git log`` command. Usually, this command will be more verbose, giving the full
@@ -633,13 +624,13 @@ than one branch is present. Then, we will obtain a graphical representation of
 the commit tree, i.e. the relation between the different branches. In addition,
 we will be shown information about all branches, not only the branch we are on.
 Finally, ``--decorate`` shows us references existing for certain commits. In our
-case, the commit ``cf870a6`` is referred to as ``HEAD`` because that is the version
+case, the commit ``aac6d17`` is referred to as ``HEAD`` because that is the version
 we are presently seeing in our working directory. This is also where the branch
 ``master`` is positioned right now. The usefulness of this information  will become
 clear once we have more than one branch or when even working with remote branches.
 
 The history documented by the output of ``git log`` is linear with the most
-recent commit on top. As we have discussed earlier, Git is distributed version
+recent commit on top. As we have discussed earlier, Git is a distributed version
 control system. Therefore, we have to expect that other developers are doing
 work in parallel which at some time should connect to our work. Otherwise, we
 could simply ignore these developers. Consequently, in general we cannot expect
@@ -671,7 +662,7 @@ forever in their own direction. Ideally, the result of the development in a bran
 should ultimately flow back into the production code, a step referred to as
 merging. 
 
-Let us take a look at an example. As branches can be become a bit confusing once
+Let us take a look at an example. As branches can become a bit confusing once
 you have several of them, it makes sense to make sure from time to time that you
 are still on the right branch. We have not created a new branch and therefore are
 on the master branch. This can be verified as follows::
@@ -702,15 +693,15 @@ We can verify the existence of the new branch::
 
 As the star indicates, we are still on the master branch, but a new branch named
 ``dev`` exists. Switching back and forth between different branches is done by means
-of the ``checkout`` command. With the following commands, we got to the development
+of the ``switch`` command. With the following commands, we got to the development
 branch and back to the master branch while verifying where we are after each checkout::
 
-   $ git checkout dev
+   $ git switch dev
    Switched to branch 'dev'
    $ git branch
    * dev
      master
-   $ git checkout master
+   $ git switch master
    Switched to branch 'master'
    $ git branch
      dev
@@ -719,48 +710,47 @@ branch and back to the master branch while verifying where we are after each che
 In addition, we can check the history of our repository::
 
    $ git log --oneline --graph --decorate --all
-   * cf870a6 (HEAD -> master, dev) .gitignore for Python added
-   * c4b2a9e hello world script refactored
-   * 572e27b repetition of hello world implemented
-   * d4a783b simple hello world script added
+   * aac6d17 (HEAD -> master, dev) .gitignore for Python added
+   * 98628ce hello world script refactored
+   * 011ce76 repetition of hello world implemented
+   * a5b522b simple hello world script added
 
-Now, commit ``cf870a6`` is also part of the branch ``dev``. For the moment, the
+Now, commit ``aac6d17`` is also part of the branch ``dev``. For the moment, the
 new branch is not really visible as branch because we have not done any development.
 
 Above, we have first created a new branch and then switched to the new branch. As one
 typically wants to switch to the new branch immediately after having created it, there
 exists a shortcut::
 
-   $ git checkout -b dev
+   $ git switch -c dev
    Switched to a new branch 'dev'
 
-The option ``-b`` demands a new branch to be created.
+The option ``-c`` demands a new branch to be created.
 
 Everything is set up now to work on the new idea. Let us suppose that at some point
 you arrive at the following script::
 
    # hello.py
    from repeat import repeated_print
-
+   
    def hello(name="", repetitions=1):
        if name:
-           s = "Hello, " + name
-           repeated_print(s, repetitions)
+           repeated_print(f"Hello, {name}", repetitions)
        else:
            repeated_print("Hello world!", repetitions)
 
 After committing it, the commit log looks as follows::
 
    $ git log --oneline --graph --decorate --all
-   * c4e6c3a (HEAD -> dev) name as new argument implemented
-   * cf870a6 (master) .gitignore for Python added
-   * c4b2a9e hello world script refactored
-   * 572e27b repetition of hello world implemented
-   * d4a783b simple hello world script added
+   * f113188 (HEAD -> dev) name as new argument implemented
+   * aac6d17 (master) .gitignore for Python added
+   * 98628ce hello world script refactored
+   * 011ce76 repetition of hello world implemented
+   * a5b522b simple hello world script added
    
 The history is still linear, but clearly the master branch and the development
 branch are in different states now. The master branch is still at commit
-``cf870a6`` while the development branch is at ``c4e6c3a``.  At this point, it
+``aac6d17`` while the development branch is at ``f113188``.  At this point, it
 is worth going back to the master branch and to check the content of
 ``hello.py``. At first, it might appear that we have lost our recent work but
 this is not the case because we had committed the new version in the development
@@ -774,7 +764,7 @@ continuing to work in the development branch, we perform the following steps:
 
   1. check out the master branch ::
 
-        $ git checkout master
+        $ git switch master
 
   2. make modifications to ``repeat.py`` ::
 
@@ -789,18 +779,18 @@ continuing to work in the development branch, we perform the following steps:
 
   4. check out the development branch ::
 
-        $ git checkout dev
+        $ git switch dev
 
 The commit history is no longer linear but has clearly separated into two branches::
 
    $ git log --oneline --graph --decorate --all
-   * 36fdabf (master) default value for number of repetitions defined
-   | * c4e6c3a (HEAD -> dev) name as new argument implemented
-   |/  
-   * cf870a6 .gitignore for Python added
-   * c4b2a9e hello world script refactored
-   * 572e27b repetition of hello world implemented
-   * d4a783b simple hello world script added
+   * 1d9a25f (master) default value for number of repetitions defined
+   | * f113188 (HEAD -> dev) name as new argument implemented
+   |/
+   * aac6d17 .gitignore for Python added
+   * 98628ce hello world script refactored
+   * 011ce76 repetition of hello world implemented
+   * a5b522b simple hello world script added
 
 Now it is time to complete the script ``hello.py`` by adding an exclamation mark
 after the name and calling the new function ``hello``::
@@ -819,95 +809,94 @@ after the name and calling the new function ``hello``::
        hello("Alice", 3)
 
 Before committing the new version, we start thinking about atomic commits. Strictly
-speaking, we made to different kinds of changes. We have added the exclamation mark
+speaking, we made two different kinds of changes. We have added the exclamation mark
 and added the function call. Instead of going back and making the changes one after
 the other, we can recall that the option ``-p`` allows to choose which changes to
 add to the staging area::
 
    $ git add -p hello.py
    diff --git a/hello.py b/hello.py
-   index 9b21403..4577216 100644
+   index b2ee076..c287658 100644
    --- a/hello.py
    +++ b/hello.py
-   @@ -2,7 +2,10 @@ from repeat import repeated_print
- 
+   @@ -3,6 +3,9 @@ from repeat import repeated_print
+   
     def hello(name="", repetitions=1):
         if name:
-   -        s = "Hello, " + name
-   +        s = "Hello, " + name + "!"
-            repeated_print(s, repetitions)
+   -        repeated_print(f"Hello, {name}", repetitions)
+   +        repeated_print(f"Hello, {name}!", repetitions)
         else:
             repeated_print("Hello world!", repetitions)
    +
    +if __name__ == "__main__":
    +    hello("Alice", 3)
-   Stage this hunk [y,n,q,a,d,/,s,e,?]?
+   (1/1) Stage this hunk [y,n,q,a,d,s,e,?]?
 
-Answering the question with ``s``, we are offered the possibility to add the
-two changes separately to the changing area. In this way, we can create two
-separate commits. After actually doing the commits, we arrive at the following
-history::
+Answering the question with ``s``, i.e. ``split``, we are offered the
+possibility to add the two changes separately to the changing area. In this
+way, we can create two separate commits. After actually doing the commits, we
+arrive at the following history::
 
    $ git log --oneline --graph --decorate --all
-   * 69ae96f (HEAD -> dev) function call added
-   * 8396a6b exclamation mark added
-   * c4e6c3a name as new argument implemented
-   | * 36fdabf (master) default value for number of repetitions defined
-   |/  
-   * cf870a6 .gitignore for Python added
-   * c4b2a9e hello world script refactored
-   * 572e27b repetition of hello world implemented
-   * d4a783b simple hello world script added
+   * a807c98 (HEAD -> dev) function call added
+   * d07dbda exclamation mark added
+   * f113188 name as new argument implemented
+   | * 1d9a25f (master) default value for number of repetitions defined
+   |/
+   * aac6d17 .gitignore for Python added
+   * 98628ce hello world script refactored
+   * 011ce76 repetition of hello world implemented
+   * a5b522b simple hello world script added
 
 Now, it is time to make the new functionality available for production, i.e. to
 merge the commits from the development branch into the master branch. To this
-end, we check out the master branch and merge the development branch::
+end, we switch to the master branch and merge the development branch::
 
-   $ git checkout master
+   $ git switch master
    Switched to branch 'master'
    $ git merge dev
    Merge made by the 'recursive' strategy.
-    hello.py | 10 +++++++++-
-    1 file changed, 9 insertions(+), 1 deletion(-)
+    hello.py | 9 ++++++++-
+    1 file changed, 8 insertions(+), 1 deletion(-)
    $ git log --oneline --graph --decorate --all
-   *   d7ae102 (HEAD -> master) Merge branch 'dev'
-   |\  
-   | * 69ae96f (dev) function call added
-   | * 8396a6b exclamation mark added
-   | * c4e6c3a name as new argument implemented
-   * | 36fdabf default value for number of repetitions defined
-   |/  
-   * cf870a6 .gitignore for Python added
-   * c4b2a9e hello world script refactored
-   * 572e27b repetition of hello world implemented
-   * d4a783b simple hello world script added
+   *   53e12db (HEAD -> master) Merge branch 'dev'
+   |\
+   | * a807c98 (dev) function call added
+   | * d07dbda exclamation mark added
+   | * f113188 name as new argument implemented
+   * | 1d9a25f default value for number of repetitions defined
+   |/
+   * aac6d17 .gitignore for Python added
+   * 98628ce hello world script refactored
+   * 011ce76 repetition of hello world implemented
+   * a5b522b simple hello world script added
 
 In this case, Git has made a so-called three-way merge based on the common ancestor
-of the two branched (``cf870a6``) and the current versions in the two branches
-(``36fdabf``) and (``69ae96f``). It is interesting to compare the script ``repeat.py``
+of the two branches (``aac6d17``) and the current versions in the two branches
+(``1d9a25f``) and (``a807c98``). It is interesting to compare the script ``repeat.py``
 in these three versions. The version in the common ancestor was::
 
-   # repeat.py cf870a6
+   # repeat.py aac6d17
    def repeated_print(text, repetitions):
        for n in range(repetitions):
            print(text)
 
 In the master branch, we have ::
 
-   # repeat.py 36fdabf
+   # repeat.py 1d9a25f
    def repeated_print(text, repetitions=1):
        for n in range(repetitions):
            print(text)
 
 while in the development branch, the script reads ::
 
-   # repeat.py 69ae96f
+   # repeat.py a807c98
    def repeated_print(text, repetitions):
        for n in range(repetitions):
            print(text)
 
-Note that in ``36fdabf`` a default value for the variable ``repetitions`` is
-present while it is not in ``69ae96f``. The common ancestor serves to resolve
+Note that in ``1d9a25f`` a default value for the variable ``repetitions`` is
+present while it is not in ``a807c98``. The common ancestor serves to resolve
 this discrepancy.  Obviously, a change was made in the master branch while it
 was not done in the development branch. Therefore, the change is kept.  The
 other modifications in the branches were not in contradiction, so that the
@@ -919,7 +908,7 @@ we decide to delete it. Since all work done in the development branch is now
 present in the master branch, we decide to delete the branch ``dev``::
 
    $ git branch -d dev
-   Deleted branch dev (was 69ae96f).
+   Deleted branch dev (was a807c98).
 
 An attempt to delete a branch which was not fully merged, will be rejected. This
 could be the case if the idea developed in a branch turns out not to be a good
@@ -952,25 +941,25 @@ while in the development branch we have chosen a different doc string ::
 The commit history of which we only show the more recent part now becomes a bit
 more complex::
 
-   $ git log --oneline --graph --decorate --all -n8
-   * 550d988 (HEAD -> dev) added a doc string
-   | * f75d4bf (master) doc string added
-   | *   d7ae102 Merge branch 'dev'
-   | |\  
-   | |/  
-   |/|   
-   * | 69ae96f function call added
-   * | 8396a6b exclamation mark added
-   * | c4e6c3a name as new argument implemented
-   | * 36fdabf default value for number of repetitions defined
-   |/  
-   * cf870a6 .gitignore for Python added
+   * c3ab8cb (HEAD -> dev) added a doc string
+   | * cc484da (master) doc string added
+   | *   53e12db Merge branch 'dev'
+   | |\
+   | |/
+   |/|
+   * | a807c98 function call added
+   * | d07dbda exclamation mark added
+   * | f113188 name as new argument implemented
+   | * 1d9a25f default value for number of repetitions defined
+   |/
+   * aac6d17 .gitignore for Python added
 
-We check out the master branch and try to merge once more the development branch::
+We switch to the master branch and try to merge once more the development branch::
 
-   $ git checkout master
+   $ git switch master
    Switched to branch 'master'
-   11:45 $ git merge dev
+   $ git merge dev
+   Auto-merging repeat.py
    CONFLICT (content): Merge conflict in repeat.py
    Automatic merge failed; fix conflicts and then commit the result.
 
@@ -994,7 +983,7 @@ branch. Let us take a look at our script::
 There are two blocks separated by ``=======``. The first block starting with
 ``<<<<<<< HEAD`` is the present version in the master branch where we are right
 now. The second block terminated by ``>>>>>>> dev`` stems from the development
-branch. The reason in the conflict lies in the different doc strings. In such a
+branch. The reason for the conflict lies in the different doc strings. In such a
 situation, Git needs help. The script should now be brought into the desired
 form by using an editor or a tool to handle merge conflicts. We choose ::
 
@@ -1011,22 +1000,21 @@ possible as well. In order to tell Git that the version conflict has been
 resolved, we add it to the staging area and commit it as usual. The history
 now looks as follows::
 
-   *   abcf4ed (HEAD -> master) merge conflict resolved
-   |\  
-   | * 550d988 (dev) added a doc string
-   * | f75d4bf doc string added
-   * |   d7ae102 Merge branch 'dev'
-   |\ \  
-   | |/  
-   | * 69ae96f function call added
-   | * 8396a6b exclamation mark added
-   | * c4e6c3a name as new argument implemented
-   * | 36fdabf default value for number of repetitions defined
-   |/  
-   * cf870a6 .gitignore for Python added
+   *   d10bdbb (HEAD -> master) merge conflict resolved
+   |\
+   | * c3ab8cb (dev) added a doc string
+   * | cc484da doc string added
+   * | 53e12db Merge branch 'dev'
+   |\|
+   | * a807c98 function call added
+   | * d07dbda exclamation mark added
+   | * f113188 name as new argument implemented
+   * | 1d9a25f default value for number of repetitions defined
+   |/
+   * aac6d17 .gitignore for Python added
 
 While the use of branches can be an extremely valuable technique even for a
-single developer, branches will inevitable appear in a multi-developer environment.
+single developer, branches will inevitably appear in a multi-developer environment.
 A good understanding of branches will therefore be helpful in the following section.
 
 
@@ -1950,6 +1938,9 @@ merge conflicts with the master branch.
 .. [#gitlab_uaux] The computing center of the University of Augsburg is running
    a GitLab server at ``git.rz.uni-augsburg.de`` which is accessible to anybody
    in possession of a valid user-ID of the computing center.
+
+.. [#github_master_main] On Github, the default branch nowadays is called ``main``
+   instead of ``master``.
 
 .. [#sha1] SHA-1 is a hash checksum which characterizes an object but does not
    allow to reconstruct it. Consisting of 160 bits, it allows for
