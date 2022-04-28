@@ -1657,7 +1657,7 @@ information about the tag::
    To ssh://localhost:30022/gert/myrepo.git
     * [new tag]         v1 -> v1
 
-The tag is now also visible on the project's webpage as shown in :numref:`gitlab-tag`.
+The tag is now also visible on the project's web page as shown in :numref:`gitlab-tag`.
 
 .. _gitlab-tag:
 .. figure:: img/gitlab-tag.png
@@ -1665,7 +1665,7 @@ The tag is now also visible on the project's webpage as shown in :numref:`gitlab
    :align: center
 
    After a tag has been pushed to the remote repository, it can be used on the
-   project's webpage to navigate to the commit associated with the tag.
+   project's web page to navigate to the commit associated with the tag.
 
 Detached head state
 -------------------
