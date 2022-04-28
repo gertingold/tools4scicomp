@@ -1550,7 +1550,7 @@ but did not commit the change. Git now does not allow us to change to the
    Aborting
 
 We could force Git to change branches by means of the option ``-f`` but probably
-it is a better idea to follow Git's advice and commit or stash the changes. We
+it is a better idea to follow the advice given by Git and to commit or stash the changes. We
 know about committing but what does stashing mean? The idea is to pack away the
 uncommitted changes so that they can be retrieved when we return to the ``dev``
 branch::
