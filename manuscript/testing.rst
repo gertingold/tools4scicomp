@@ -74,7 +74,7 @@ in the following example.
 
        name: name of the person to greet
        """
-       return 'Hello {}!'.format(name)
+       return f'Hello {name}!'
 
 In our example, the docstring is available as ``welcome.__doc__`` and can also be
 obtained by means of ``help(welcome)``.
@@ -112,7 +112,7 @@ Python shell.
        >>> welcome('Alice')
        'Hello Alice!'
        """
-       return 'Hello {}!'.format(name)
+       return f'Hello {name}!'
 
 Running the test with the option ``-v`` to obtain some output, we find::
 
@@ -154,7 +154,7 @@ when designing our function.
        >>> welcome('Alice')
        'Hello Alice!'
        """
-       return 'Hello {}!'.format(name)
+       return f'Hello {name}!'
 
 Running the doctests, we identify our first coding error by means of a test::
 
@@ -191,7 +191,7 @@ make the tests pass.
        'Hello Alice!'
        """
        if name:
-           return 'Hello {}!'.format(name)
+           return f'Hello {name}!'
        else:
            return 'Hello!'
 
@@ -216,7 +216,7 @@ as well.
        'Hello Alice!'
        """
        if name:
-           return 'Hello {}!'.format(name)
+           return f'Hello {name}!'
        else:
            return 'Hello!'
 
@@ -241,7 +241,7 @@ works fine.
        'Hello Alice!'
        """
        if name:
-           return 'Hello {}!'.format(name)
+           return f'Hello {name}!'
        else:
            return 'Hello!'
 
@@ -270,9 +270,9 @@ In a next step development step, we make the function ``welcome`` multilingual.
        hellodict = {'en': 'Hello', 'de': 'Hallo'}
        hellostring = hellodict[lang]
        if name:
-           return '{} {}!'.format(hellostring, name)
+           return f'{hellostring} {name}!'
        else:
-           return '{}!'.format(hellostring)
+           return f'{hellostring}!'
 
 It is interesting to consider the case where the value of ``lang`` is not a valid
 key. Calling the function with ``lang`` set to ``fr``, one obtains::
@@ -323,12 +323,12 @@ with an appropriate error message.
        try:
            hellostring = hellodict[lang]
        except KeyError:
-           errmsg = 'unknown language: {}'.format(lang)
+           errmsg = f'unknown language: {lang}'
            raise ValueError(errmsg)
        if name:
-           return '{} {}!'.format(hellostring, name)
+           return f'{hellostring} {name}!'
        else:
-           return '{}!'.format(hellostring)
+           return f'{hellostring}!'
 
    if __name__ == '__main__':
        welcome('Alice', 'fr')
@@ -398,7 +398,7 @@ a line of Pascal's triangle.
 
    if __name__ == '__main__':
        for n in range(7):
-           line = ' '.join('{:2}'.format(x) for x in pascal(n))
+           line = ' '.join(f'{x:2}' for x in pascal(n))
            print(str(n)+line.center(25))
 
 Running this script returns the first seven lines of Pascal's triangle::

@@ -488,8 +488,8 @@ To demonstrate that Numba compiles the function for each signature anew, we call
    nmax = 100000000
    for x in (2, 2.5, 2+1j):
        start = time.time()
-       print('ζ({}) = {}'.format(x, zeta(x, nmax)))
-       print('execution time: {:5.2f}s\n'.format(time.time()-start))
+       print(f'ζ({x}) = {zeta(x, nmax)}')
+       print(f'execution time: {time.time()-start:5.2f}s\n')
    
    print(zeta.signatures)
 
