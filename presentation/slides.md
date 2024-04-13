@@ -870,3 +870,273 @@ $ echo python | sha1sum
 
 * For practical purposes with Git, it is usually sufficient to specify the first 6 or 7 hexadecimal
   digits of the hash value in order to uniquely identify a commit.
+
+---
+
+# How often to commit?
+
+* In a distributed version control system it is possible to commit as often as one wishes
+  because no internet connectivity is needed.
+  
+<div class="mt-3 p-2 border-2 border-teal-800 bg-teal-50 text-teal-800">
+  <div class="grid grid-cols-[2%_1fr] gap-4">
+    <div><carbon-idea class="text-teal-800 text-xl" /></div>
+    <div>
+    <b>atomic commit</b><br>
+    collect all modifications associated with one minimal logical change in one commit
+    </div>
+  </div>
+</div>
+
+<br>
+
+* Do not combine different logical changes in a single commit. This might later help to revert well defined changes.
+* `git add -p`: The option `-p` is helpful when you want to stage only some of the changes which you have made.
+* At the beginning of a project, atomic commits might not be that useful.
+* Atomic commits might be more useful for code development but less when a text or a presentation is developped
+  in a version control system.
+* In the end it is up to you to decide what best suits your needs.
+
+---
+
+# Let us slightly refactor our code
+
+````md magic-move
+```python
+# hello.py
+for n in range(3):
+    print("Hello world!")
+```
+```python
+#hello.py
+repeated_print("Hello world!", 3)
+```
+```python
+#hello.py
+from repeat import repeated_print
+
+repeated_print("Hello world!", 3)
+```
+````
+
+<v-click>
+```python
+# repeat.py
+def repeated_print(text, repetitions):
+    for n in range(repetitions):
+        print(text)
+```
+</v-click>
+
+<br>
+
+<v-click>
+Let us check whether the code still works:
+
+```text
+$ python hello.py
+Hello world!
+Hello world!
+Hello world!
+```
+</v-click>
+
+---
+
+# Irrelevant objects appear
+
+```text {all|8,10,11}
+$ git status
+Auf Branch master
+Änderungen, die nicht zum Commit vorgemerkt sind:
+  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
+  (benutzen Sie "git restore <Datei>...", um die Änderungen im Arbeitsverzeichnis zu verwerfen)
+        geändert:       hello.py
+
+Unversionierte Dateien:
+  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
+        __pycache__/
+        repeat.py
+
+keine Änderungen zum Commit vorgemerkt (benutzen Sie "git add" und/oder "git commit -a")
+```
+
+```text {hide|1|5,8,10}
+$ ls -lR
+.:
+insgesamt 12
+-rw-rw-r-- 1 gert gert   69 Apr 13 13:42 hello.py
+drwxrwxr-x 2 gert gert 4096 Apr 13 13:42 __pycache__
+-rw-rw-r-- 1 gert gert   92 Apr 13 13:42 repeat.py
+
+./__pycache__:
+insgesamt 4
+-rw-rw-r-- 1 gert gert 393 Apr 13 13:42 repeat.cpython-311.pyc
+```
+
+---
+
+# Let Git ignore objects
+
+```text
+# .gitignore
+__pycache__/
+```
+
+```text {hide|all|8,10-11}
+$ git status
+Auf Branch master
+Änderungen, die nicht zum Commit vorgemerkt sind:
+  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
+  (benutzen Sie "git restore <Datei>...", um die Änderungen im Arbeitsverzeichnis zu verwerfen)
+        geändert:       hello.py
+
+Unversionierte Dateien:
+  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
+        .gitignore
+        repeat.py
+
+keine Änderungen zum Commit vorgemerkt (benutzen Sie "git add" und/oder "git commit -a")
+```
+
+* the directory `__pycache__/` is no longer listed
+* wildcards can be used: `*.py[cod]` corresponds to all files with extensions `pyc`, `pyo`, or `pyd`
+* put `.gitignore` into version control
+* [github.com/github/gitignore](https://github.com/github/gitignore) contains a number of
+  `.gitignore` files for different languages
+
+---
+
+# The `master` branch 
+
+* So far, we have been working with only one branch.
+* This branch was called `master` but the name is not really important. GitHub uses the name `main`
+  instead.
+* There can be other branches, e.g. to separate production code and development code.
+* In addition to local branches, there can be remote branches.
+
+<br>
+
+```text
+$ git log --oneline --graph --decorate --all
+* 4a97579 (HEAD -> master) .gitignore for Python added
+* 0c227f4 hello world script refactored
+* 52b9aa8 repetition of hello world implemented
+* 11e2d07 simple hello world script added
+```
+
+* So far, we have a linear history involving only the branch `master`.
+* In our working directory, we have commit `4a97579` which is referred to as `HEAD`.
+
+---
+
+# Creating a development branch
+
+```text
+$ git branch
+* master
+```
+
+* We only have one branch and the asterisk indicates that this is the branch on which we are at present.
+
+<br>
+
+* Create a development branch called `dev`. Other names could be used as well to identify the branch.
+
+```text
+$ git switch -c dev
+```
+
+* `switch` switches the branch, `-c` implies creation of a new branch.
+
+```text {all|2}
+$ git branch
+* dev
+  master
+```
+
+<br>
+Alternative:
+
+```text
+$ git branch dev
+$ git switch dev
+```
+
+---
+
+# Switching back and forth
+
+```text
+$ git branch
+* dev
+  master
+```
+
+```text
+$ git switch master
+Zu Zweig »master« gewechselt
+```
+
+```text
+$ git branch
+  dev
+* master
+```
+
+```text
+$ git switch dev
+Zu Zweig »dev« gewechselt
+```
+
+```text {all|2}
+git log  --oneline --graph --decorate=short --all
+* 4a97579 (HEAD -> dev, master) .gitignore for Python added
+* 0c227f4 hello world script refactored
+* 52b9aa8 repetition of hello world implemented
+* 11e2d07 simple hello world script added
+```
+
+* `HEAD` is now pointing to the `dev` branch.
+* Commit `4a97579` belongs both to the `master` branch and the `dev` branch.
+
+---
+
+# Let us do some developping
+
+````md magic-move
+```python
+#hello.py
+from repeat import repeated_print
+
+repeated_print("Hello world!", 3)
+```
+```python
+# hello.py
+from repeat import repeated_print
+
+def hello(name="", repetitions=1):
+    if name:
+        repeated_print(f"Hello, {name}", repetitions)
+    else:
+        repeated_print("Hello world!", repetitions)
+```
+````
+
+```text {hide|all|2,3}
+$ git log --oneline --graph --decorate --all
+* d5a8fb8 (HEAD -> dev) name as new argument implemented
+* 4a97579 (master) .gitignore for Python added
+* 0c227f4 hello world script refactored
+* 52b9aa8 repetition of hello world implemented
+* 11e2d07 simple hello world script added
+```
+
+<br>
+
+<v-click>
+
+* Commit `d5a8fb8` is on the branch `dev` while master is still at commit `4a97579`.
+* So far, the history is still linear.
+
+</v-click>
