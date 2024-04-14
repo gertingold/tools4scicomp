@@ -650,14 +650,18 @@ No commits yet
 nothing to commit (create/copy files and use "git add" to track)
 ```
 
+<v-click>
+
 <div class="mt-3 p-2 border-2 border-teal-800 bg-teal-50 text-teal-800">
   <div class="grid grid-cols-[2%_1fr] gap-4">
     <div><carbon-idea class="text-teal-800 text-xl" /></div>
     <div>
-    Use `git status` frequently, in particular when unsure whether things are running correctly.
+    Use <code>git status</code> frequently, in particular when unsure whether things are running correctly.
     </div>
   </div>
 </div>
+
+</v-click>
 
 ---
 
@@ -947,18 +951,18 @@ Hello world!
 
 ```text {all|8,10,11}
 $ git status
-Auf Branch master
-Änderungen, die nicht zum Commit vorgemerkt sind:
-  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
-  (benutzen Sie "git restore <Datei>...", um die Änderungen im Arbeitsverzeichnis zu verwerfen)
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
         geändert:       hello.py
 
-Unversionierte Dateien:
-  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
         __pycache__/
         repeat.py
 
-keine Änderungen zum Commit vorgemerkt (benutzen Sie "git add" und/oder "git commit -a")
+no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
 ```text {hide|1|5,8,10}
@@ -985,18 +989,18 @@ __pycache__/
 
 ```text {hide|all|8,10-11}
 $ git status
-Auf Branch master
-Änderungen, die nicht zum Commit vorgemerkt sind:
-  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
-  (benutzen Sie "git restore <Datei>...", um die Änderungen im Arbeitsverzeichnis zu verwerfen)
-        geändert:       hello.py
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   hello.py
 
-Unversionierte Dateien:
-  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
         .gitignore
         repeat.py
 
-keine Änderungen zum Commit vorgemerkt (benutzen Sie "git add" und/oder "git commit -a")
+no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
 * the directory `__pycache__/` is no longer listed
@@ -1045,6 +1049,7 @@ $ git branch
 
 ```text
 $ git switch -c dev
+Switched to a new branch 'dev'
 ```
 
 * `switch` switches the branch, `-c` implies creation of a new branch.
@@ -1075,7 +1080,7 @@ $ git branch
 
 ```text
 $ git switch master
-Zu Zweig »master« gewechselt
+Switched to branch »master«
 ```
 
 ```text
@@ -1086,7 +1091,7 @@ $ git branch
 
 ```text
 $ git switch dev
-Zu Zweig »dev« gewechselt
+Switched to branch »dev«
 ```
 
 ```text {all|2}
@@ -1102,7 +1107,7 @@ git log  --oneline --graph --decorate=short --all
 
 ---
 
-# Let us do some developping
+# Let us do some work in the `dev` branch
 
 ````md magic-move
 ```python
@@ -1140,3 +1145,492 @@ $ git log --oneline --graph --decorate --all
 * So far, the history is still linear.
 
 </v-click>
+
+---
+
+# Switching back and forth
+
+#### `dev` branch
+
+```text {all|2}
+$ git branch
+* dev
+  master
+```
+
+```text
+$ cat hello.py
+from repeat import repeated_print
+
+def hello(name="", repetitions=1):
+    if name:
+        repeated_print(f"Hello, {name}", repetitions)
+    else:
+        repeated_print("Hello world!", repetitions)
+```
+
+#### `master` branch
+
+```text
+$ git switch master
+Switched to branch »master«
+```
+```text
+$ cat hello.py
+from repeat import repeated_print
+
+repeated_print("Hello world!", 3)
+```
+
+---
+
+# Improvement in the `master` branch
+  
+<div class="mt-3 p-2 border-2 border-teal-800 bg-teal-50 text-teal-800">
+  <div class="grid grid-cols-[2%_1fr] gap-4">
+    <div><carbon-idea class="text-teal-800 text-xl" /></div>
+    <div>
+    Before beginning with your work, make sure that you are in the correct branch:<br>
+    <code>git branch</code> or <code>git status</code>
+    </div>
+  </div>
+</div>
+
+```text
+$ git branch
+  dev
+* master
+```
+
+<br>
+
+#### add default value to argument `repetitions`
+
+````md magic-move
+```python
+# repeat.py
+def repeated_print(text, repetitions):
+    for n in range(repetitions):
+        print(text)
+```
+```python
+# repeat.py
+def repeated_print(text, repetitions=1):
+    for n in range(repetitions):
+        print(text)
+```
+````
+
+<br>
+
+<v-click>
+
+#### commit and go back to the `dev` branch
+
+```text
+$ git commit -a -m 'default value for number of repetitions defined'
+$ git switch dev
+```
+
+</v-click>
+
+---
+
+# Two branches
+
+```text
+$ git log --oneline --graph --decorate --all
+* 598bbf7 (master) default value for number of repetitions defined
+| * d5a8fb8 (HEAD -> dev) name as new argument implemented
+|/  
+* 4a97579 .gitignore for Python added
+* 0c227f4 hello world script refactored
+* 52b9aa8 repetition of hello world implemented
+* 11e2d07 simple hello world script added
+```
+
+* The history is no longer linear. We now have changes in two parallel branches.
+* We are in the `dev` branch. Therefore, `HEAD` is pointing to `dev`.
+
+---
+
+# Do some more changes to the `hello.py` script
+
+````md magic-move
+```python
+# hello.py
+from repeat import repeated_print
+
+def hello(name="", repetitions=1):
+    if name:
+        repeated_print(f"Hello, {name}", repetitions)
+    else:
+        repeated_print("Hello world!", repetitions)
+```
+```python
+# hello.py
+from repeat import repeated_print
+
+def hello(name="", repetitions=1):
+    if name:
+        repeated_print(f"Hello, {name}!", repetitions)
+    else:
+        repeated_print("Hello world!", repetitions)
+```
+```python
+# hello.py
+from repeat import repeated_print
+
+def hello(name="", repetitions=1):
+    if name:
+        repeated_print(f"Hello, {name}!", repetitions)
+    else:
+        repeated_print("Hello world!", repetitions)
+
+if __name__ == "__main__":
+    hello("Alice", 3)
+```
+````
+
+<v-clicks at="1">
+
+* add the missing exclamation mark
+* add a function call
+
+</v-clicks>
+
+<br>
+
+<v-click>
+
+* What about atomic commits?  
+  These two changes are not logically related.
+
+</v-click>
+
+---
+
+# `git add -p`
+
+```text
+$ git add -p hello.py
+diff --git a/hello.py b/hello.py
+index 539c294..1240711 100644
+--- a/hello.py
++++ b/hello.py
+@@ -2,6 +2,9 @@ from repeat import repeated_print
+ 
+ def hello(name="", repetitions=1):
+     if name:
+-        repeated_print(f"Hello, {name}", repetitions)
++        repeated_print(f"Hello, {name}!", repetitions)
+     else:
+         repeated_print("Hello world!", repetitions)
++
++if __name__ == "__main__":
++    hello("Alice", 3)
+(1/1) Stage this hunk [y,n,q,a,d,s,e,?]?
+```
+
+```text {all}{maxHeight:'100px'}
+y - stage this hunk
+n - do not stage this hunk
+q - quit; do not stage this hunk or any of the remaining ones
+a - stage this hunk and all later hunks in the file
+d - do not stage this hunk or any of the later hunks in the file
+s - split the current hunk into smaller hunks
+e - manually edit the current hunk
+? - print help
+```
+
+---
+
+# Split the changes
+
+```text 
+(1/1) Stage this hunk [y,n,q,a,d,s,e,?]? s
+Split into 2 hunks.
+@@ -2,6 +2,6 @@
+ 
+ def hello(name="", repetitions=1):
+     if name:
+-        repeated_print(f"Hello, {name}", repetitions)
++        repeated_print(f"Hello, {name}!", repetitions)
+     else:
+         repeated_print("Hello world!", repetitions)
+(1/2) Stage this hunk [y,n,q,a,d,j,J,g,/,e,?]? y
+@@ -6,2 +6,5 @@
+     else:
+         repeated_print("Hello world!", repetitions)
++
++if __name__ == "__main__":
++    hello("Alice", 3)
+(2/2) Stage this hunk [y,n,q,a,d,K,g,/,e,?]? n
+```
+
+* now we can commit the first change
+* the other change can be put into a separate commit after a simple `git add`
+
+---
+
+# Merging two branches
+
+```text
+$ git log --oneline --graph --decorate --all
+* 3915166 (HEAD -> dev) function call added
+* 8b7465e exclamation mark added
+* d5a8fb8 name as new argument implemented
+| * 598bbf7 (master) default value for number of repetitions defined
+|/  
+* 4a97579 .gitignore for Python added
+* 0c227f4 hello world script refactored
+* 52b9aa8 repetition of hello world implemented
+* 11e2d07 simple hello world script added
+```
+
+<br>
+
+#### merge `dev` branch into `master` branch
+
+```text
+$ git switch master
+Switched to branch »master«
+```
+
+* switch to the `master` branch first
+* now we can merge `dev` into `master`
+
+---
+
+# Merging two branches
+
+```text
+$ git merge dev
+Merge made by the 'ort' strategy.
+ hello.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+```
+
+```text
+$ git log --oneline --graph --decorate --all
+*   9137444 (HEAD -> master) Merge branch 'dev'
+|\  
+| * 3915166 (dev) function call added
+| * 8b7465e exclamation mark added
+| * d5a8fb8 name as new argument implemented
+* | 598bbf7 default value for number of repetitions defined
+|/  
+* 4a97579 .gitignore for Python added
+* 0c227f4 hello world script refactored
+* 52b9aa8 repetition of hello world implemented
+* 11e2d07 simple hello world script added
+```
+
+* In this case, merging of the two branches could be done cleanly.
+* The new version of combines the changes made in the two branches.
+
+---
+
+# Merging
+
+##### common ancestor
+
+```python
+# repeat.py 4a97579
+def repeated_print(text, repetitions):
+    for n in range(repetitions):
+        print(text)
+
+```
+
+<br>
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+<div>
+<h5>version in <code>master</code> branch</h5>
+
+```python
+# repeat.py 598bbf7
+def repeated_print(text, repetitions=1):
+    for n in range(repetitions):
+        print(text)
+```
+</div>
+<div>
+<h5>version <code>dev</code> branch</h5>
+
+```python
+# repeat.py 3915166
+def repeated_print(text, repetitions):
+    for n in range(repetitions):
+        print(text)
+```
+</div>
+</div>
+
+<br>
+
+##### merged version
+
+```python
+# repeat.py 9137444
+def repeated_print(text, repetitions=1):
+    for n in range(repetitions):
+        print(text)
+```
+
+---
+
+# Deleting a branch
+
+* The branch `dev` can be kept for further development.
+* It can also be deleted and a new branch `dev` can be created later.
+
+```text
+$ git branch -d dev
+Deleted branch dev (was 3915166).
+```
+
+* If changes could be lost, the option `-d` is not sufficient to delete the branch.
+  Use `-D` if the deletion of the branch is really wanted.
+
+```text
+$ git log --oneline --graph --decorate --all
+*   9137444 (HEAD -> master) Merge branch 'dev'
+|\  
+| * 3915166 function call added
+| * 8b7465e exclamation mark added
+| * d5a8fb8 name as new argument implemented
+* | 598bbf7 default value for number of repetitions defined
+|/  
+* 4a97579 .gitignore for Python added
+* 0c227f4 hello world script refactored
+* 52b9aa8 repetition of hello world implemented
+* 11e2d07 simple hello world script added
+```
+
+---
+
+# Merge conflicts
+
+* merge conflicts can happen if changes in different branches are inconsistent
+
+<br>
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+<div>
+<h5>version in <code>master</code> branch</h5>
+
+```python
+# repeat.py 6adb4bd
+def repeated_print(text, repetitions=1):
+    """print text repeatedly
+
+    """
+    for n in range(repetitions):
+        print(text)
+```
+</div>
+<div>
+<h5>version <code>dev</code> branch</h5>
+
+```python
+# repeat.py d7f54e0
+def repeated_print(text, repetitions):
+    """print text several times"""
+    for n in range(repetitions):
+        print(text)
+```
+</div>
+</div>
+
+<br>
+
+```text
+$ git log --oneline --graph --decorate --all
+* 6adb4bd (master) doc string added
+*   9137444 Merge branch 'dev'
+|\  
+* | 598bbf7 default value for number of repetitions defined
+| | * d7f54e0 (HEAD -> dev) added a doc string
+| |/  
+| * 3915166 function call added
+⋮  ⋮
+```
+
+---
+
+# Merge conflicts
+
+```text {all|6,7}
+$ git branch
+  dev
+* master
+$ git merge dev
+Auto-merging repeat.py
+CONFLICT (content): Merge conflict in repeat.py
+Automatic merge failed; fix conflicts and then commit the result.
+```
+<v-click>
+
+* open file(s) with merge conflicts in an editor
+
+</v-click>
+
+<v-after>
+
+```text {all|2-7|7-10}
+ # repeat.py
+ <<<<<<< HEAD
+ def repeated_print(text, repetitions=1):
+     """print text repeatedly
+ 
+     """
+ =======
+ def repeated_print(text, repetitions):
+     """print text several times"""
+ >>>>>>> dev
+     for n in range(repetitions):
+         print(text)
+```
+
+</v-after>
+<v-click>
+
+* edit as needed, then add to staging area and commit
+
+</v-click>
+
+---
+
+# History after resolution of merge conflict
+
+```text
+$ git log --oneline --graph --decorate --all
+*   ee1bcde (HEAD -> master) Merge branch 'dev'
+|\  
+| * d7f54e0 (dev) added a doc string
+* | 6adb4bd doc string added
+* | 9137444 Merge branch 'dev'
+|\| 
+| * 3915166 function call added
+| * 8b7465e exclamation mark added
+| * d5a8fb8 name as new argument implemented
+* | 598bbf7 default value for number of repetitions defined
+|/  
+* 4a97579 .gitignore for Python added
+* 0c227f4 hello world script refactored
+* 52b9aa8 repetition of hello world implemented
+* 11e2d07 simple hello world script added
+```
+
+* Collaborative development makes merge conflicts more likely.
+  
+<div class="mt-3 p-2 border-2 border-teal-800 bg-teal-50 text-teal-800">
+  <div class="grid grid-cols-[2%_1fr] gap-4">
+    <div><carbon-idea class="text-teal-800 text-xl" /></div>
+    <div>
+     A good project management can help to avoid merge conflicts. 
+    </div>
+  </div>
+</div>
