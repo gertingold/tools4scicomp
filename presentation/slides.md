@@ -1660,3 +1660,21 @@ $ git log --oneline --graph --decorate --all
     </div>
   </div>
 </div>
+
+---
+
+# Collaborative development with GitLab
+
++ problem: several or even many developers who do not grant access to their computers
++ solution: exchange code via a server (GitLab server or GitHub)
+
+<br>
+
+#### scenario with more than one user
+
+<br>
+
+<img src="images/gitlab.png" style="width: 60%; margin: auto">
+
+<br>
+
