@@ -1310,6 +1310,32 @@ if __name__ == "__main__":
 
 ---
 
+# What did we change?
+
+```text {1|all}
+$ git diff
+diff --git a/hello.py b/hello.py
+index 539c294..1240711 100644
+--- a/hello.py
++++ b/hello.py
+@@ -2,6 +2,9 @@ from repeat import repeated_print
+ 
+ def hello(name="", repetitions=1):
+     if name:
+-        repeated_print(f"Hello, {name}", repetitions)
++        repeated_print(f"Hello, {name}!", repetitions)
+     else:
+         repeated_print("Hello world!", repetitions)
++
++if __name__ == "__main__":
++    hello("Alice", 3)
+```
+
+* `git diff` helps if you want to know what modifications have been made
+* `git diff` works also if more than one file has been modified
+
+---
+
 # `git add -p`
 
 ```text
