@@ -141,7 +141,6 @@ layout: section
   <div>1972</div><div>SCCS (source code control system)</div>
   <div>1982</div><div>RCS (revision control system)</div>
   <div>1990</div><div>CVS (concurrent versions system)</div>
-  <div>1990</div><div>CVS (concurrent versions system)</div>
   <div>2000</div><div>Subversion</div>
   <div>2005</div><div><span style="color: #aa0000;">Git</span>, Mercurial, Bazaar</div>
 </div>
