@@ -53,7 +53,7 @@ h1{ color: white; }
 * Version control with Git
 * Testing of code
 * Scientific computing with NumPy and SciPy
-* Run-time analysics
+* Run-time analysis
 * Documentation of code
 * Aspects of parallel computing
 
