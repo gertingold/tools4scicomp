@@ -85,7 +85,7 @@ layout: gli-two-cols-header
 ### What can be earned
 
 * a lot of useful knowledge, but also:
-* 6 credit points
+* 8 credit points
 * Master Materials Science and Engineering
   - Methods in Materials Science
 * Master Physics
