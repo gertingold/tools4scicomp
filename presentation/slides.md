@@ -1669,11 +1669,25 @@ $ git log --oneline --graph --decorate --all
 
 <br>
 
-#### scenario with more than one user
+#### typical scenario with more than one user
 
 <br>
 
-<img src="images/gitlab.png" style="width: 60%; margin: auto">
+<div class="grid grid-cols-[60%_1fr] gap-8">
+ <div><img src="images/gitlab.png" style="width: 100%; margin: auto"></div>
+ <div>
+
+  #### project maintainer
+
+  * public repository `upstream`
+  * only needed in a multi-developer scenario
+
+  #### user(s)
+  
+  * private local Git repository
+  * public repository `origin` to make code available to `upstream` repository
+ </div>
+</div>
 
 <br>
 
