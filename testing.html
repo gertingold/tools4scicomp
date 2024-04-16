@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3. Testing of code &#8212; Tools for Scientific Computing 0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=e491ac2d" />
+    <script src="_static/documentation_options.js?v=b489f392"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4. Scientific computing with NumPy and SciPy" href="numpy.html" />
+    <link rel="prev" title="2. Version Control with Git" href="git.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Tools for Scientific Computing 0.3 documentation</span></a></h1>
+        <h2 class="heading"><span>3. Testing of code</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="git.html"><span class="section-number">2. </span>Version Control with Git</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="numpy.html"><span class="section-number">4. </span>Scientific computing with NumPy and SciPy</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <section id="testing-of-code">
+<span id="testing"></span><h1><span class="section-number">3. </span>Testing of code<a class="headerlink" href="#testing-of-code" title="Link to this heading">¶</a></h1>
+<section id="why-testing">
+<h2><span class="section-number">3.1. </span>Why testing?<a class="headerlink" href="#why-testing" title="Link to this heading">¶</a></h2>
+<p>Scientific code usually aims at producing new insights which implies that
+typically the correctness of the result is difficult to assess. Occasionally,
+bugs in the code can be identified because the results do not make any sense.
+In general the situation may not be that clear. Therefore testing the code is
+crucial. However, it is insufficient to test code from time to time in an
+informal manner. Instead, one should aim at a comprehensive set of tests which
+can be applied to the code at any time. Ideally, all code committed to version
+control should successfully run the existing tests. Test can then also serve as
+documentation of which kind of functionality is guaranteed to work.
+Furthermore, tests constitute an important safety net when refactoring code,
+i.e. when rewriting the inner structure of the code without affecting its
+external behavior. Tests running correctly for the old code should do so also
+for the refactored code.</p>
+<p>Whenever a bug has been discovered in the code, it is a good habit to write
+one or more tests capable of detecting this bug. While it is barely possible to detect
+all imaginable bugs with tests, one should ensure at least that bugs which
+appeared once do not have a chance to sneak back into the code. Furthermore,
+one should add tests for any new functionality implemented. One indicator for
+the quality of a test suite, i.e. a collection of tests, is code coverage which
+says which percentage of lines of code are run during the tests. In practice,
+one rarely will reach one hundred percent code coverage but one should nevertheless
+strive for a good code coverage. At the same time, code coverage is not the
+only aspect to look for. One should also make sure that tests are independent
+from each other and independent of the logic of the code, if possible. The
+meaning of this will become clear in some of the examples presented later.
+Corner cases deserve special attention in testing as they are frequently ignored
+when setting up the logic of a program.</p>
+<p>Tests can be developed in parallel to the code or even after the code has been
+written. A typical example for the latter is when the presence of a bug is
+noticed. Then, the bug should be fixed and a test should be implemented which
+will detect the presence of the fixed bug in the future. Another approach is
+the so-called <em>test-driven development</em> where the tests are first written. In a
+second step, the code is developed until all test run successfully.</p>
+<p>Testing a big piece of software is usually difficult to do and as mentioned in the
+beginning in the case of scientific software can be almost impossible because one
+cannot anticipate the result beforehand. Therefore, one often tests on a much finer
+level, an approach called <em>unit testing</em>. Here, typically relatively small functions
+are tested to make sure that they work as expected. An interesting side effect of
+unit testing is often a significant improvement in code structure. Often a function
+needs to be rewritten in order to be tested properly. It often needs to be better
+isolated from the rest of the code and its interface has to be defined more carefully,
+thereby improving the quality of the code.</p>
+<p>In this chapter, we will be concerned with unit testing and mainly cover two approaches.
+The first one are doctests which are implemented in Python within the doc strings of a
+function or method. The second approach are unit tests based on asserts using <code class="docutils literal notranslate"><span class="pre">py.test</span></code>.</p>
+</section>
+<section id="doctests">
+<span id="id1"></span><h2><span class="section-number">3.2. </span>Doctests<a class="headerlink" href="#doctests" title="Link to this heading">¶</a></h2>
+<p>The standard way to document a function in Python is a so-called docstring as shown
+in the following example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
+
+<span class="k">def</span> <span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+
+<span class="sd">    name: name of the person to greet</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+</pre></div>
+</div>
+<p>In our example, the docstring is available as <code class="docutils literal notranslate"><span class="pre">welcome.__doc__</span></code> and can also be
+obtained by means of <code class="docutils literal notranslate"><span class="pre">help(welcome)</span></code>.</p>
+<p>Even though we have not formulated any test, we can run the (non-existing) doctests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m doctest hello.py
+</pre></div>
+</div>
+<p>No news is good news, i.e. the fact that this command does not yield any output implied
+that no error occurred in running the tests. One can ask doctest to be more verbose by
+adding the option <code class="docutils literal notranslate"><span class="pre">-v</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m doctest -v hello.py
+1 items had no tests:
+    hello.py
+0 tests in 1 items.
+0 passed and 0 failed.
+Test passed.
+</pre></div>
+</div>
+<p>This message states explicitly that no tests have been run and no tests have failed.</p>
+<p>We now add our first doctest. Doing so is quite straightforward. One simply
+reproduces how a function call together with its output would look in the
+Python shell.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
+
+<span class="k">def</span> <span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+
+<span class="sd">    name: name of the person to greet</span>
+
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
+<span class="sd">    &#39;Hello Alice!&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+</pre></div>
+</div>
+<p>Running the test with the option <code class="docutils literal notranslate"><span class="pre">-v</span></code> to obtain some output, we find:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m doctest -v hello.py
+Trying:
+    welcome(&#39;Alice&#39;)
+Expecting:
+    &#39;Hello Alice!&#39;
+ok
+1 items had no tests:
+    hello
+1 items passed all tests:
+    1 tests in hello.welcome
+1 tests in 2 items.
+1 passed and 0 failed.
+Test passed.
+</pre></div>
+</div>
+<p>Our test passes as expected. It is worth noting that besides providing a
+test, the last two lines of the new doc string can also serve as a documentation
+of how to call the function <code class="docutils literal notranslate"><span class="pre">welcome</span></code>.</p>
+<p>Now let us add a corner case. A special case occurs if no name is given. Even in
+this situation, the function should behave properly. However, an appropriate test
+will reveal in a second that we have not sufficiently considered this corner case
+when designing our function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># hello.py</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="k">def</span> <span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span><span class="sd">    name: name of the person to greet</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
+<span class="linenos"> 9</span><span class="sd">    &#39;Hello!&#39;</span>
+<span class="linenos">10</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
+<span class="linenos">11</span><span class="sd">    &#39;Hello Alice!&#39;</span>
+<span class="linenos">12</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">13</span>    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+</pre></div>
+</div>
+<p>Running the doctests, we identify our first coding error by means of a test:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m doctest hello.py
+**********************************************************************
+File &quot;hello.py&quot;, line 8, in hello.welcome
+Failed example:
+    welcome(&#39;&#39;)
+Expected:
+    &#39;Hello!&#39;
+Got:
+    &#39;Hello !&#39;
+**********************************************************************
+1 items had failures:
+   1 of   2 in hello.welcome
+***Test Failed*** 1 failures.
+</pre></div>
+</div>
+<p>The call specified in line 8 of our script failed because we implicitly
+add a blank which should not be there. So let us modify our script to
+make the tests pass.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
+
+<span class="k">def</span> <span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+
+<span class="sd">    name: name of the person to greet</span>
+
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
+<span class="sd">    &#39;Hello!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
+<span class="sd">    &#39;Hello Alice!&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Hello!&#39;</span>
+</pre></div>
+</div>
+<p>Now the tests pass successfully.</p>
+<p>If now we decide to change our script, e.g. by giving a default value to the variable
+name, we can use the tests as a safety net. They should run for the modified script
+as well.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
+
+<span class="k">def</span> <span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+
+<span class="sd">    name: name of the person to greet</span>
+
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
+<span class="sd">    &#39;Hello!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
+<span class="sd">    &#39;Hello Alice!&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Hello!&#39;</span>
+</pre></div>
+</div>
+<p>Both tests pass successfully. However, we have not yet tested the new default value
+for the variable <code class="docutils literal notranslate"><span class="pre">name</span></code>. So, let us add another test to make sure that everything
+works fine.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
+
+<span class="k">def</span> <span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+
+<span class="sd">    name: name of the person to greet</span>
+
+<span class="sd">    &gt;&gt;&gt; welcome()</span>
+<span class="sd">    &#39;Hello!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
+<span class="sd">    &#39;Hello!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
+<span class="sd">    &#39;Hello Alice!&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Hello!&#39;</span>
+</pre></div>
+</div>
+<p>All three tests pass successfully.</p>
+<p>In a next step development step, we make the function <code class="docutils literal notranslate"><span class="pre">welcome</span></code> multilingual.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
+
+<span class="k">def</span> <span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+
+<span class="sd">    name: name of the person to greet</span>
+
+<span class="sd">    &gt;&gt;&gt; welcome()</span>
+<span class="sd">    &#39;Hello!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
+<span class="sd">    &#39;Hello!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
+<span class="sd">    &#39;Hello Alice!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;, lang=&#39;de&#39;)</span>
+<span class="sd">    &#39;Hallo Alice!&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hellodict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;en&#39;</span><span class="p">:</span> <span class="s1">&#39;Hello&#39;</span><span class="p">,</span> <span class="s1">&#39;de&#39;</span><span class="p">:</span> <span class="s1">&#39;Hallo&#39;</span><span class="p">}</span>
+    <span class="n">hellostring</span> <span class="o">=</span> <span class="n">hellodict</span><span class="p">[</span><span class="n">lang</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1">!&#39;</span>
+</pre></div>
+</div>
+<p>It is interesting to consider the case where the value of <code class="docutils literal notranslate"><span class="pre">lang</span></code> is not a valid
+key. Calling the function with <code class="docutils literal notranslate"><span class="pre">lang</span></code> set to <code class="docutils literal notranslate"><span class="pre">fr</span></code>, one obtains:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python hello.py
+Traceback (most recent call last):
+  File &quot;hello.py&quot;, line 25, in &lt;module&gt;
+    welcome(&#39;Alice&#39;, &#39;fr&#39;)
+  File &quot;hello.py&quot;, line 18, in welcome
+    hellostring = hellodict[lang]
+KeyError: &#39;fr&#39;
+</pre></div>
+</div>
+<p>Typically, error messages related to exception can be quite complex and it is
+either cumbersome to reproduce them in a test or depending on the situation it
+might even by impossible. One might think that the complexity of an error
+message is irrelevant because error messages should not occur in the first place.
+However, there are two reasons to consider such a situation. First, it is not
+uncommon that an appropriate exception is raised and one should check in a test
+whether it is properly raised. Second, more complex outputs appear not only in
+the context of exceptions and one should know ways to handle such situations.</p>
+<p>Let us assume that we handle the <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> by raising a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> together
+with an appropriate error message.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># hello.py</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="k">def</span> <span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span><span class="sd">    name: name of the person to greet</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="sd">    &gt;&gt;&gt; welcome()</span>
+<span class="linenos"> 9</span><span class="sd">    &#39;Hello!&#39;</span>
+<span class="linenos">10</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
+<span class="linenos">11</span><span class="sd">    &#39;Hello!&#39;</span>
+<span class="linenos">12</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
+<span class="linenos">13</span><span class="sd">    &#39;Hello Alice!&#39;</span>
+<span class="linenos">14</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;, lang=&#39;de&#39;)</span>
+<span class="linenos">15</span><span class="sd">    &#39;Hallo Alice!&#39;</span>
+<span class="linenos">16</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;, lang=&#39;fr&#39;)</span>
+<span class="linenos">17</span><span class="sd">    Traceback (most recent call last):</span>
+<span class="linenos">18</span><span class="sd">    ValueError: unknown language: fr</span>
+<span class="linenos">19</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">20</span>    <span class="n">hellodict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;en&#39;</span><span class="p">:</span> <span class="s1">&#39;Hello&#39;</span><span class="p">,</span> <span class="s1">&#39;de&#39;</span><span class="p">:</span> <span class="s1">&#39;Hallo&#39;</span><span class="p">}</span>
+<span class="linenos">21</span>    <span class="k">try</span><span class="p">:</span>
+<span class="linenos">22</span>        <span class="n">hellostring</span> <span class="o">=</span> <span class="n">hellodict</span><span class="p">[</span><span class="n">lang</span><span class="p">]</span>
+<span class="linenos">23</span>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<span class="linenos">24</span>        <span class="n">errmsg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;unknown language: </span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s1">&#39;</span>
+<span class="linenos">25</span>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">errmsg</span><span class="p">)</span>
+<span class="linenos">26</span>    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+<span class="linenos">27</span>        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+<span class="linenos">28</span>    <span class="k">else</span><span class="p">:</span>
+<span class="linenos">29</span>        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1">!&#39;</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="linenos">32</span>    <span class="n">welcome</span><span class="p">(</span><span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="s1">&#39;fr&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>All tests run successfully. Note that in lines 17 and 18 we did not reproduce the full
+traceback. It was sufficient to put line 17 which signals that the following traceback
+can be ignored. Line 18 is checked again to be consistent with the actual error message.
+If one does not need to verify the error message but just the type of exception raised,
+one can use a doctest directive. For example, one could replace lines 16 to 18 by the
+following code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&gt;&gt;&gt; welcome(&#39;Alice&#39;, lang=&#39;fr&#39;) # doctest: +ELLIPSIS</span>
+<span class="sd">Traceback (most recent call last):</span>
+<span class="sd">ValueError: ...</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>The directive is here specified by the comment “<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">doctest:</span> <span class="pre">+ELLIPSIS</span></code>” and the
+ellipsis “<code class="docutils literal notranslate"><span class="pre">...</span></code>” in the last line will replace any output following the text
+“<code class="docutils literal notranslate"><span class="pre">ValueError:</span></code>”.</p>
+<p>Another useful directive is <code class="docutils literal notranslate"><span class="pre">+SKIP</span></code> which tells doctest to skip the test marked
+in this way. Sometimes, one has already written a test before the corresponding
+functionality has been implemented. Then it may make sense to temporarily deactivate
+the test to avoid getting distracted from seriously failing tests by tests which
+are known beforehand to fail. A complete list of directives can be found in
+the <a class="reference external" href="https://docs.python.org/3/library/doctest.html">doctest documentation</a>. For
+example, it is worth to check out the directive <code class="docutils literal notranslate"><span class="pre">+NORMALIZE_WHITESPACE</span></code> which
+helps avoiding trouble with different kinds of white spaces.</p>
+<p>As we have seen, doctests are easy to write and in addition to testing code they
+are helpful in documenting the usage of functions or methods. On the other hand,
+they are particularly well suited for numerical tests where results have to agree
+only to a certain precision. For more complex test cases, it might also be helpful
+to choose the approach discussed in the next section instead of using doctests.</p>
+</section>
+<section id="testing-with-pytest">
+<h2><span class="section-number">3.3. </span>Testing with pytest<a class="headerlink" href="#testing-with-pytest" title="Link to this heading">¶</a></h2>
+<p>For more complex test cases, the Python standard library provides a framework
+called <code class="docutils literal notranslate"><span class="pre">unittest</span></code>. Another often used test framework is <code class="docutils literal notranslate"><span class="pre">nose</span></code>. Recently,
+<code class="docutils literal notranslate"><span class="pre">pytest</span></code> has become very popular which compared <code class="docutils literal notranslate"><span class="pre">unittest</span></code> requires less
+overhead when writing tests. In this section we will focus on <code class="docutils literal notranslate"><span class="pre">pytest</span></code> which
+is not part of the Python standard library but is included e.g. in the Anaconda
+distribution.</p>
+<p>We illustrate the basic usage of <code class="docutils literal notranslate"><span class="pre">pytest</span></code> by testing a function generating
+a line of Pascal’s triangle.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pascal</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;create the n-th line of Pascal&#39;s triangle</span>
+
+<span class="sd">    The line numbers start with n=0 for the line</span>
+<span class="sd">    containing only the entry 1. The elements of</span>
+<span class="sd">    a line are generated successively.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">yield</span> <span class="n">x</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">k</span><span class="p">)</span><span class="o">//</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">x</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s1">2</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pascal</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">+</span><span class="n">line</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Running this script returns the first seven lines of Pascal’s triangle:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python pascal.py
+0             1
+1           1  1
+2          1  2  1
+3        1  3  3  1
+4       1  4  6  4  1
+5     1  5 10 10  5  1
+6    1  6 15 20 15  6  1
+</pre></div>
+</div>
+<p>We will now test the function <code class="docutils literal notranslate"><span class="pre">pascal(n)</span></code> which returns the elements of the
+<span class="math notranslate nohighlight">\(n\)</span>-th line of Pascal’s triangle.  The function is based on the fact that
+the elements of Pascal’s triangle are binomial coefficients. While the output
+of the first seven lines looks fine, it make sense to test the function more
+thoroughly.</p>
+<p>The first and most obvious test is to automate at least part of the test which we
+were just doing visually. It is always a good idea to check boundary cases. In our
+case this means that we make sure that <code class="docutils literal notranslate"><span class="pre">n=0</span></code> indeed corresponds to the first line.
+We also check the following line as well as a typical non-trivial line. We call the
+following script <code class="docutils literal notranslate"><span class="pre">test_pascal.py</span></code> because <code class="docutils literal notranslate"><span class="pre">pytest</span></code> will run scripts with names
+of the form <code class="docutils literal notranslate"><span class="pre">test_*.py</span></code> or <code class="docutils literal notranslate"><span class="pre">*_test.py</span></code> in the present directory or its subdirectories
+automatically. Here, the star stands for any other valid part of a filename.
+Within the script, the test functions should start with <code class="docutils literal notranslate"><span class="pre">test_</span></code> to distinguish
+them from other functions which may be present.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pascal</span> <span class="kn">import</span> <span class="n">pascal</span>
+
+<span class="k">def</span> <span class="nf">test_n0</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">test_n1</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">test_n5</span><span class="p">():</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="o">==</span> <span class="n">expected</span>
+</pre></div>
+</div>
+<p>The tests contain an <code class="docutils literal notranslate"><span class="pre">assert</span></code> statement which raises an <code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> in
+case the test should fail. In fact, this will happen for our test script, even though
+the implementation of the function <code class="docutils literal notranslate"><span class="pre">pascal</span></code> is not to blame. In this case, we have
+inserted a mistake into our test script to show the output of <code class="docutils literal notranslate"><span class="pre">pytest</span></code> in the case
+of errors. Can you find the mistake in the test script? If not, it suffices to run
+the script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
+============================= test session starts =============================
+platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1
+rootdir: /home/gert/pascal, inifile:
+plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+collected 3 items
+
+test_pascal.py ..F                                                      [100%]
+
+================================== FAILURES ===================================
+___________________________________ test_n5 ___________________________________
+
+    def test_n5():
+        expected = [1, 4, 6, 4, 1]
+&gt;       assert list(pascal(5)) == expected
+E       assert [1, 5, 10, 10, 5, 1] == [1, 4, 6, 4, 1]
+E         At index 1 diff: 5 != 4
+E         Left contains more items, first extra item: 1
+E         Use -v to get the full diff
+
+test_pascal.py:11: AssertionError
+===================== 1 failed, 2 passed in 0.04 seconds ======================
+</pre></div>
+</div>
+<p>The last line in the first part of the output, before the header entitled <code class="docutils literal notranslate"><span class="pre">FAILURES</span></code>,
+<code class="docutils literal notranslate"><span class="pre">pytest</span></code> gives a summary of the test run. It ran three tests present in the script
+<code class="docutils literal notranslate"><span class="pre">test_pascal.py</span></code> and the result is indicated by <code class="docutils literal notranslate"><span class="pre">..F</span></code> . The two dots represent
+two successful tests and the <code class="docutils literal notranslate"><span class="pre">F</span></code> marks test which failed and for which detailed information
+is given in the second part of the output. Clearly, the elements of line 5 in Pascal’s
+triangle yielded by our function does not coincide with our expectation.</p>
+<p>It occasionally happens that a test is known to fail in the present of
+development.  One still may want to keep the test in the test suite, but it
+should not be flagged as failure. In such a case, the test can be decorated
+with <code class="docutils literal notranslate"><span class="pre">pytest.mark.xfail</span></code>. Even though decorators can be used without knowing
+how they work, it can be useful to have an idea of this concept. A brief introduction
+to decorators is given in <a class="reference internal" href="appendix.html#appendixdecorators"><span class="std std-numref">Section 8.1</span></a>.</p>
+<p>The relevant test then looks as follows</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">xfail</span>
+<span class="k">def</span> <span class="nf">test_n5</span><span class="p">():</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="o">==</span> <span class="n">expected</span>
+</pre></div>
+</div>
+<p>In addition, the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> module need to be imported. Now, the test is marked
+by an <code class="docutils literal notranslate"><span class="pre">x</span></code> for expected failure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
+============================= test session starts =============================
+platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1
+rootdir: /home/gert/pascal, inifile:
+plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+collected 3 items
+
+test_pascal.py ..x                                                      [100%]
+
+===================== 2 passed, 1 xfailed in 0.04 seconds =====================
+</pre></div>
+</div>
+<p>The marker <code class="docutils literal notranslate"><span class="pre">x</span></code> is set in lowercase to distinguish it from serious failures like
+<code class="docutils literal notranslate"><span class="pre">F</span></code> for a failed test. If a test expected to fail actually passes, it will be
+marked by an uppercase <code class="docutils literal notranslate"><span class="pre">X</span></code> to indicate that corresponding test should not pass.</p>
+<p>One can also skip tests by means of the decorator <code class="docutils literal notranslate"><span class="pre">pytest.mark.skip</span></code> which
+takes an optional variable <code class="docutils literal notranslate"><span class="pre">reason</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s2">&quot;just for demonstration&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_n5</span><span class="p">():</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="o">==</span> <span class="n">expected</span>
+</pre></div>
+</div>
+<p>However, the reason will only be listed in the output, if the option <code class="docutils literal notranslate"><span class="pre">-r</span> <span class="pre">s</span></code> is
+applied:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest -r s
+============================= test session starts =============================
+platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1
+rootdir: /home/gert/pascal, inifile:
+plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+collected 3 items
+
+test_pascal.py ..s                                                      [100%]
+=========================== short test summary info ===========================
+SKIP [1] test_pascal.py:10: just for demonstration
+
+===================== 2 passed, 1 skipped in 0.01 seconds =====================
+</pre></div>
+</div>
+<p>In our case, it is of course better to correct the expected result in function <code class="docutils literal notranslate"><span class="pre">test_n5</span></code>.
+The we obtain the following output from <code class="docutils literal notranslate"><span class="pre">pytest</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
+============================= test session starts =============================
+platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1
+rootdir: /home/gert/pascal, inifile:
+plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+collected 3 items
+
+test_pascal.py ...                                                      [100%]
+
+========================== 3 passed in 0.01 seconds ===========================
+</pre></div>
+</div>
+<p>Now, all tests pass just fine.</p>
+<p>One might object that the test so far only verify a few special cases and in particular
+are limited to very small values of <code class="docutils literal notranslate"><span class="pre">n</span></code>. How do we test line 10000 of Pascal’s triangle
+without having to determine the expected result? We can test properties related to the
+fact that the elements of Pascal’s triangle are binomial coefficients. The sum of the
+elements in the <span class="math notranslate nohighlight">\(n\)</span>-th line amounts to <span class="math notranslate nohighlight">\(2^n\)</span> and if the sign is changed
+from element to element the sum vanishes. This kind of test is quite independent of the
+logic of the function <code class="docutils literal notranslate"><span class="pre">pascal</span></code> and therefore particularly significant. We can implement
+the two tests in the following way.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_sum</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="o">**</span><span class="n">n</span>
+
+<span class="k">def</span> <span class="nf">test_alternate_sum</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">alternate</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span> <span class="o">==</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">alternate</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">sign</span><span class="o">*</span><span class="n">elem</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="n">sign</span>
+</pre></div>
+</div>
+<p>Here, the name of the function <code class="docutils literal notranslate"><span class="pre">alternate</span></code> does not start with the string <code class="docutils literal notranslate"><span class="pre">test</span></code> because
+this function is not intended to be executed as a test. Instead, it serves to alternate
+the sign of subsequent elements used in the test <code class="docutils literal notranslate"><span class="pre">test_alternate_sum</span></code>. One can verify that
+indeed five tests are run. For a change, we use the option <code class="docutils literal notranslate"><span class="pre">-v</span></code> for a verbose output
+listing the name of the test functions being executed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest -v
+============================ test session starts ============================
+platform linux -- Python 3.6.6, pytest-3.8.0, py-1.6.0, pluggy-0.7.1 -- /home/gert/anaconda3/bin/python
+cachedir: .pytest_cache
+rootdir: /home/gert/pascal, inifile:
+plugins: remotedata-0.3.0, openfiles-0.3.0, doctestplus-0.1.3, arraydiff-0.2
+collected 5 items
+
+test_pascal.py::test_n0 PASSED                                        [ 20%]
+test_pascal.py::test_n1 PASSED                                        [ 40%]
+test_pascal.py::test_n5 PASSED                                        [ 60%]
+test_pascal.py::test_sum PASSED                                       [ 80%]
+test_pascal.py::test_alternate_sum PASSED                             [100%]
+
+========================= 5 passed in 0.10 seconds ==========================
+</pre></div>
+</div>
+<p>We could also check whether a line in Pascal’s triangle can be constructed from the previous
+line by adding neighboring elements. This test is completely independent of the inner logic
+of the function to be tested. Furthermore, we can execute it for arbitrary line numbers, at least
+in principle. We add the test</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_generate_next_line</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">chain</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">pascal</span><span class="p">(</span><span class="n">n</span><span class="p">)),</span>
+                                    <span class="n">chain</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                    <span class="n">pascal</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="k">assert</span> <span class="n">left</span><span class="o">+</span><span class="n">right</span> <span class="o">==</span> <span class="n">new</span>
+</pre></div>
+</div>
+<p>where we need to add <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">itertools</span> <span class="pre">import</span> <span class="pre">chain</span></code> in the import section of our test script.</p>
+<p>The last three of our tests contain loops, but they do not behave like several tests. As
+soon as an exception is raised, the test has failed. In contrast our first three tests for
+the lines in Pascal’s triangle with numbers 0, 1, and 5 are individual tests which could
+be unified. How can we do this while the keeping the individuality of the test? The answer
+is the <code class="docutils literal notranslate"><span class="pre">parametrize</span></code> decorator which we use in the following new version of our test script.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">pascal</span> <span class="kn">import</span> <span class="n">pascal</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;lineno, expected&quot;</span><span class="p">,</span> <span class="p">[</span>
+<span class="linenos"> 6</span>    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+<span class="linenos"> 7</span>    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+<span class="linenos"> 8</span>    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="linenos"> 9</span><span class="p">])</span>
+<span class="linenos">10</span><span class="k">def</span> <span class="nf">test_line</span><span class="p">(</span><span class="n">lineno</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+<span class="linenos">11</span>    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="n">lineno</span><span class="p">))</span> <span class="o">==</span> <span class="n">expected</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="n">powers_of_ten</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;lineno&quot;</span><span class="p">,</span>
+<span class="linenos">14</span>                    <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">])</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="nd">@powers_of_ten</span>
+<span class="linenos">17</span><span class="k">def</span> <span class="nf">test_sum</span><span class="p">(</span><span class="n">lineno</span><span class="p">):</span>
+<span class="linenos">18</span>    <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="n">lineno</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="o">**</span><span class="n">lineno</span>
+<span class="linenos">19</span>
+<span class="linenos">20</span><span class="nd">@powers_of_ten</span>
+<span class="linenos">21</span><span class="k">def</span> <span class="nf">test_alternate_sum</span><span class="p">(</span><span class="n">lineno</span><span class="p">):</span>
+<span class="linenos">22</span>    <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">alternate</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="n">lineno</span><span class="p">)))</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="linenos">23</span>
+<span class="linenos">24</span><span class="k">def</span> <span class="nf">alternate</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+<span class="linenos">25</span>    <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos">26</span>    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+<span class="linenos">27</span>        <span class="k">yield</span> <span class="n">sign</span><span class="o">*</span><span class="n">elem</span>
+<span class="linenos">28</span>        <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="n">sign</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="nd">@powers_of_ten</span>
+<span class="linenos">31</span><span class="k">def</span> <span class="nf">test_generate_next_line</span><span class="p">(</span><span class="n">lineno</span><span class="p">):</span>
+<span class="linenos">32</span>    <span class="k">for</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">chain</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">pascal</span><span class="p">(</span><span class="n">lineno</span><span class="p">)),</span>
+<span class="linenos">33</span>                                <span class="n">chain</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="n">lineno</span><span class="p">),</span> <span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+<span class="linenos">34</span>                                <span class="n">pascal</span><span class="p">(</span><span class="n">lineno</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+<span class="linenos">35</span>        <span class="k">assert</span> <span class="n">left</span><span class="o">+</span><span class="n">right</span> <span class="o">==</span> <span class="n">new</span>
+</pre></div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">test_line</span></code> replaces the original first three tests. In order to do
+so, it takes two arguments which are provided by the decorator in lines 5 to 9. This
+decorator makes sure that the test function is run three times with different values
+of the line number in Pascal’s triangle and the expected result. In the remaining three
+test functions, we have replaced the original loop by a <code class="docutils literal notranslate"><span class="pre">parametrize</span></code> decorator.
+In order to avoid repetitive code, we have defined a decorator <code class="docutils literal notranslate"><span class="pre">powers_of_ten</span></code> in
+line 13 and 14 which then is used in three tests. Our script now contains 15 tests.</p>
+<p>When discussing doctests, we had seen how one can make sure that a certain exception
+is raised. Of course, this can also be achieved with <code class="docutils literal notranslate"><span class="pre">pytest</span></code>. At least in the present
+form, it does not make sense to call <code class="docutils literal notranslate"><span class="pre">pascal</span></code> with a negative value for the line number.
+In such a case, a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> should be raised, a behavior which can be tested with
+the following test.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_negative_int</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+        <span class="nb">next</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">next</span></code> explicitly asks the generator to provide us with a value so that the function
+<code class="docutils literal notranslate"><span class="pre">pascal</span></code> gets a chance to check the validity of the line number. Of course, this test will
+only pass once we have adapted our function <code class="docutils literal notranslate"><span class="pre">pascal</span></code> accordingly.</p>
+<p>In order to illustrate a problem frequently occurring when writing tests for scientific
+applications, we generalize our function <code class="docutils literal notranslate"><span class="pre">pascal</span></code> to floating point number arguments.
+As an example, let us choose the argument 1/3. We would then obtain the coefficients in
+the Taylor expansion</p>
+<div class="math notranslate nohighlight">
+\[(1+x)^{1/3} = 1+\frac{1}{3}x-\frac{1}{9}x^2+\frac{5}{81}x^3+\ldots\]</div>
+<p>Be aware that the generator will now provide us with an infinite number of
+return values so that we should take care not to let this happen. In the
+following script <code class="docutils literal notranslate"><span class="pre">pascal_float</span></code>, we do so by taking advantage of the fact
+that <code class="docutils literal notranslate"><span class="pre">zip</span></code> terminates whenever one of the generators is exhausted.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">taylor_power</span><span class="p">(</span><span class="n">power</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;generate the Taylor coefficients of (1+x)**power</span>
+
+<span class="sd">       This function is based on the function pascal().</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">yield</span> <span class="n">coeff</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">power</span><span class="o">-</span><span class="n">k</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="n">coeff</span><span class="o">*</span><span class="p">(</span><span class="n">power</span><span class="o">-</span><span class="n">k</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">yield</span> <span class="n">coeff</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">taylor_power</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We call this script <code class="docutils literal notranslate"><span class="pre">pascal_float.py</span></code> and obtain the following output by running it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0</span> <span class="mi">1</span>
+<span class="mi">1</span> <span class="mf">0.3333333333333333</span>
+<span class="mi">2</span> <span class="o">-</span><span class="mf">0.11111111111111112</span>
+<span class="mi">3</span> <span class="mf">0.0617283950617284</span>
+<span class="mi">4</span> <span class="o">-</span><span class="mf">0.0411522633744856</span>
+</pre></div>
+</div>
+<p>The first four lines match our expectations from the Taylor expansion of <span class="math notranslate nohighlight">\((1+x)^{1/3}\)</span>.</p>
+<p>We test our new function with the test script <code class="docutils literal notranslate"><span class="pre">test_taylor_power.py</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">pascal_float</span> <span class="kn">import</span> <span class="n">taylor_power</span>
+
+<span class="k">def</span> <span class="nf">test_one_third</span><span class="p">():</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">taylor_power</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">9</span><span class="p">,</span> <span class="mi">5</span><span class="o">/</span><span class="mi">81</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="n">expected</span>
+</pre></div>
+</div>
+<p>The failures section of the output of <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">-v</span></code> shows where the problem lies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>______________________________ test_one_third _______________________________
+
+    def test_one_third():
+        p = taylor_power(1/3)
+        result = [next(p) for _ in range(4)]
+        expected = [1, 1/3, -1/9, 5/81]
+&gt;       assert result == expected
+E       assert [1, 0.3333333...7283950617284] == [1, 0.33333333...2839506172839]
+E         At index 2 diff: -0.11111111111111112 != -0.1111111111111111
+E         Full diff:
+E         - [1, 0.3333333333333333, -0.11111111111111112, 0.0617283950617284]
+E         ?                                            -                   ^
+E         + [1, 0.3333333333333333, -0.1111111111111111, 0.06172839506172839]
+E         ?                                                               ^^
+
+test_taylor_power.py:8: AssertionError
+========================= 1 failed in 0.04 seconds ==========================
+</pre></div>
+</div>
+<p>It looks like rounding errors spoil our test and this problem will get worse if
+we want to check further coefficients. We are thus left with two problems.
+First, one needs to have an idea of how well the actual and the expected result
+should agree.  It is not straightforward to answer this, because the precision
+of a result may depend strongly on the numerical methods employed. For a
+numerical integration, a relative error of <span class="math notranslate nohighlight">\(10^{-8}\)</span> might be perfectly
+acceptable while for a pure rounding error, this value would be too large. On a
+more practical side, how can we test in the presence of numerical errors?</p>
+<p>There are actually a number of possibilities. The <code class="docutils literal notranslate"><span class="pre">math</span></code>-module of the Python
+standard library provides a function <code class="docutils literal notranslate"><span class="pre">isclose</span></code> which allows to check whether
+two numbers agree up to a given absolute or relative tolerance. However, one
+would have to compare each pair of numbers individually and then combine the
+Boolean results by means of <code class="docutils literal notranslate"><span class="pre">all</span></code>. When dealing with arrays, the NumPy
+library provides a number of useful functions in its <code class="docutils literal notranslate"><span class="pre">testing</span></code> module. Several
+of these functions can be useful when comparing floats. Finally, <code class="docutils literal notranslate"><span class="pre">pytest</span></code>
+itself provides a function <code class="docutils literal notranslate"><span class="pre">approx</span></code> which can test individual values or
+values collected in a list, a NumPy array, or even a dictionary. Using
+<code class="docutils literal notranslate"><span class="pre">pytest.approx</span></code>, our test could look as follows.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">pascal_float</span> <span class="kn">import</span> <span class="n">taylor_power</span>
+
+<span class="k">def</span> <span class="nf">test_one_third</span><span class="p">():</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">taylor_power</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">9</span><span class="p">,</span> <span class="mi">5</span><span class="o">/</span><span class="mi">81</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="n">pytest</span><span class="o">.</span><span class="n">approx</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="nb">abs</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rel</span><span class="o">=</span><span class="mf">1e-15</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here we test whether the relative tolerance between two values in a pair is at
+most <span class="math notranslate nohighlight">\(10^{-15}\)</span>. By default, the absolute tolerance is set to
+<span class="math notranslate nohighlight">\(10^{-12}\)</span> and the relative tolerance to <span class="math notranslate nohighlight">\(10^{-6}\)</span> where in the end
+the larger value is taken. If we would not specify <code class="docutils literal notranslate"><span class="pre">abs=0</span></code>, a very small
+relative tolerance would be ignored in favor of the default absolute tolerance.
+On the other hand, if no relative tolerance is specified, the absolute
+tolerance is taken for the comparison.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pytest.approx</span></code> and <code class="docutils literal notranslate"><span class="pre">math.isclose</span></code> differ when the relative tolerance is
+checked. While the first one takes the relative tolerance with respect to the
+argument of <code class="docutils literal notranslate"><span class="pre">pytest.approx</span></code>, the second one checks whether the relative
+tolerances are met with respect to both values.</p>
+<p>In this section, we have discussed some of the more important aspects of <code class="docutils literal notranslate"><span class="pre">pytest</span></code>
+without being complete. More information can be found in the <a class="reference external" href="https://docs.pytest.org">corresponding documentation</a>. Of interest, in particular if more extensive tests
+are written, could be the possibility to group tests in classes. This can also
+be useful if a number of tests requires the same setup which then can be defined
+in a dedicated function.</p>
+</section>
+</section>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="git.html"><span class="section-number">2. </span>Version Control with Git</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="numpy.html"><span class="section-number">4. </span>Scientific computing with NumPy and SciPy</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2018—2022, Gert-Ludwig Ingold, license: CC BY 4.0 International.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

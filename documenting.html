@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>6. Documentation of code &#8212; Tools for Scientific Computing 0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=e491ac2d" />
+    <script src="_static/documentation_options.js?v=b489f392"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="7. Aspects of parallel computing" href="parallel.html" />
+    <link rel="prev" title="5. Run-time analysis" href="profiling.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Tools for Scientific Computing 0.3 documentation</span></a></h1>
+        <h2 class="heading"><span>6. Documentation of code</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="profiling.html"><span class="section-number">5. </span>Run-time analysis</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="parallel.html"><span class="section-number">7. </span>Aspects of parallel computing</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <section id="documentation-of-code">
+<span id="documenting"></span><h1><span class="section-number">6. </span>Documentation of code<a class="headerlink" href="#documentation-of-code" title="Link to this heading">¶</a></h1>
+<p>Besides writing code and testing it, documenting the code is also an important
+task which should not be neglected. In Python, it is a good habit to provide
+each function or method with a docstring which might even contain doctests as we
+have discussed in <a class="reference internal" href="testing.html#doctests"><span class="std std-numref">Section 3.2</span></a>. For more complex programs, modules or even
+packages, it will not be sufficient to limit the documentation to the doctests.
+This chapter will be devoted to the discussion of the documentation tool
+<em>Sphinx</em> which is commonly employed to document Python project but which can
+be used also to document projects written in other programming languages. Even
+the present lecture notes are making use of <em>Sphinx</em>.</p>
+<p><em>Sphinx</em> is based on the markup language <em>reStructuredText</em>. Due to its
+unobtrusive syntax the original text can easily be read. At the same time,
+the markup is powerful enough to produce nicely laid out output in different
+formats, in particular in HTML and LaTeX. The latter can directly be used to
+produce the documentation in PDF format.</p>
+<p>The value of <em>Sphinx</em> for the documentation of software projects relies to a
+large extent on its capability to make use of docstrings for inclusion in the
+documentation. <em>Sphinx</em> thus provides another good reason to supply functions
+and methods with docstrings.</p>
+<p>In the following, we will first give an introduction to the markup language
+<em>reStructuredText</em> and then explain some of the more important aspects of how
+<em>Sphinx</em> can be used to document code. For further information, we refer to
+the documentation of <em>reStructuredText</em> <a class="footnote-reference brackets" href="#docrest" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> and <em>Sphinx</em> <a class="footnote-reference brackets" href="#docsphinx" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<section id="markup-with-restructuredtext">
+<h2><span class="section-number">6.1. </span>Markup with reStructuredText<a class="headerlink" href="#markup-with-restructuredtext" title="Link to this heading">¶</a></h2>
+<p>Markup languages are used to annotate text for electronic text processing, for
+example in order to specify its meaning. A text could be marked as representing
+a section title and a computer program could then represent it accordingly, e.g.
+as larger text set in boldface. A widespread markup language is the HyperText
+Markup Language HTML used for markup of webpages. A pair of tags <code class="docutils literal notranslate"><span class="pre">&lt;LI&gt;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&lt;/LI&gt;</span></code> would indicate in HTML that the enclosed text represents an item in
+a list. An example of a markup language commonly found in a scientific context
+is LaTeX. Here, <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">$x$</span></code> will be typeset differently because the dollar
+signs in the second case indicate that the character <code class="docutils literal notranslate"><span class="pre">x</span></code> is meant to be a
+mathematical variable which usually is typeset in an italic font.</p>
+<p>The markup in HTML and LaTeX helps computer programs to interpret the meaning
+of the text and to represent it correctly. However, text written in these markup
+languages often lacks a good human readability. This is particularly true for the
+very flexible extensible markup language XML.</p>
+<p>On the other hand, there exist so-called lightweight markup languages like
+reStructuredText or Markdown where the latter may come in different variants.
+These markup languages are designed in such a way that the meaning of the markup
+appears rather natural to a human reader. From the following example written in
+reStructuredText</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Markup of lists
+===============
+
+The following is a bullet-point list:
+
+* first item
+* second item
+</pre></div>
+</div>
+<p>it is pretty clear that the first two lines represent a header title and the
+last two lines represent a list. Due to the simplicity of its markup, Markdown
+or one of its variants is commonly used in Wikis. Both, texts written in
+Markdown or in reStructuredText are frequently used for documentation files in
+software projects like README.md or README.rst, respectively, which usually
+specify the purpose of the software and give further useful information. In
+version control systems like Gitlab, they can be represented in a nice form
+in the browser.</p>
+<p>The documentation generator <em>Sphinx</em> is based on reStructuredText. Therefore, we
+will now discuss some of the more important aspects of this markup language.</p>
+<p>Within a text, parts can be emphasized or even strongly emphasized by enclosing
+them in one or two stars, respectively. Inline literals are enclosed in a pairs
+of back-quotes. It is important that these constructs should be delimited by
+characters which could also be used otherwise to delimit words like a whitespace
+or a punctuation character. If a whitespace is used but should not appear in the
+output, it needs to be escaped by means of a backslash. The text to which the
+markup is applied may not start or end with a whitespace. The following example
+provides an illustration.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Text can be *emphasized*, usually as italics, or even **strongly emphasized**,
+usually as boldface. It is also possible to insert ``inline literals`` which
+will usually be represented as monospaced text.
+
+This is another paragraph showing how to embed an inline literal while
+suppressing the surrounding blanks: re\ ``structured``\ Text.
+</pre></div>
+</div>
+<p>will be represented as <a class="footnote-reference brackets" href="#sphinxlatexrepr" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p>
+<blockquote>
+<div><p>Text can be <em>emphasized</em>, usually as italics, or even <strong>strongly emphasized</strong>,
+usually as boldface. It is also possible to insert <code class="docutils literal notranslate"><span class="pre">inline</span> <span class="pre">literals</span></code> which
+will usually be represented as monospaced text.</p>
+<p>This is another paragraph showing how to embed an inline literal while
+suppressing the surrounding blanks: re<code class="docutils literal notranslate"><span class="pre">structured</span></code>Text.</p>
+</div></blockquote>
+<p>This example also shows that paragraphs are separated by a blank line. On a
+higher level, text is sectioned into parts, chapters, sections etc. A hierarchy
+is established by adorning titles in a systematic way. To this end, an
+underline or an underline together with an overline is added to the corresponding
+title. An underline or overline is at least as long as the title and contains only
+identical non-alphanumeric printable ASCII characters. It is recommended to choose
+among the characters <code class="docutils literal notranslate"><span class="pre">=</span> <span class="pre">-</span> <span class="pre">`</span> <span class="pre">:</span> <span class="pre">.</span> <span class="pre">'</span> <span class="pre">&quot;</span> <span class="pre">~</span> <span class="pre">^</span> <span class="pre">_</span> <span class="pre">*</span> <span class="pre">+</span> <span class="pre">#</span></code>. Note that even though in this way
+one can define a large number of different sectioning levels, in practice this number
+may be limited. For example, in HTML the number of different headings is limited to
+six. An example of sectioning of a text could look as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">============</span>
+<span class="n">Introduction</span>
+<span class="o">============</span>
+
+<span class="n">A</span> <span class="n">first</span> <span class="n">section</span>
+<span class="o">===============</span>
+
+<span class="n">Here</span> <span class="n">comes</span> <span class="n">some</span> <span class="n">text</span> <span class="o">...</span>
+
+<span class="n">A</span> <span class="n">second</span> <span class="n">section</span>
+<span class="o">================</span>
+<span class="n">More</span> <span class="n">text</span><span class="o">...</span>
+
+<span class="n">A</span> <span class="n">subsection</span>
+<span class="o">------------</span>
+<span class="n">And</span> <span class="n">so</span> <span class="n">on</span><span class="o">...</span>
+</pre></div>
+</div>
+<p>As this example indicates, an empty line can be put after a title but this is not
+mandatory.</p>
+<p>Lists, either as bullet-point lists or as enumerated lists, can easily be obtained
+in reStructuredText. In a bullet-point list, the items are indicated by a few characters
+including <code class="docutils literal notranslate"><span class="pre">*</span> <span class="pre">+</span> <span class="pre">-</span> <span class="pre">•</span></code>. If the text if an item runs over several lines, it needs
+to be consistently indented. Sublists need to be separated from the surrounding list
+by empty lines. The following example illustrates the use of bullet-point lists:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>* This is the text for the first item which runs over several lines. Make
+  sure that the text is consistently indented.
+
+  Further paragraphs in an item can be added provided the indentation
+  is consistent.
+* second item
+
+  * a subitem
+
+* third item
+</pre></div>
+</div>
+<p>This code results in</p>
+<blockquote>
+<div><ul>
+<li><p>This is the text for the first item which runs over several lines. Make
+sure that the text is consistently indented.</p>
+<p>Further paragraphs in an item can be added provided the indentation
+is consistent.</p>
+</li>
+<li><p>second item</p>
+<ul class="simple">
+<li><p>A subitem is obtained by indenting the corresponding entry.</p></li>
+</ul>
+</li>
+<li><p>third item</p></li>
+</ul>
+</div></blockquote>
+<p>An enumerated list can be numbered explicitly by numbers, alphabet characters
+in uppercase or lowercase, or Roman numerals. It is also possible to autonumber
+a list by means of <code class="docutils literal notranslate"><span class="pre">#</span></code>. The sublist of the second item demonstrates two
+aspects. The first subitem specifies that lowercase letters should be used for
+enumeration and, in addition, the sublist should start with a letter other than
+“a”.  Once autonumbering has started, fixing a subsequent label would lead to
+the start of a new list.</p>
+<p>The following code</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#. first item with automatic numbering
+#. second item
+
+   p. subitem
+   #. another subitem
+
+#. another item
+</pre></div>
+</div>
+<p>results in</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>first item with automatic numbering</p></li>
+<li><p>second item</p>
+<ol class="loweralpha simple" start="16">
+<li><p>subitem</p></li>
+<li><p>another subitem</p></li>
+</ol>
+</li>
+<li><p>another item</p></li>
+</ol>
+</div></blockquote>
+<p>We have already seen how to produce inline literals which may be useful to
+mark for example keywords. To display multiline code, the <em>code</em> directive
+is appropriate. The following example makes use of the possibility to add
+linenumbers.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.. code:: python
+
+   nmax = 10
+   sum = 0
+   for n in range(1, nmax+1):
+       sum = sum+n**2
+   print(nmax, sum)
+</pre></div>
+</div>
+<p>Since it is indicated that the code is written in Python, the syntax of the
+code can be highlighted.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nmax</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="o">+</span><span class="n">n</span><span class="o">**</span><span class="mi">2</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">nmax</span><span class="p">,</span> <span class="nb">sum</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Another possibility to typeset code is the use of two colons. If the colons
+follow the preceding text immediately, a single colon will be displayed at the
+end of the text:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">following</span> <span class="n">script</span> <span class="n">displays</span> <span class="s2">&quot;hello world&quot;</span> <span class="n">three</span> <span class="n">times</span><span class="p">::</span>
+
+   <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello world!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note the indentation of the code block which indicates which part of the text
+should be considered as code. The output is as follows:</p>
+<blockquote>
+<div><p>The following script displays “hello world” three times:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello world!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>The colon in the output can be avoided if the colons are separated from the
+text by a blank:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">following</span> <span class="n">script</span> <span class="n">displays</span> <span class="s2">&quot;hello world&quot;</span> <span class="n">three</span> <span class="n">times</span><span class="o">.</span> <span class="p">::</span>
+
+   <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello world!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, the output looks as follows:</p>
+<blockquote>
+<div><p>The following script displays “hello world” three times.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello world!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>For scientific applications, one might want to include mathematical
+expressions.  This can be done by means of the <em>math</em> role (<code class="docutils literal notranslate"><span class="pre">:math:</span></code>) for
+inline mathematical expressions and the <em>math</em> directive (<code class="docutils literal notranslate"><span class="pre">math::</span></code>) for
+displayed mathematical expressions. In both cases, the mathematical expression
+is entered in LaTeX format. The following code</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Einstein found the famous formula :math:`E=mc^2` which describes the
+equivalence of energy and mass.
+
+.. math::
+
+   \int_{-\infty}^\infty \mathrm{d}x \mathrm{e}^{-x^2} = \sqrt{\pi}
+</pre></div>
+</div>
+<p>will result in the output:</p>
+<blockquote>
+<div><p>Einstein found the famous formula <span class="math notranslate nohighlight">\(E=mc^2\)</span> which describes the
+equivalence of energy and mass.</p>
+<div class="math notranslate nohighlight">
+\[\int_{-\infty}^\infty \mathrm{d}x \mathrm{e}^{-x^2} = \sqrt{\pi}\]</div>
+</div></blockquote>
+<p>There exists also a directive to include images:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.. image:: img/example.png
+   :width: 100
+   :height: 100
+   :align: center
+</pre></div>
+</div>
+<p>The name of the image file to be included needs to be specified. Here, the file
+happens to reside in a subdirectory <code class="docutils literal notranslate"><span class="pre">img</span></code> of the present directory. We have
+also specified the size and the alignment of the figure, resulting in the
+following output:</p>
+<a class="reference internal image-reference" href="_images/example.png"><img alt="_images/example.png" class="align-center" src="_images/example.png" style="width: 100px; height: 100px;" /></a>
+<p>The <code class="docutils literal notranslate"><span class="pre">figure</span></code> directive can be used to add a figure caption. The caption text
+needs to be indented to indicate that it belongs to the figure directive.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.. figure:: img/example.png
+   :height: 50
+   :width: 100
+
+   A graphics can be distorted by specifying ``height`` and ``width``.
+</pre></div>
+</div>
+<p>This code results in <a class="reference internal" href="#example"><span class="std std-numref">Figure 6.1</span></a>, which by means of the <em>Sphinx</em> LaTeX builder
+is created as a floating object.</p>
+<figure class="align-default" id="id9">
+<span id="example"></span><a class="reference internal image-reference" href="_images/example.png"><img alt="_images/example.png" src="_images/example.png" style="width: 100px; height: 50px;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 6.1 </span><span class="caption-text">A graphics can be distorted by specifying <code class="docutils literal notranslate"><span class="pre">height</span></code> and <code class="docutils literal notranslate"><span class="pre">width</span></code>.</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Occasionally, one may want to include a link to a web resource. In a documentation, this
+might be desirable to refer to a publication where an algorithm or the theoretical basis
+of the code has been described. As an example, we present various ways to link to the
+seminal paper by Cooley and Tukey on the fast Fourier transformation. The numbering allows
+us to refer more easily to the three different versions and plays no role with respect to
+the links.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#. J. W. Cooley and J. W. Tukey, *An algorithm for the machine calculation
+   of complex Fourier series*,
+   `Math. Comput. 19, 297–301 (1965) &lt;https://doi.org/10.2307/2003354&gt;`_
+
+#. J. W. Cooley and J. W. Tukey, *An algorithm for the machine calculation
+   of complex Fourier series*,
+   Math. Comput. **19**, 297–301 (1965) `&lt;https://doi.org/10.2307/2003354&gt;`_
+
+#. J. W. Cooley and J. W. Tukey, *An algorithm for the machine calculation
+   of complex Fourier series*,
+   Math. Comput. **19**, 297–301 (1965) https://doi.org/10.2307/2003354
+</pre></div>
+</div>
+<p>results in the output</p>
+<ol class="arabic simple">
+<li><p>J. W. Cooley and J. W. Tukey, <em>An algorithm for the machine calculation of complex Fourier series</em>,
+<a class="reference external" href="https://doi.org/10.2307/2003354">Math. Comput. 19, 297–301 (1965)</a></p></li>
+<li><p>J. W. Cooley and J. W. Tukey, <em>An algorithm for the machine calculation of complex Fourier series</em>,
+Math. Comput. <strong>19</strong>, 297–301 (1965) <a class="reference external" href="https://doi.org/10.2307/2003354">https://doi.org/10.2307/2003354</a></p></li>
+<li><p>J. W. Cooley and J. W. Tukey, <em>An algorithm for the machine calculation of complex Fourier series</em>,
+Math. Comput. <strong>19</strong>, 297–301 (1965) <a class="reference external" href="https://doi.org/10.2307/2003354">https://doi.org/10.2307/2003354</a></p></li>
+</ol>
+<p>The first case represents the most comprehensive way to represent a link. The pair of back apostrophes
+encloses the text and the link delimited by a less-than and greater-than sign. The text will be shown
+in the output with the link associated with it. The underscore at the very end indicates that this is
+an outgoing link. In contrast to the two other variants, the volume number (19) can be set as boldface
+as nesting of the markup is not possible.</p>
+<p>The second alternative explicitly displays the URL since no text is given. The same effect is obtained
+in the third variant by simply putting a URL which can be recognized as such.</p>
+<p>In addition to external links, reStructuredText also allows to create internal links. An example are
+footnotes like in the following example.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>This is some text. [#myfootnote]_ And more text...
+
+.. [#myfootnote] Some remarks.
+</pre></div>
+</div>
+<p>It is also possible to refer to titles of chapters or sections. The following example gives an
+illustration.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Introduction
+============
+
+This is an introductory chapter.
+
+Chapter 1
+=========
+
+As discussed in the `Introduction`_ ...
+</pre></div>
+</div>
+<p>Here, the text of the link has to agree with the text of the chapter or section.</p>
+<p>The discussion of reStructuredText in this section did not attempt to cover all possibilities provided
+by this markup language. For more details, it is recommended to consult the
+<a class="reference external" href="http://docutils.sourceforge.net/rst.html">documentation</a>.</p>
+</section>
+<section id="sphinx-documentation-generator">
+<h2><span class="section-number">6.2. </span>Sphinx documentation generator<a class="headerlink" href="#sphinx-documentation-generator" title="Link to this heading">¶</a></h2>
+<p>The <em>Sphinx</em> documentation generator was initially created to produce the documentation for
+Python. However, it is very flexible and can be employed for many other use cases. In fact,
+the present lecture notes were also generated by means of <em>Sphinx</em>. As a documentation generator,
+<em>Sphinx</em> accepts documents written in reStructuredText including a number of extension and
+provides builders to convert the input into a variety of output formats, among them HTML and
+PDF, where the latter is obtained through LaTeX as an intermediate format. <em>Sphinx</em> offers the
+interesting possibility to autogenerate the documentation or part of it on the basis of the
+docstrings provided by the code being documented.</p>
+<section id="setting-up-a-sphinx-project">
+<h3><span class="section-number">6.2.1. </span>Setting up a Sphinx project<a class="headerlink" href="#setting-up-a-sphinx-project" title="Link to this heading">¶</a></h3>
+<p>There is not a unique way to set up a <em>Sphinx</em> documentation project. For a unexperienced user of
+<em>Sphinx</em>, the probably simplest way is to invoke <a class="footnote-reference brackets" href="#sphinxversion" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sphinx-quickstart
+</pre></div>
+</div>
+<p>Remember that the dollar sign represents the command line prompt and should not
+be typed. The user will then be asked a number of questions and the answers
+will allow <em>Sphinx</em> to create the basic setup. For the documentation of a
+software project, it makes sense to store all documentation related material in
+a subdirectory <code class="docutils literal notranslate"><span class="pre">doc</span></code>. Then, <code class="docutils literal notranslate"><span class="pre">sphinx-quickstart</span></code> should either be run in
+this directory or the path to this directory should be given as an argument.</p>
+<p>The dialog starts with a question about where to place the build directory
+relative to the source directory. The latter would for example be the directory
+<code class="docutils literal notranslate"><span class="pre">doc</span></code> and typically contains a configuration file, reStructuredText files,
+and possibly images.  For a larger documentation, these files can be organized
+in a subdirectory structure.  These source files will usually be put under
+version control. When creating the documentation in an output format, <em>Sphinx</em>
+puts intermediate files and the output in a special directory to avoid mixing
+these files with the source files. There are two ways to do so. A directory named
+<code class="docutils literal notranslate"><span class="pre">build</span></code> can be put in parallel to the <code class="docutils literal notranslate"><span class="pre">doc</span></code> directory or the it can be kept
+within the <code class="docutils literal notranslate"><span class="pre">doc</span></code> directory. Then it will be called <code class="docutils literal notranslate"><span class="pre">_build</span></code> where the underscore
+indicates its special role. It is not necessary to rerun <code class="docutils literal notranslate"><span class="pre">sphinx-quickstart</span></code>
+if you change your mind. One can instead modify the file <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> and/or <code class="docutils literal notranslate"><span class="pre">make.bat</span></code>
+which will be discussed below. It may be useful to add the build directory
+to the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file, provided a Git repository is used.</p>
+<p><em>Sphinx</em> now asks the user to choose between the two alternatives. <code class="docutils literal notranslate"><span class="pre">(y/n)</span></code> in
+the last line indicates the possible valid answers. <code class="docutils literal notranslate"><span class="pre">[n]</span></code> indicates the default
+value which can also be chosen by simply hitting the return key. Per default, <em>Sphinx</em>
+thus chooses to place build files into a directory <code class="docutils literal notranslate"><span class="pre">_build</span></code> within the source
+directory.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>You have two options for placing the build directory for Sphinx output.
+Either, you use a directory &quot;_build&quot; within the root path, or you separate
+&quot;source&quot; and &quot;build&quot; directories within the root path.
+&gt; Separate source and build directories (y/n) [n]:
+</pre></div>
+</div>
+<p>Often, it makes sense to follow the recommendations of <em>Sphinx</em>. Two pieces of information
+are however mandatory: the name of the project and the author name(s). The default language
+is English, but for example by choosing <code class="docutils literal notranslate"><span class="pre">de</span></code> it can be switched to German. This information
+is relevant when converting to LaTeX in order to choose the correct hyphenation patterns.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sphinx-quickstart</span></code> offers also to enable a number of extensions. It is possible to
+change one’s mind later by adapting the configuration file <code class="docutils literal notranslate"><span class="pre">conf.py</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; autodoc: automatically insert docstrings from modules (y/n) [n]:
+&gt; doctest: automatically test code snippets in doctest blocks (y/n) [n]:
+&gt; intersphinx: link between Sphinx documentation of different projects (y/n) [n]:
+&gt; todo: write &quot;todo&quot; entries that can be shown or hidden on build (y/n) [n]:
+&gt; coverage: checks for documentation coverage (y/n) [n]:
+&gt; imgmath: include math, rendered as PNG or SVG images (y/n) [n]:
+&gt; mathjax: include math, rendered in the browser by MathJax (y/n) [n]:
+&gt; ifconfig: conditional inclusion of content based on config values (y/n) [n]:
+&gt; viewcode: include links to the source code of documented Python objects (y/n) [n]:
+&gt; githubpages: create .nojekyll file to publish the document on GitHub pages (y/n) [n]:
+</pre></div>
+</div>
+<p>We briefly comment on a few of the more important extensions. <code class="docutils literal notranslate"><span class="pre">autodoc</span></code>
+should be enabled if one wants to generate documentation from the docstrings
+provided in the code being documented by the <em>Sphinx</em> project. <code class="docutils literal notranslate"><span class="pre">intersphinx</span></code>
+is useful if one wants to provide links to other projects. It is for example
+possible to refer to the NumPy documentation.  <code class="docutils literal notranslate"><span class="pre">MathJax</span></code> is a Javascript
+package <a class="footnote-reference brackets" href="#mathjax" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> which allows for high-quality typesetting of mathematical
+material in HTML.</p>
+<p>Depending on the operating system(s) on which output is generated for the <em>Sphinx</em> project,
+one typically chooses either the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> for Un*x operating systems or a
+Windows command file for Windows operating systems or even both if more than one operating
+system is being used.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; Create Makefile? (y/n) [y]:
+&gt; Create Windows command file? (y/n) [y]:
+</pre></div>
+</div>
+<p>While the conversion to an output format can always be done by means of <code class="docutils literal notranslate"><span class="pre">sphinx-build</span></code>,
+the task is facilitated by a Makefile or command file. On a Un*x system, running one of
+the commands</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make html
+$ make latexpdf
+</pre></div>
+</div>
+<p>in the directory where the Makefile resides is sufficient to obtain HTML output of
+PDF output, respectively.</p>
+<p>Accepting the default values proposed by <em>Sphinx</em>, the content of the source directory
+on a Un*x system will typically look as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>doc
++-- _build
++-- _static
++-- _templates
++-- conf.py
++-- index.rst
++-- Makefile
+</pre></div>
+</div>
+<p>As is indicated by the extension, <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> is a Python file which defines the
+configuration of the <em>Sphinx</em> project. This file can be modified according to the
+user’s need as long as the Python syntax is respected. <code class="docutils literal notranslate"><span class="pre">index.rst</span></code> is the main
+source file from which reference to other reStructuredText files can be made. Finally,
+<code class="docutils literal notranslate"><span class="pre">Makefile</span></code> defines what should be done when invoking <code class="docutils literal notranslate"><span class="pre">make</span></code> with one of the
+targets <code class="docutils literal notranslate"><span class="pre">html</span></code> or <code class="docutils literal notranslate"><span class="pre">latexpdf</span></code> or any other valid target specified by <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">help</span></code>.</p>
+</section>
+<section id="sphinx-configuration">
+<h3><span class="section-number">6.2.2. </span>Sphinx configuration<a class="headerlink" href="#sphinx-configuration" title="Link to this heading">¶</a></h3>
+<p>As already mentioned, the file <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> offers the possibility to adapt
+<em>Sphinx</em> to the needs of the project. Basic information includes the name of
+the project and of the author(s) as well as copyright information and version
+numbers. It makes sense to create a corresponding version tag in the project
+repository.</p>
+<p>We have seen that <code class="docutils literal notranslate"><span class="pre">sphinx-quickstart</span></code> proposes the use of a number of
+extensions which, if selected, will appear in the list <code class="docutils literal notranslate"><span class="pre">extensions</span></code>. Here,
+other extensions may be added.  When generating documentation from docstrings,
+the <code class="docutils literal notranslate"><span class="pre">napoleon</span></code> extensions is of particular interest. Its usefulness will be
+discussed in <a class="reference internal" href="#autogeneration"><span class="std std-numref">Section 6.2.3</span></a>. This extension can be enabled by adding
+<code class="docutils literal notranslate"><span class="pre">sphinx.ext.napoleon</span></code> to the list of extensions.</p>
+<p>The configuration file contains section for different output builders. We restrict
+ourselves here to HTML output and LaTeX output which can serve to produce a PDF
+document. Among the options for the HTML output, probably the most interesting
+variable is <code class="docutils literal notranslate"><span class="pre">html_theme</span></code>. <a class="reference external" href="https://www.sphinx-doc.org/en/stable/theming.html">https://www.sphinx-doc.org/en/stable/theming.html</a> lists
+a few builtin themes which represent a simple way to change the look and feel of
+the HTML output. Third-party themes can be found at <a class="reference external" href="https://sphinx-themes.org/">https://sphinx-themes.org/</a> and
+there is also the possibility to create one’s own customized theme.</p>
+<p>If the LaTeX output needs to be customized, the dictionary <code class="docutils literal notranslate"><span class="pre">latex_elements</span></code> is the
+place to look for. The configuration file created by <code class="docutils literal notranslate"><span class="pre">sphinx-quickstart</span></code> provides
+a structure which is commented out, but might be useful if one needs to customize certain
+aspects. For example, if one wants to typeset for A4 paper and would like to have floats
+preferentially placed on the top of the page, one might set the dictionary as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">latex_elements</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="c1"># The paper size (&#39;letterpaper&#39; or &#39;a4paper&#39;).</span>
+     <span class="c1">#</span>
+     <span class="s1">&#39;papersize&#39;</span><span class="p">:</span> <span class="s1">&#39;a4paper&#39;</span><span class="p">,</span>
+
+     <span class="c1"># The font size (&#39;10pt&#39;, &#39;11pt&#39; or &#39;12pt&#39;).</span>
+     <span class="c1">#</span>
+     <span class="c1"># &#39;pointsize&#39;: &#39;10pt&#39;,</span>
+
+     <span class="c1"># Additional stuff for the LaTeX preamble.</span>
+     <span class="c1">#</span>
+     <span class="c1"># &#39;preamble&#39;: &#39;&#39;,</span>
+
+     <span class="c1"># Latex figure (float) alignment</span>
+     <span class="c1">#</span>
+     <span class="s1">&#39;figure_align&#39;</span><span class="p">:</span> <span class="s1">&#39;tbp&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>An interesting entry is also <code class="docutils literal notranslate"><span class="pre">'preamble'</span></code> where all information can be specified which
+would normally go in the preamble of a LaTeX document, i.e. between the <code class="docutils literal notranslate"><span class="pre">documentclass</span></code>
+statement and the <code class="docutils literal notranslate"><span class="pre">\begin{document}</span></code> line. Note, however, that the use of backslashes
+common in LaTeX documents might require to specify the string as raw string by placing
+an <code class="docutils literal notranslate"><span class="pre">r</span></code> in front of it. A number of parameters specified by the Sphinx style file can be
+modified in an entry with key <code class="docutils literal notranslate"><span class="pre">'sphinxsetup'</span></code>. If the outline of the box enclosing code
+should be removed and a background color different from white should be used, one
+might specify:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;sphinxsetup&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;&#39;verbatimwithframe=false,</span>
+<span class="s1">                  VerbatimColor=</span><span class="si">{named}{AliceBlue}</span><span class="s1">,</span>
+<span class="s1">               &#39;&#39;&#39;</span>
+</pre></div>
+</div>
+<p>This definition is used for the present document. Details about which
+parameters can be changed in this way and about other entries which can be
+added to the dictionary <code class="docutils literal notranslate"><span class="pre">latex_elements</span></code> can be found in the section <a class="reference external" href="https://www.sphinx-doc.org/en/master/latex.html">LaTeX
+customization</a> of the Sphinx
+documentation. Finally, it may be useful to know that in the list <code class="docutils literal notranslate"><span class="pre">latex_documents</span></code>
+several properties of the document are specified like the title and author appearing
+on the cover page of the documentation.</p>
+</section>
+<section id="autogeneration-of-a-documentation">
+<span id="autogeneration"></span><h3><span class="section-number">6.2.3. </span>Autogeneration of a documentation<a class="headerlink" href="#autogeneration-of-a-documentation" title="Link to this heading">¶</a></h3>
+<p>With <em>Sphinx</em> it is possible to autogenerate documentation from docstrings. Before discussing
+how docstrings can be formatted for use by <em>Sphinx</em>, we make a few general remarks on docstrings.
+Recommendations about how a docstring should look like are given in <span class="target" id="index-0"></span><a class="pep reference external" href="https://peps.python.org/pep-0257/"><strong>PEP 257</strong></a>. <a class="footnote-reference brackets" href="#pep" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>
+We here focus on the keypoints pertinent to docstrings of methods and functions. The first line
+of the docstring should be a phrase ending in a period. It should be written as a command like
+“do something” instead of a description like “does something”. This phrase should not exceed
+one line and it should be separated from the rest of the docstring by one empty line. Then,
+in particular the arguments of the function or method and the return value(s) should be explained.
+Or course, further information deemed useful can be given in addition.</p>
+<p>In order to demonstrate the autogeneration of documentation from docstrings, we take as an
+example the last script for the quantum carpet discussed in <a class="reference internal" href="profiling.html#profiling"><span class="std std-numref">Section 5</span></a>. We have
+partially supplied the code with docstrings which now looks as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+
+<span class="k">class</span> <span class="nc">InfiniteWell</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quantum carpet for infinitely deep potential well.</span>
+
+<span class="sd">    This class allows to determine the time evolution of an</span>
+<span class="sd">    initial state in an infinitely deep potential well.</span>
+
+<span class="sd">    :param func psi0: initial wave function</span>
+<span class="sd">    :param float width: width of the potential well</span>
+<span class="sd">    :param int nbase: number of basis states</span>
+<span class="sd">    :param int nint: number of intervals used in the integration routine</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">nbase</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nbase</span> <span class="o">=</span> <span class="n">nbase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nint</span> <span class="o">=</span> <span class="n">nint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="n">trapezoidal</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">psi0</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+                                  <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">eigenfunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine set of eigenfunction values at position ``x``.</span>
+
+<span class="sd">        The basis set is limited by the number of eigenstates given by</span>
+<span class="sd">        ``self.nbase``.</span>
+
+<span class="sd">        :param x: position at which the eigenfunctions are to be determined</span>
+<span class="sd">        :type x: float or numpy.ndarray</span>
+<span class="sd">        :return: array of eigenfunction values</span>
+<span class="sd">        :rtype: numpy.ndarray</span>
+<span class="sd">        :raises AssertionError: if the dimension of ``x`` does not equal 1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">normalization</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">normalization</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">normalization</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">psi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">eigenvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">tvals</span> <span class="o">=</span> <span class="n">t</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">psit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">coeffs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                      <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">eigenvals</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tvals</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">psit</span>
+
+<span class="k">def</span> <span class="nf">trapezoidal</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="n">nint</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">nint</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">integrand</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">integrand</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">integrand</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">integrand</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">integrand</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">delta</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">psi0</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine Gaussian wave function.</span>
+
+<span class="sd">    :param float x: position at which the wave function is determined</span>
+<span class="sd">    :return: value of wave function at position ``x``</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.005</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="mf">0.25</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">InfiniteWell</span><span class="p">(</span><span class="n">psi0</span><span class="o">=</span><span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nbase</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nint</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">hot</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$t$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$x$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In addition to the docstrings, this code makes sure that the last part is not executed
+when this script is imported, because in order to access the docstrings, <em>Sphinx</em> will
+import the script. Execution of the last part in our case will simply cost time but
+in general can have more serious side effects. Note that the script can only be imported,
+if it is in the search path defined in the <em>Sphinx</em> configuration file. This usually
+requires to uncomment the three lines</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>and to adjust the argument of <code class="docutils literal notranslate"><span class="pre">os.path.abspath</span></code> according to the place where the
+script to be imported can be found.</p>
+<p>The docstrings are written in reStructuredText and admittedly are not easy to
+read. We will discuss a solution to this problem shortly. For the moment,
+however, we will keep this form of the docstrings.</p>
+<p>Now let us add the following code in one of our reStructuredText files which are part of
+the documentation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">automodule</span><span class="p">::</span> <span class="n">carpet</span>
+   <span class="p">:</span><span class="n">members</span><span class="p">:</span>
+   <span class="p">:</span><span class="n">undoc</span><span class="o">-</span><span class="n">members</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>This code will only function correctly, if the <code class="docutils literal notranslate"><span class="pre">autodoc</span></code> extension is loaded, i.e.
+the list <code class="docutils literal notranslate"><span class="pre">extensions</span></code> in the <em>Sphinx</em> configuration file contains the entry <code class="docutils literal notranslate"><span class="pre">'sphinx.ext.autodoc'</span></code>.
+The argument <code class="docutils literal notranslate"><span class="pre">carpet</span></code> of the <code class="docutils literal notranslate"><span class="pre">automodule</span></code> directive implies that the file <code class="docutils literal notranslate"><span class="pre">carpet.py</span></code>
+will be imported. The autogenerated documentation will list all documented as well as
+all undocumented members. The generated output will look as follows:</p>
+<blockquote>
+<div><p>class carpet.InfiniteWell(psi0, width, nbase, nint)</p>
+<blockquote>
+<div><p>Quantum carpet for infinitely deep potential well.</p>
+<p>This class allows to determine the time evolution of an initial
+state in an infinitely deep potential well.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><p><strong>psi0</strong> (<em>func</em>) – initial wave function</p></li>
+<li><p><strong>width</strong> (<em>float</em>) – width of the potential well</p></li>
+<li><p><strong>nbase</strong> (<em>int</em>) – number of basis states</p></li>
+<li><p><strong>nint</strong> (<em>int</em>) – number of intervals used in the
+integration routine</p></li>
+</ul>
+</dd>
+</dl>
+<p>eigenfunction(x)</p>
+<blockquote>
+<div><p>Determine set of eigenfunction values at position <em>x</em>.</p>
+<p>The basis set is limited by the number of eigenstates given by
+<code class="docutils literal notranslate"><span class="pre">self.nbase</span></code>.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p><strong>x</strong> (<em>float or numpy.ndarray</em>) – position at which the
+eigenfunctions are to be determined</p>
+</dd>
+<dt>Returns:</dt><dd><p>array of eigenfunction values</p>
+</dd>
+<dt>Return type:</dt><dd><p>numpy.ndarray</p>
+</dd>
+<dt>Raises:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> – if the dimension of <em>x</em> does not equal
+1</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>psi(x, t)</p>
+</div></blockquote>
+<p>carpet.psi0(x)</p>
+<blockquote>
+<div><p>Determine Gaussian wave function.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p><strong>x</strong> (<em>float</em>) – position at which the wave function is
+determined</p>
+</dd>
+<dt>Returns:</dt><dd><p>value of wave function at position <code class="docutils literal notranslate"><span class="pre">x</span></code></p>
+</dd>
+<dt>Return type:</dt><dd><p>float</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>carpet.trapezoidal(func, a, b, nint)</p>
+</div></blockquote>
+<p>If the line containing <code class="docutils literal notranslate"><span class="pre">:undoc-members:</span></code> were left out in the <code class="docutils literal notranslate"><span class="pre">automodule</span></code> directive,
+the output would contain only the documented class and methods. The listed methods could
+be restricted by giving the appropriate names after <code class="docutils literal notranslate"><span class="pre">:members:</span></code>.</p>
+<p>As already mentioned, the docstrings given above are not particularly easy to read. There
+are two standards for docstrings which are handled by <em>Sphinx</em>, provided the extension
+<code class="docutils literal notranslate"><span class="pre">napoleon</span></code> is loaded. The list <code class="docutils literal notranslate"><span class="pre">extensions</span></code> in the <em>Sphinx</em> configuration file then
+should contain the string <code class="docutils literal notranslate"><span class="pre">'sphinx.ext.napoleon'</span></code>. The supported standards for docstrings
+are the Google style docstring <a class="footnote-reference brackets" href="#googledocstring" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> and NumPy style docstring <a class="footnote-reference brackets" href="#numpydocstring" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>.
+We will focus our discussion of these two standards to the method <code class="docutils literal notranslate"><span class="pre">eigenfunction</span></code> in the
+quantum carpet script.</p>
+<p>Applying the NumPy style to the method <code class="docutils literal notranslate"><span class="pre">eigenfunction</span></code> would result in</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eigenfunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine set of eigenfunction values at position `x`.</span>
+
+<span class="sd">    The basis set is limited by the number of eigenstates given by</span>
+<span class="sd">    ``self.nbase``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : float or numpy.ndarray</span>
+<span class="sd">        position at which the eigenfunctions are to be determined</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        array of eigenfunction values</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    AssertionError</span>
+<span class="sd">        if the dimension of `x` does not equal 1</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>where we did not repeat the code of the eigenfunction method. This docstring is nicely
+formatted in sections. The possible sections are not restricted to the ones used in this
+example. A complete list is given in the documentation of the <a class="reference external" href="http://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html">napoleon preprocessor</a>. The output obtained
+from this docstring corresponds to the one given before, possibly with minor differences, so
+that we do not reproduce it here.</p>
+<p>The Google style for docstrings resembles the NumPy style in the sectioning of the
+docstring even though the details of the format differ. Our example would take the
+following form where we again leave out the code of the method:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">eigenfunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine set of eigenfunction values at position `x`.</span>
+
+<span class="sd">    The basis set is limited by the number of eigenstates given by</span>
+<span class="sd">    ``self.nbase``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (float or numpy.ndarray): Position at which the eigenfunctions</span>
+<span class="sd">            are to be determined.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: Array of eigenfunction values.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        AssertionError: The dimension of `x` does not equal 1.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>These examples may serve to get the basic idea of how a documentation can be autogenerated
+from docstrings. When working with the <em>Sphinx</em> documentation generator, questions are likely
+to come up which have not been addressed in this chapter. A complete description can be found
+in the extensive online documentation which should be consulted in the case of need.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="docrest" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>More information on reStructuredText can be found in the documentation
+of the docutils project at <a class="reference external" href="http://docutils.sourceforge.net/rst.html">http://docutils.sourceforge.net/rst.html</a>.</p>
+</aside>
+<aside class="footnote brackets" id="docsphinx" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>The <em>Sphinx</em> project page can be found at <a class="reference external" href="https://www.sphinx-doc.org/">https://www.sphinx-doc.org/</a>.</p>
+</aside>
+<aside class="footnote brackets" id="sphinxlatexrepr" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Note that the representation given here and in following examples
+is generated by the LaTeX builder of <em>Sphinx</em>. It may look differently if the
+representation is generated otherwise, e.g. with tools like <code class="docutils literal notranslate"><span class="pre">rst2html</span></code> or
+<code class="docutils literal notranslate"><span class="pre">rst2latex</span></code> provided by <code class="docutils literal notranslate"><span class="pre">docutils</span></code> or <code class="docutils literal notranslate"><span class="pre">rst2pdf</span></code>.</p>
+</aside>
+<aside class="footnote brackets" id="sphinxversion" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>The following discussion is based on version 1.8.2 of <em>Sphinx</em> but
+should mostly apply to all recent versions of <em>Sphinx</em>.</p>
+</aside>
+<aside class="footnote brackets" id="mathjax" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>For more information see <a class="reference external" href="https://www.mathjax.org/">https://www.mathjax.org/</a>.</p>
+</aside>
+<aside class="footnote brackets" id="googledocstring" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">6</a><span class="fn-bracket">]</span></span>
+<p>For a complete description see
+<a class="reference external" href="https://google.github.io/styleguide/pyguide.html#functions-and-methods">https://google.github.io/styleguide/pyguide.html#functions-and-methods</a> and
+<a class="reference external" href="https://google.github.io/styleguide/pyguide.html#comments-in-classes">https://google.github.io/styleguide/pyguide.html#comments-in-classes</a>.</p>
+</aside>
+<aside class="footnote brackets" id="numpydocstring" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">7</a><span class="fn-bracket">]</span></span>
+<p>For details see <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">https://numpydoc.readthedocs.io/en/latest/format.html</a>.</p>
+</aside>
+<aside class="footnote brackets" id="pep" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">8</a><span class="fn-bracket">]</span></span>
+<p>PEP is short for Python Enhancement Proposal.</p>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="profiling.html"><span class="section-number">5. </span>Run-time analysis</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="parallel.html"><span class="section-number">7. </span>Aspects of parallel computing</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2018—2022, Gert-Ludwig Ingold, license: CC BY 4.0 International.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

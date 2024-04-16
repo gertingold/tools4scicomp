@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>7. Aspects of parallel computing &#8212; Tools for Scientific Computing 0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=e491ac2d" />
+    <script src="_static/documentation_options.js?v=b489f392"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="8. Appendix" href="appendix.html" />
+    <link rel="prev" title="6. Documentation of code" href="documenting.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Tools for Scientific Computing 0.3 documentation</span></a></h1>
+        <h2 class="heading"><span>7. Aspects of parallel computing</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="documenting.html"><span class="section-number">6. </span>Documentation of code</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="appendix.html"><span class="section-number">8. </span>Appendix</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <section id="aspects-of-parallel-computing">
+<span id="parallel-computing"></span><h1><span class="section-number">7. </span>Aspects of parallel computing<a class="headerlink" href="#aspects-of-parallel-computing" title="Link to this heading">¶</a></h1>
+<p>Today even consumer computers are equipped with multi-core processors which allow to
+run programs truly in parallel. In numerical calculations, algorithms can often
+be parallelized so that the execution time can be reduced by running the code on
+several compute cores. A program could thus profit from the use of several cores
+within a single processor or from a potentially large number of cores in a
+computer cluster accommodating a large number of processors.</p>
+<p>Parallel execution of a program can result in problems if the individual
+computations are not well synchronized among each other. The final result might
+then depend on how fast each of the computations is carried out. Such racing
+conditions may lead to problems which are sometimes difficult to debug. CPython,
+the most popular implementation of Python, therefore implements the so-called
+<em>Global Interpreter Lock</em> (GIL) which prevents actual parallel execution within
+a single Python process. This aspect will be discussed further in the following
+section.</p>
+<p>Despite the GIL, parallel processing is possible in Python if several processes
+is started. In <a class="reference internal" href="#parallel-computing-in-python"><span class="std std-numref">Section 7.2</span></a>, we will demonstrate how
+this can be done by considering the calculation of the Mandelbrot set as an
+example. This problem is particularly simple because it allows to decompose the
+full problem into smaller problems without requiring any exchange of data
+between them. This kind of problems is referred to as <em>embarrassingly parallel</em>.
+Here, we will restrict ourselves to this type of problems. The communication
+between processes running in parallel raises a number of difficulties which
+are beyond the scope of the present lecture notes. Readers interested more
+deeply in this topic might want to read more on the <em>message passing interface</em>
+(MPI) and take a look at the <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> package.</p>
+<p>In the last section of this chapter, we will address the possibilities offered
+by Numba, a so-called <em>Just in Time Compiler</em> (JIT Compiler). The use of Numba
+can lead to significant improvements of the run time of a program. Furthermore,
+Numba can support the parallel handling of Python code.</p>
+<section id="threads-processes-and-the-gil">
+<h2><span class="section-number">7.1. </span>Threads, processes and the GIL<a class="headerlink" href="#threads-processes-and-the-gil" title="Link to this heading">¶</a></h2>
+<p>Modern operating systems can seemingly run several tasks in parallel even on a
+simple compute core. In practice, this is achieved by in turn allotting compute
+time to different tasks so that a single task usually cannot block other
+tasks from execution over a longer period of time.</p>
+<p>It is important to distinguish two different kinds of tasks: processes and
+threads. Processes have at their disposal a reserved range of memory and their
+own access to other system resources. As a consequence, starting a new process
+comes with a certain overhead in time. A single process will start first one
+and subsequently possibly further threads in order to handle different tasks.
+Threads differ from processes by working on the same range of memory and by
+accessing the same system resources. Starting a thread is thus less demanding
+than starting a process.</p>
+<p>Since threads share a common range of memory, they can access the same data and
+easily exchange data among each other. Communication between different threads
+thus leads to very little overhead. However, the access to common data is not
+without risks. If one does not take care that reading and writing data by
+different threads is done in the intended order, it may happen that a thread
+does not obtain the data it needs. As the occurrence of such mistakes depends on
+details of which thread executes which tasks at a given time, such problems are
+not easily reproducible and sometimes quite difficult to identify. There exist
+techniques to cope with the difficulties involved in the communication between
+different threads, making multithreading, i.e. the parallel treatment in several
+threads, possible. We will, however, not cover these techniques in the
+present lecture notes.</p>
+<p>As already mentioned in the introduction, the most popular implementation of
+Python, CPython implemented in C, makes use of the GIL, the global interpreter
+lock. The GIL prevents a single Python process to execute more than one thread
+in parallel. While it is possible to make use of multithreading in Python
+<a class="footnote-reference brackets" href="#cpython" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, the GIL will ensure that individual threads will never run in
+parallel but in turn are allotted their slots of compute time. In this way,
+only an illusion of parallel processing is created.</p>
+<p>If the time of execution of a Python script is limited by the compute time,
+multithreading will not result an in improvement. To the contrary, the overhead
+arising from the necessity to change between different threads will lead to
+a slow-down of the script. However, there exist scripts which are I/O-bound.
+An example could be a script processing data which need to be downloaded from
+the internet. While a thread is waiting for new data to arrive, another thread
+might use the time to process data already available. For I/O-bounded scripts,
+multithreading thus may be a good strategy even in Python.</p>
+<p>However, numerical programs are usually not I/O-bound but limited by the
+compute time. Therefore, we will not consider multithreading any further but
+rather concentrate on multiprocessing, i.e. parallel treatment by means of
+several Python processes. It is worth mentioning though that multithreading may
+play a role even in numerical applications written in Python when numerical
+libraries are used. Such libraries are often based on C code which is not
+subject to the restrictions imposed by the GIL. Linear algebra routines
+provided by an appropriately compiled version of NumPy may serve as an example.
+This includes the NumPy library available through the Anaconda distribution
+which is compiled with the Intel® Math Kernel Library (MKL).
+<a class="reference internal" href="#systemload"><span class="std std-numref">Figure 7.1</span></a> demonstrates an example where four cores are used when
+determining the eigenvectors and eigenvalues of a large matrix. Another option
+to circumvent the GIL is offered by Cython <a class="footnote-reference brackets" href="#cython" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> which allows to generate
+C extensions from Python code.  Those parts of the code not accessing Python
+objects can then be executed in a <code class="docutils literal notranslate"><span class="pre">nogil</span></code> context outside the control of the
+GIL.</p>
+<figure class="align-center" id="id6">
+<span id="systemload"></span><a class="reference internal image-reference" href="_images/systemload.png"><img alt="_images/systemload.png" src="_images/systemload.png" style="width: 15em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 7.1 </span><span class="caption-text">In this example, the graph of the system load shows that during the solution
+of the eigenvalue problem for a large matrix by means of NumPy compiled
+with the Intel® MKL four cores are used at the same time.</span><a class="headerlink" href="#id6" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="parallel-computing-in-python">
+<span id="id3"></span><h2><span class="section-number">7.2. </span>Parallel computing in Python<a class="headerlink" href="#parallel-computing-in-python" title="Link to this heading">¶</a></h2>
+<p>We will illustrate the use of parallel processes in Python by considering a
+specific example, namely the calculation of the Mandelbrot set. Mathematically,
+the Mandelbrot set is defined as the set of complex numbers <span class="math notranslate nohighlight">\(c\)</span> for which
+the series generated by the iteration</p>
+<div class="math notranslate nohighlight">
+\[z_{n+1} = z_n^2+c\]</div>
+<p>with the initial value <span class="math notranslate nohighlight">\(z_0=0\)</span> remains bounded. It is known that the
+series is not bound once <span class="math notranslate nohighlight">\(\vert z\vert&gt;2\)</span> has been reached so that it
+suffices to perform the iteration until this threshold has been reached. The
+iterations for different values of <span class="math notranslate nohighlight">\(c\)</span> can be performed completely
+independently of each other so that it is straightforward to distribute
+different values of <span class="math notranslate nohighlight">\(c\)</span> to different processes. The problem is thus
+<em>embarrassingly parallel</em>. Once all individual calculations are finished,
+it suffices to collect all data and to represent them graphically.</p>
+<p>We start out with the following initial version of a Python script to determine
+the Mandelbrot set.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="k">def</span> <span class="nf">mandelbrot_iteration</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nitermax</span><span class="p">):</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+        <span class="n">y2</span> <span class="o">=</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span>
+        <span class="k">if</span> <span class="n">x2</span><span class="o">+</span><span class="n">y2</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">n</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x2</span><span class="o">-</span><span class="n">y2</span><span class="o">+</span><span class="n">cx</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="o">+</span><span class="n">cy</span>
+    <span class="k">return</span> <span class="n">nitermax</span>
+
+<span class="k">def</span> <span class="nf">mandelbrot</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">npts</span><span class="p">,</span> <span class="n">npts</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmax</span><span class="o">-</span><span class="n">xmin</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">npts</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="p">(</span><span class="n">ymax</span><span class="o">-</span><span class="n">ymin</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">npts</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">nx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">xmin</span><span class="o">+</span><span class="n">nx</span><span class="o">*</span><span class="n">dx</span>
+        <span class="k">for</span> <span class="n">ny</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="p">):</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ymin</span><span class="o">+</span><span class="n">ny</span><span class="o">*</span><span class="n">dy</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">]</span> <span class="o">=</span> <span class="n">mandelbrot_iteration</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+<span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">),</span>
+               <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">nitermax</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="n">npts</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="n">xmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+<span class="n">xmax</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">ymin</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.5</span>
+<span class="n">ymax</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">mandelbrot</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">)</span>
+<span class="n">ende</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ende</span><span class="o">-</span><span class="n">start</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, the iteration prescription is carried out in the function
+<code class="docutils literal notranslate"><span class="pre">mandelbrot_iteration</span></code> up to maximum number of iterations given by
+<code class="docutils literal notranslate"><span class="pre">nitermax</span></code>. We handle real and imaginary parts separately instead
+of performing the iteration with complex numbers. It turns out that
+our choice is slightly faster, but more importantly, this approach
+can also be employed for the NumPy version which we are going to
+discuss next.</p>
+<p>The purpose of the function <code class="docutils literal notranslate"><span class="pre">mandelbrot</span></code> is to walk through
+a grid of complex values <span class="math notranslate nohighlight">\(c\)</span> and to collect the results in the
+array <code class="docutils literal notranslate"><span class="pre">data</span></code>. For simple testing purposes, it is useful to graphically
+represent the results by means of the function <code class="docutils literal notranslate"><span class="pre">plot</span></code>. We also have
+added code to determine the time spent in the functions <code class="docutils literal notranslate"><span class="pre">mandelbrot</span></code>
+and <code class="docutils literal notranslate"><span class="pre">mandelbrot_iteration</span></code>. On an i7-6700HQ CPU, we measured and
+execution time of 81.1 seconds.</p>
+<p>Before parallelizing code, it often makes sense to consider other
+possible improvements. In our case, it is natural to take a look
+at a version making use of NumPy. Here, we list only the code
+replacing the functions <code class="docutils literal notranslate"><span class="pre">mandelbrot</span></code> and <code class="docutils literal notranslate"><span class="pre">mandelbrot_iteration</span></code>
+in our first version.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">mandelbrot</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">):</span>
+    <span class="n">cy</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="n">ymin</span><span class="p">:</span><span class="n">ymax</span><span class="p">:</span><span class="n">npts</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="n">xmin</span><span class="p">:</span><span class="n">xmax</span><span class="p">:</span><span class="n">npts</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nitermax</span><span class="p">):</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+        <span class="n">y2</span> <span class="o">=</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span>
+        <span class="n">notdone</span> <span class="o">=</span> <span class="n">x2</span><span class="o">+</span><span class="n">y2</span> <span class="o">&lt;</span> <span class="mi">4</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">notdone</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x2</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span><span class="o">-</span><span class="n">y2</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span><span class="o">+</span><span class="n">cx</span><span class="p">[</span><span class="n">notdone</span><span class="p">],</span>
+                                  <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span><span class="o">+</span><span class="n">cy</span><span class="p">[</span><span class="n">notdone</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+</div>
+<p>For an appealing graphical representation of the Mandelbrot set, we
+need to keep track of the number of iterations required to reach the
+threshold for the absolute value of <span class="math notranslate nohighlight">\(z\)</span>. We achieve this by fancy
+indexing with the array <code class="docutils literal notranslate"><span class="pre">notdone</span></code>. An entry of <code class="docutils literal notranslate"><span class="pre">True</span></code> means that
+the threshold has not been reached yet. An example of the graphical output
+generated by the NumPy version of the program is shown in <a class="reference internal" href="#mandelbrot-detail"><span class="std std-numref">Figure 7.2</span></a>.</p>
+<figure class="align-center" id="id7">
+<span id="mandelbrot-detail"></span><a class="reference internal image-reference" href="_images/mandelbrot_detail.png"><img alt="_images/mandelbrot_detail.png" src="_images/mandelbrot_detail.png" style="width: 20em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 7.2 </span><span class="caption-text">Detail of the Mandelbrot set where the color represents the number of iterations
+needed until the threshold of 2 for the absolute value of <span class="math notranslate nohighlight">\(z\)</span> is reached.</span><a class="headerlink" href="#id7" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>For the NumPy version, we have measured an execution time of 22.8s, i.e. almost
+a factor of 3.6 faster than our initial version.</p>
+<p>Now, we will further accelerate the computation by splitting the task into several
+parts which will be attributed to a number of processes for processing. For this
+purpose, we will make use of the module <code class="docutils literal notranslate"><span class="pre">concurrent.futures</span></code> available from the
+Python standard library. The name <code class="docutils literal notranslate"><span class="pre">concurrent</span></code> indicates that several tasks are
+carried out at the same time while <code class="docutils literal notranslate"><span class="pre">futures</span></code> refers to objects which will provide
+the desired results at a later time.</p>
+<p>For a parallel computation of the Mandelbrot set, we decompose the area in the
+complex plane covering the relevant values of <span class="math notranslate nohighlight">\(c\)</span> into tiles, which will
+be treated separately by the different processes. <a class="reference internal" href="#mandelbrot-tiles"><span class="std std-numref">Figure 7.3</span></a>
+displays a distribution of 64 tiles on four processes indicated by different
+colors. Since the processing time for the tiles differs, there is one process
+which has treated only 15 tiles while another process has treated 17.</p>
+<figure class="align-center" id="id8">
+<span id="mandelbrot-tiles"></span><a class="reference internal image-reference" href="_images/mandelbrot_tiles.png"><img alt="_images/mandelbrot_tiles.png" src="_images/mandelbrot_tiles.png" style="width: 20em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 7.3 </span><span class="caption-text">The four different colors indicate which one out of four processes has carried
+out the computation for the corresponding tile. Note that the number of tiles
+per process does not necessarily equal 16.</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The following code demonstrates how the NumPy based version can be adapted to
+a parallel treatment. Again we concentrate on the Mandelbrot specific parts.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">concurrent</span> <span class="kn">import</span> <span class="n">futures</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="k">def</span> <span class="nf">mandelbrot_tile</span><span class="p">(</span><span class="n">nitermax</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">):</span>
+<span class="linenos"> 8</span>    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span>
+<span class="linenos"> 9</span>    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span>
+<span class="linenos">10</span>    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+<span class="linenos">11</span>    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nitermax</span><span class="p">):</span>
+<span class="linenos">12</span>        <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+<span class="linenos">13</span>        <span class="n">y2</span> <span class="o">=</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span>
+<span class="linenos">14</span>        <span class="n">notdone</span> <span class="o">=</span> <span class="n">x2</span><span class="o">+</span><span class="n">y2</span> <span class="o">&lt;</span> <span class="mi">4</span>
+<span class="linenos">15</span>        <span class="n">data</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+<span class="linenos">16</span>        <span class="n">x</span><span class="p">[</span><span class="n">notdone</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x2</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span><span class="o">-</span><span class="n">y2</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span><span class="o">+</span><span class="n">cx</span><span class="p">[</span><span class="n">notdone</span><span class="p">],</span>
+<span class="linenos">17</span>                                  <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="n">notdone</span><span class="p">]</span><span class="o">+</span><span class="n">cy</span><span class="p">[</span><span class="n">notdone</span><span class="p">])</span>
+<span class="linenos">18</span>    <span class="k">return</span> <span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="linenos">19</span>
+<span class="linenos">20</span><span class="k">def</span> <span class="nf">mandelbrot</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">,</span> <span class="n">ndiv</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="linenos">21</span>    <span class="n">cy</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="n">ymin</span><span class="p">:</span><span class="n">ymax</span><span class="p">:</span><span class="n">npts</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="n">xmin</span><span class="p">:</span><span class="n">xmax</span><span class="p">:</span><span class="n">npts</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">]</span>
+<span class="linenos">22</span>    <span class="n">nlen</span> <span class="o">=</span> <span class="n">npts</span><span class="o">//</span><span class="n">ndiv</span>
+<span class="linenos">23</span>    <span class="n">paramlist</span> <span class="o">=</span> <span class="p">[(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span>
+<span class="linenos">24</span>                  <span class="n">cx</span><span class="p">[</span><span class="n">nx</span><span class="o">*</span><span class="n">nlen</span><span class="p">:(</span><span class="n">nx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nlen</span><span class="p">,</span> <span class="n">ny</span><span class="o">*</span><span class="n">nlen</span><span class="p">:(</span><span class="n">ny</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nlen</span><span class="p">],</span>
+<span class="linenos">25</span>                  <span class="n">cy</span><span class="p">[</span><span class="n">nx</span><span class="o">*</span><span class="n">nlen</span><span class="p">:(</span><span class="n">nx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nlen</span><span class="p">,</span> <span class="n">ny</span><span class="o">*</span><span class="n">nlen</span><span class="p">:(</span><span class="n">ny</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nlen</span><span class="p">])</span>
+<span class="linenos">26</span>                 <span class="k">for</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ndiv</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">2</span><span class="p">)]</span>
+<span class="linenos">27</span>    <span class="k">with</span> <span class="n">futures</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">executors</span><span class="p">:</span>
+<span class="linenos">28</span>        <span class="n">wait_for</span> <span class="o">=</span> <span class="p">[</span><span class="n">executors</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">mandelbrot_tile</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">),</span>
+<span class="linenos">29</span>                                             <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span>
+<span class="linenos">30</span>                    <span class="k">for</span> <span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span> <span class="ow">in</span> <span class="n">paramlist</span><span class="p">]</span>
+<span class="linenos">31</span>        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">futures</span><span class="o">.</span><span class="n">as_completed</span><span class="p">(</span><span class="n">wait_for</span><span class="p">)]</span>
+<span class="linenos">32</span>    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+<span class="linenos">33</span>    <span class="k">for</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+<span class="linenos">34</span>        <span class="n">data</span><span class="p">[</span><span class="n">nx</span><span class="o">*</span><span class="n">nlen</span><span class="p">:(</span><span class="n">nx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nlen</span><span class="p">,</span> <span class="n">ny</span><span class="o">*</span><span class="n">nlen</span><span class="p">:(</span><span class="n">ny</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nlen</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+<span class="linenos">35</span>    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+</div>
+<p>The main changes have occurred in the function <code class="docutils literal notranslate"><span class="pre">mandelbrot</span></code>. In addition to
+the arguments present already in earlier versions, two arguments have been
+added: <code class="docutils literal notranslate"><span class="pre">ndiv</span></code> and <code class="docutils literal notranslate"><span class="pre">max_workers</span></code>. <code class="docutils literal notranslate"><span class="pre">ndiv</span></code> defines the number of divisions
+in each dimension of the complex plane. In the example of
+<a class="reference internal" href="#mandelbrot-tiles"><span class="std std-numref">Figure 7.3</span></a>, <code class="docutils literal notranslate"><span class="pre">ndiv</span></code> was set to 8, resulting in 64 tiles. The
+argument <code class="docutils literal notranslate"><span class="pre">max_workers</span></code> defines the maximal number of processes which will run
+under the control of our script.  The choice for this argument will depend on
+the number of cores available to the script.</p>
+<p>In lines 23-26, we define a list of parameters characterizing the individual
+tiles. Each entry contains the coordinates (<code class="docutils literal notranslate"><span class="pre">nx</span></code>, <code class="docutils literal notranslate"><span class="pre">ny</span></code>) of the tile which
+will later be needed to collect all data. In addition, the section of the real
+and imaginary parts of <span class="math notranslate nohighlight">\(c\)</span> corresponding to the tile become part of the
+parameter list. The double loop required in the list comprehension is
+simplified by making use of the <code class="docutils literal notranslate"><span class="pre">product</span></code> method available from the
+<code class="docutils literal notranslate"><span class="pre">itertools</span></code> module of the Python standard library imported in line 2.</p>
+<p>The main part responsible for the distribution of tasks to the different
+workers can be found in lines 27-31. This code runs under the control of a
+context manager which allocates a pool of <code class="docutils literal notranslate"><span class="pre">max_workers</span></code> executors. The method
+<code class="docutils literal notranslate"><span class="pre">ProcessPoolExecutor</span></code> is available from the <code class="docutils literal notranslate"><span class="pre">concurrent.futures</span></code> module.</p>
+<p>In lines 28-30 a list of tasks is submitted to the executors. Each submission
+consists of a function, in our case <code class="docutils literal notranslate"><span class="pre">mandelbrot_tile</span></code>, and the corresponding
+parameters.  The function <code class="docutils literal notranslate"><span class="pre">mandelbrot_tile</span></code> possesses one argument
+<code class="docutils literal notranslate"><span class="pre">nitermax</span></code> which is the same for all tasks and the parameters listed in
+<code class="docutils literal notranslate"><span class="pre">paramlist</span></code> which differ from task to task. Therefore, we construct a partial
+function object which fixes <code class="docutils literal notranslate"><span class="pre">nitermax</span></code> and requires only <code class="docutils literal notranslate"><span class="pre">nx</span></code>, <code class="docutils literal notranslate"><span class="pre">ny</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cx</span></code>, and <code class="docutils literal notranslate"><span class="pre">cy</span></code> as arguments. The <code class="docutils literal notranslate"><span class="pre">partial</span></code> method is imported from the
+<code class="docutils literal notranslate"><span class="pre">functools</span></code> module in line 3.</p>
+<p>In line 31, the results are collected in a list comprehension. Once all
+tasks have been completed, the list <code class="docutils literal notranslate"><span class="pre">results</span></code> contains entries consisting
+of the coordinates (<code class="docutils literal notranslate"><span class="pre">nx</span></code>, <code class="docutils literal notranslate"><span class="pre">ny</span></code>) of the tile and the corresponding data
+as defined in line 18. In lines 33-34, the data are brought into order to
+fill the final array <code class="docutils literal notranslate"><span class="pre">data</span></code> which subsequently can be used to produce
+graphical output.</p>
+<p>It is interesting to study how the total time to determine the Mandelbrot set
+depends on the number of tiles. The corresponding data are shown in
+<a class="reference internal" href="#parallel-processes"><span class="std std-numref">Figure 7.4</span></a> for four parallel processes. In the case of
+four tiles, we see that the different tiles require different times so that
+we have to wait for the slowest process. For four tiles, where the memory
+requirement per process is relatively large, we also can see a significant
+time needed to start a process. Increasing the number of tiles leads to a
+reduction of the execution time. However, even for 16 tiles, one has to wait
+for the last process. The optimum for four processes is reached for 64 tiles.
+Increasing the number of tiles further will lead to an increasing overhead
+when switching from one task to the next.</p>
+<figure class="align-center" id="id9">
+<span id="parallel-processes"></span><a class="reference internal image-reference" href="_images/parallel.png"><img alt="_images/parallel.png" src="_images/parallel.png" style="width: 40em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 7.4 </span><span class="caption-text">Distribution of tasks to determine the Mandelbrot set over four processes
+as a function of the number of tiles.</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><a class="reference internal" href="#parallel-time"><span class="std std-numref">Figure 7.5</span></a> depicts the acceleration for four processes as a
+function of the number of divisions per axis. The points connected by the
+dotted line are obtained by dividing the time required by a single process
+without subdividing the task through the time required by four processes with
+the subdivision indicated in the figure. In agreement with
+<a class="reference internal" href="#parallel-processes"><span class="std std-numref">Figure 7.4</span></a> we find the largest acceleration for 8 divisions
+per axis, i.e. 64 tiles. Interestingly, the acceleration can reach values
+slightly exceeding a factor six. This effect may result from a more effective
+use of caches for smaller problems as compared to the full problem with
+<span class="math notranslate nohighlight">\(n=1\)</span>.  The effect of caches can be excluded by taking ratio of the
+execution times for one and four processes for the same number of tiles. As
+<a class="reference internal" href="#parallel-time"><span class="std std-numref">Figure 7.5</span></a> demonstrates, a factor of nearly four is reached beyond
+<span class="math notranslate nohighlight">\(n=8\)</span>.</p>
+<figure class="align-center" id="id10">
+<span id="parallel-time"></span><a class="reference internal image-reference" href="_images/parallel_time.png"><img alt="_images/parallel_time.png" src="_images/parallel_time.png" style="width: 25em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 7.5 </span><span class="caption-text">Acceleration by parallelization in the computation of the Mandelbrot set
+with four processes as a function of the number of divisions per axis. The
+points connected by the dotted line represent the acceleration of the
+parallelized version with respect to the unparallelized version without
+subdivision. The points connected by the full line represent the acceleration
+of the parallelized version with respect to the unparallelized version for
+the same number of divisions.</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="numba">
+<h2><span class="section-number">7.3. </span>Numba<a class="headerlink" href="#numba" title="Link to this heading">¶</a></h2>
+<p>In the previous section we have seen how a program can be accelerated by means
+of NumPy and parallelization. For our example of the Mandelbrot set, this could
+be achieved in a rather straightforward manner because the use of arrays came
+quite naturally and parallelization did not require any communication between
+the different tasks. Besides the use of NumPy and parallelization of the code,
+there exist other options to accelerate Python scripts, some of them being very
+actively developed at present. Therefore, we do not attempt a complete description
+but rather highlight some ways to accelerate a Python script.</p>
+<p>We will specifically discuss Numba <a class="footnote-reference brackets" href="#id5" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> because it is designed to work
+with NumPy and also supports parallelization. Numba makes use of <em>just in time</em>
+(JIT) compilation. While Python scripts usually are interpreted, Numba will
+produce executable code for a function when it is called first. The compilation
+step implies a certain investment of time but the function can be executed faster
+during subsequent calls. Python allows to call functions with different
+signatures, i.e. the data types of the arguments are not fixed. Compiled code,
+on the other hand, depends on the signature. Therefore, additional compilation
+steps may become necessary.</p>
+<p>We will demonstrate just in time compilation and the effect of different signatures
+by approximately determining the Riemann zeta function</p>
+<div class="math notranslate nohighlight">
+\[\zeta(s) = \sum_{n=1}^\infty\frac{1}{n^s}\,.\]</div>
+<p>The following implementation of the code is not particularly well suited to
+efficiently determine the zeta function but this is not relevant for our
+discussion. Without using Numba, a direct implementation of the sum looks
+as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">zeta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">nmax</span><span class="p">):</span>
+    <span class="n">zetasum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">zetasum</span> <span class="o">=</span> <span class="n">zetasum</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">zetasum</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">zeta</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100000000</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>We can now simply make use of Numba by importing it in line 1 and adding
+a decorator <code class="docutils literal notranslate"><span class="pre">numba.jit</span></code> to the function <code class="docutils literal notranslate"><span class="pre">zeta</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">numba</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span>
+<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">zeta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">nmax</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="n">zetasum</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos"> 6</span>    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+<span class="linenos"> 7</span>        <span class="n">zetasum</span> <span class="o">=</span> <span class="n">zetasum</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+<span class="linenos"> 8</span>    <span class="k">return</span> <span class="n">zetasum</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="nb">print</span><span class="p">(</span><span class="n">zeta</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100000000</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Running the two pieces of code, we find an execution time for the first version
+of 34.1 seconds while the second version takes only 0.85 seconds. After running
+the code, we can print out the signatures for which the function <code class="docutils literal notranslate"><span class="pre">zeta</span></code> was
+compiled by Numba:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">zeta</span><span class="o">.</span><span class="n">signatures</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Because we called the function with two integers as arguments, we obtain not
+unexpectedly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="n">int64</span><span class="p">,</span> <span class="n">int64</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Like in NumPy and in contrast to Python, integers cannot become arbitrarily large.
+In our example, they have a length of eight bytes. Accordingly, one has to beware
+of overflows. For example, if we set <code class="docutils literal notranslate"><span class="pre">x</span></code> to 3, we will encounter a division
+by zero.</p>
+<p>To demonstrate that Numba compiles the function for each signature anew, we call
+<code class="docutils literal notranslate"><span class="pre">zeta</span></code> with an integer, a float, and a complex number:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">numba</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span>
+<span class="linenos"> 5</span><span class="k">def</span> <span class="nf">zeta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">nmax</span><span class="p">):</span>
+<span class="linenos"> 6</span>    <span class="n">zetasum</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos"> 7</span>    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+<span class="linenos"> 8</span>        <span class="n">zetasum</span> <span class="o">=</span> <span class="n">zetasum</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+<span class="linenos"> 9</span>    <span class="k">return</span> <span class="n">zetasum</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="n">nmax</span> <span class="o">=</span> <span class="mi">100000000</span>
+<span class="linenos">12</span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">):</span>
+<span class="linenos">13</span>    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="linenos">14</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ζ(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s1">) = </span><span class="si">{</span><span class="n">zeta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">nmax</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">15</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;execution time: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start</span><span class="si">:</span><span class="s1">5.2f</span><span class="si">}</span><span class="s1">s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="nb">print</span><span class="p">(</span><span class="n">zeta</span><span class="o">.</span><span class="n">signatures</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting output demonstrates that the execution time depends
+on the type of variable <code class="docutils literal notranslate"><span class="pre">x`</span></code> and that Numba has indeed compiled
+the function for three different signatures:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ζ</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.644934057834575</span>
+<span class="n">execution</span> <span class="n">time</span><span class="p">:</span>  <span class="mf">0.59</span><span class="n">s</span>
+
+<span class="n">ζ</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.341487257103954</span>
+<span class="n">execution</span> <span class="n">time</span><span class="p">:</span>  <span class="mf">5.52</span><span class="n">s</span>
+
+<span class="n">ζ</span><span class="p">((</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">))</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.1503556987382961</span><span class="o">-</span><span class="mf">0.43753086346605924</span><span class="n">j</span><span class="p">)</span>
+<span class="n">execution</span> <span class="n">time</span><span class="p">:</span> <span class="mf">13.41</span><span class="n">s</span>
+
+<span class="p">[(</span><span class="n">int64</span><span class="p">,</span> <span class="n">int64</span><span class="p">),</span> <span class="p">(</span><span class="n">float64</span><span class="p">,</span> <span class="n">int64</span><span class="p">),</span> <span class="p">(</span><span class="n">complex128</span><span class="p">,</span> <span class="n">int64</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Numba also allows us to transform functions into universal functions or <em>ufuncs</em> which
+we have introduced in <a class="reference internal" href="numpy.html#ufuncs"><span class="std std-numref">Section 4.2.6</span></a>. Besides scalar arguments, universal functions
+are capable of handling array arguments. This is achieved already by using the decorator
+<code class="docutils literal notranslate"><span class="pre">jit</span></code>. By means of the decorator <code class="docutils literal notranslate"><span class="pre">vectorize</span></code>, the evaluation of the function with
+an array argument can even by performed in several threads in parallel.</p>
+<p>In the following code example, we specify the signature for which the function <code class="docutils literal notranslate"><span class="pre">zeta</span></code>
+should be compiled as argument of the decorator <code class="docutils literal notranslate"><span class="pre">vectorize</span></code>. The argument <code class="docutils literal notranslate"><span class="pre">x</span></code> is
+a <code class="docutils literal notranslate"><span class="pre">float64</span></code> and can also be a corresponding array while <code class="docutils literal notranslate"><span class="pre">n</span></code> is an <code class="docutils literal notranslate"><span class="pre">int64</span></code>. The
+result is again a <code class="docutils literal notranslate"><span class="pre">float64</span></code> and is listed as first argument before the pair of
+parentheses enclosing the arguments’ data type. The argument <code class="docutils literal notranslate"><span class="pre">target</span></code> is given the
+value <code class="docutils literal notranslate"><span class="pre">'parallel'</span></code> so that in the case of an array argument the use of several
+threads is possible. If a parallel processing is not desired, for example because
+for a small task starting a thread would cost too much time, one can set <code class="docutils literal notranslate"><span class="pre">target='cpu'</span></code>
+instead. If an appropriate graphics processor is available, one might consider
+setting <code class="docutils literal notranslate"><span class="pre">target='cuda'</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">vectorize</span><span class="p">,</span> <span class="n">float64</span><span class="p">,</span> <span class="n">int64</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="nd">@vectorize</span><span class="p">([</span><span class="n">float64</span><span class="p">(</span><span class="n">float64</span><span class="p">,</span> <span class="n">int64</span><span class="p">)],</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;parallel&#39;</span><span class="p">)</span>
+<span class="linenos"> 5</span><span class="k">def</span> <span class="nf">zeta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">nmax</span><span class="p">):</span>
+<span class="linenos"> 6</span>    <span class="n">zetasum</span> <span class="o">=</span> <span class="mf">0.</span>
+<span class="linenos"> 7</span>    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nmax</span><span class="p">):</span>
+<span class="linenos"> 8</span>        <span class="n">zetasum</span> <span class="o">=</span> <span class="n">zetasum</span><span class="o">+</span><span class="mf">1.</span><span class="o">/</span><span class="p">((</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+<span class="linenos"> 9</span>    <span class="k">return</span> <span class="n">zetasum</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="linenos">12</span><span class="n">y</span> <span class="o">=</span> <span class="n">zeta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">10000000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#numba-parallel"><span class="std std-numref">Figure 7.6</span></a> shows how the execution time for the Riemann zeta
+function can be reduced by using more than one thread. The number of threads
+can be set by means of an environment variable. The following command sets
+the number of threads to four:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export NUMBA_NUM_THREADS=4; python zeta.py
+</pre></div>
+</div>
+<p>The timing in <a class="reference internal" href="#numba-parallel"><span class="std std-numref">Figure 7.6</span></a> was done on an i7-6700HQ processor with
+four cores and hyperthreading which allows to run eight threads in parallel.
+Up to four threads, the execution time decrease almost inversely proportional
+to the number of threads. Increasing the number of threads beyond the number
+of cores will further accelerate the execution but by a much smaller amount.
+The reason is that threads need to wait for free resources more often.</p>
+<figure class="align-center" id="id11">
+<span id="numba-parallel"></span><a class="reference internal image-reference" href="_images/numba_parallel.png"><img alt="_images/numba_parallel.png" src="_images/numba_parallel.png" style="width: 25em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 7.6 </span><span class="caption-text">Acceleration of the computation of the Riemann zeta function as a function
+of the number of threads on a CPU with four cores and hyperthreading.</span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>With Numba, universal functions can be further generalized by means of the
+decorator <code class="docutils literal notranslate"><span class="pre">guvectorize</span></code> so that not only scalars but also arrays can be
+employed in the inner loop. We will illustrate this by applying Numba to
+our Mandelbrot example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span><span class="p">,</span> <span class="n">guvectorize</span><span class="p">,</span> <span class="n">complex128</span><span class="p">,</span> <span class="n">int64</span>
+<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="linenos"> 3</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nd">@jit</span>
+<span class="linenos"> 6</span><span class="k">def</span> <span class="nf">mandelbrot_iteration</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">maxiter</span><span class="p">):</span>
+<span class="linenos"> 7</span>    <span class="n">z</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos"> 8</span>    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+<span class="linenos"> 9</span>        <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">c</span>
+<span class="linenos">10</span>        <span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">real</span><span class="o">*</span><span class="n">z</span><span class="o">.</span><span class="n">real</span><span class="o">+</span><span class="n">z</span><span class="o">.</span><span class="n">imag</span><span class="o">*</span><span class="n">z</span><span class="o">.</span><span class="n">imag</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+<span class="linenos">11</span>            <span class="k">return</span> <span class="n">n</span>
+<span class="linenos">12</span>    <span class="k">return</span> <span class="n">maxiter</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="nd">@guvectorize</span><span class="p">([(</span><span class="n">complex128</span><span class="p">[:],</span> <span class="n">int64</span><span class="p">[:],</span> <span class="n">int64</span><span class="p">[:])],</span> <span class="s1">&#39;(n), () -&gt; (n)&#39;</span><span class="p">,</span>
+<span class="linenos">15</span>             <span class="n">target</span><span class="o">=</span><span class="s1">&#39;parallel&#39;</span><span class="p">)</span>
+<span class="linenos">16</span><span class="k">def</span> <span class="nf">mandelbrot</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">itermax</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+<span class="linenos">17</span>    <span class="n">nitermax</span> <span class="o">=</span> <span class="n">itermax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos">18</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+<span class="linenos">19</span>        <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mandelbrot_iteration</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nitermax</span><span class="p">)</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="k">def</span> <span class="nf">mandelbrot_set</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">):</span>
+<span class="linenos">22</span>    <span class="n">cy</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ogrid</span><span class="p">[</span><span class="n">ymin</span><span class="p">:</span><span class="n">ymax</span><span class="p">:</span><span class="n">npts</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="n">xmin</span><span class="p">:</span><span class="n">xmax</span><span class="p">:</span><span class="n">npts</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="p">]</span>
+<span class="linenos">23</span>    <span class="n">c</span> <span class="o">=</span> <span class="n">cx</span><span class="o">+</span><span class="n">cy</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+<span class="linenos">24</span>    <span class="k">return</span> <span class="n">mandelbrot</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">)</span>
+<span class="linenos">25</span>
+<span class="linenos">26</span><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">):</span>
+<span class="linenos">27</span>    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">),</span>
+<span class="linenos">28</span>               <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="linenos">29</span>    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span><span class="n">nitermax</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="linenos">32</span><span class="n">npts</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="linenos">33</span><span class="n">xmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+<span class="linenos">34</span><span class="n">xmax</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="linenos">35</span><span class="n">ymin</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.5</span>
+<span class="linenos">36</span><span class="n">ymax</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="linenos">37</span><span class="n">data</span> <span class="o">=</span> <span class="n">mandelbrot_set</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">nitermax</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let us take a closer look at the function <code class="docutils literal notranslate"><span class="pre">mandelbrot</span></code> decorated by <code class="docutils literal notranslate"><span class="pre">guvectorize</span></code>
+which has a special set of arguments. The function <code class="docutils literal notranslate"><span class="pre">mandelbrot</span></code> possesses three
+arguments. However, only two of them are intended as input: <code class="docutils literal notranslate"><span class="pre">c</span></code> and <code class="docutils literal notranslate"><span class="pre">itermax</span></code>.
+The third argument <code class="docutils literal notranslate"><span class="pre">output</span></code> will contain the data returned by the function. This
+can be inferred from the second argument of the decorator, the so-called layout.
+The present layout indicates that the returned array <code class="docutils literal notranslate"><span class="pre">output</span></code> has the same shape
+as the input array <code class="docutils literal notranslate"><span class="pre">c</span></code>. Because <code class="docutils literal notranslate"><span class="pre">c</span></code> is a two-dimensional array, the argument
+<code class="docutils literal notranslate"><span class="pre">c[i]</span></code> of the function <code class="docutils literal notranslate"><span class="pre">mandelbrot_iteration</span></code> is again an array which can be
+handled by several threads. While <code class="docutils literal notranslate"><span class="pre">maxiter</span></code> in the function <code class="docutils literal notranslate"><span class="pre">mandelbrot_iteration</span></code>
+has to be a scalar, the array <code class="docutils literal notranslate"><span class="pre">itermax</span></code> is converted in line 17 into a
+scalar.</p>
+<p>On the same processor on which we timed earlier version of the Mandelbrot program
+and which through hyperthreads supports up to eight threads, we find an execution
+time of 0.56 seconds. Compared to our fastest parallelized program, we thus observe
+an acceleration by more than a factor of six and compared to our very first
+version the present version is faster by a factor of almost 150.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="cpython" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>When referring to Python, we always mean CPython. An example
+of an implementation of Python without a GIL is Jython written in Java.</p>
+</aside>
+<aside class="footnote brackets" id="cython" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Cython should not be confused with CPython, the C implementation of
+Python. More information on Cython can be found at <a class="reference external" href="https://cython.org/">https://cython.org/</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
+<p>Up-to-date information on Numba can be found at <a class="reference external" href="https://numba.pydata.org/">https://numba.pydata.org/</a>.</p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="documenting.html"><span class="section-number">6. </span>Documentation of code</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="appendix.html"><span class="section-number">8. </span>Appendix</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2018—2022, Gert-Ludwig Ingold, license: CC BY 4.0 International.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

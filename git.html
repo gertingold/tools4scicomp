@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2. Version Control with Git &#8212; Tools for Scientific Computing 0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=e491ac2d" />
+    <script src="_static/documentation_options.js?v=b489f392"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3. Testing of code" href="testing.html" />
+    <link rel="prev" title="1. Introduction" href="introduction.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Tools for Scientific Computing 0.3 documentation</span></a></h1>
+        <h2 class="heading"><span>2. Version Control with Git</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="introduction.html"><span class="section-number">1. </span>Introduction</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="testing.html"><span class="section-number">3. </span>Testing of code</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <section id="version-control-with-git">
+<span id="version-control"></span><h1><span class="section-number">2. </span>Version Control with Git<a class="headerlink" href="#version-control-with-git" title="Link to this heading">¶</a></h1>
+<section id="why-version-control">
+<h2><span class="section-number">2.1. </span>Why version control?<a class="headerlink" href="#why-version-control" title="Link to this heading">¶</a></h2>
+<p>A program is rarely written in one go but rather evolves through a number of
+stages where the code is improved, for example by fixing errors or improving its
+functionality. In this process, it is generally a good idea to keep old
+versions. Occasionally, one has an apparently good idea of how to improve a
+program, only to find out somewhat later that it was not such a good idea after
+all. Without having the original version available, one might have a hard time
+going back to it.</p>
+<p>Often, old versions are kept in an informal way by inventing filenames to
+distinguish different versions. Unless one strictly abides by a naming
+convention, sooner or later one will be unable to identify the stage of
+development corresponding to a given file. Things become even more difficult if
+more than one developer is involved.</p>
+<p>The potential loss of a working program is not the only motivation to keep
+a history of program versions. Suppose that a version of the program is used
+to compute scientific data and suppose that the program is further developed,
+e.g. by adding functionality. One might think that it is unnecessary to keep
+the old version. However, imagine that at some point it turns out that the
+program contains a mistake resulting in erroneous data. In such a situation,
+it may become essential to know whether the data obtained previously are
+affected by the mistake or not. Do the data have to be discarded or can continue
+to use them? If the version of the code used obtain the data is documented, this
+question can be decided. Otherwise, one probably could not trust the old data
+anymore.</p>
+<p>Another reason of keeping the history of a program is to document its evolution.
+The motivation for design decisions can be made transparent and even bad
+decisions could be kept for further reference. In a scenario where code is
+developed by several or even a large number of people, it might be desirable to
+know who is to be praised or blamed for a certain piece of code. Version control
+systems often support collaborative development by providing tools to discuss
+code before accepting the associated changes and by the possibility of easily
+going back to an older version. In this way, trying out new ideas can be
+encouraged.</p>
+<p>A version control system storing the history of a software project is clearly
+an invaluable tool. This insight is anything but new and indeed as early as in
+the 1970s, a first version control system, SCCS (short for source code control
+system), was developed. Later systems in wide use include RCS (revision control
+system) and CVS  (concurrent versions system), both developed in the last century,
+Subversion developed around the turn of the century and more recent systems
+like Git, Mercurial and Bazaar.</p>
+<p>Here, we will discuss the version control system Git created by Linus Torvalds
+in 2005. Its original purpose was to serve in the development of the Linux
+kernel. In order to make certain aspects of Git better understandable and to
+highlight some of its advantages, we will consider in the following section
+in some more detail different approaches to version control.</p>
+</section>
+<section id="centralized-and-distributed-version-control-systems">
+<span id="cvcs-vs-dvcs"></span><h2><span class="section-number">2.2. </span>Centralized and distributed version control systems<a class="headerlink" href="#centralized-and-distributed-version-control-systems" title="Link to this heading">¶</a></h2>
+<p>Often software is developed by a team. For the sake of illustration let us
+think of a number of authors working jointly on a text. In fact, scientific
+manuscripts are often written in (La)TeX which can be viewed as a specialized
+programming language. Obviously, there exists a probability that persons
+working in parallel on the text will make incompatible changes. Inevitably, at
+some point the question arises which version should actually be accepted. We
+will encounter such situations later as so-called merge conflicts.</p>
+<p>Early version control systems like RCS avoided such conflicts by a locking
+technique. In order to change the text or code, it was necessary to first
+lock the corresponding file, thus preventing other persons from modifying the
+same file at the same time. Unfortunately, this technique tends to impede
+parallel development. For our example of manuscript, it is perfectly fine
+if several persons work in parallel on different sections. Therefore, locking
+has been found not to be a good idea and it is not substitute for communication
+between team members about who is doing what.</p>
+<p>More modern version control systems are designed to favor collaboration within
+a team. There exist two different approaches: centralized version control
+systems on the one hand and distributed version control systems on the other
+hand. The version control system Git, which we are going to discuss in more
+detail in this chapter, is a distributed version control system. In order to
+better understand some of its aspects, it is useful to contrast it with a
+centralized version control system like Subversion.</p>
+<figure class="align-center" id="id8">
+<span id="cvcs"></span><a class="reference internal image-reference" href="_images/cvcs.png"><img alt="_images/cvcs.png" src="_images/cvcs.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.1 </span><span class="caption-text">A centralized version control system contains a well defined set of
+files at any given moment in time which can be referred to by a
+sequential revision number.</span><a class="headerlink" href="#id8" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>More modern version control systems are designed to favor collaboration within
+a team. There exist two different approaches: centralized version control
+systems on the one hand and distributed version control systems on the other
+hand. The version control system Git which we are going to discuss in more
+detail in this chapter is a distributed version control system. In order to
+better understand some of its aspects, it is useful to contrast it with a
+centralized version control system like Subversion.</p>
+<p>The basic structure of a centralized version control system is depicted in the
+left part of <a class="reference internal" href="#cvcs"><span class="std std-numref">Figure 2.1</span></a>. One or more developers, referred to as clients
+here, exchange code versions via the internet with a central server. At any
+moment of time, the server contains a definite set of files, i.e. a revision
+which is numbered sequentially as indicated in the right part of <a class="reference internal" href="#cvcs"><span class="std std-numref">Figure 2.1</span></a>.
+From one revision to the next, files can change or remain unchanged and files
+can be added or removed. The price to pay for this simple sequential history
+is that an internet connection and a working server is needed in order to
+create a new revision. A developer cannot create new revisions of the code
+while working off-line, an important drawback of centralized version control
+systems.</p>
+<figure class="align-center" id="id9">
+<span id="dvcs"></span><a class="reference internal image-reference" href="_images/dvcs.png"><img alt="_images/dvcs.png" src="_images/dvcs.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.2 </span><span class="caption-text">In a distributed version control system each user keeps file versions in
+a local repository and exchanges versions with other repositories when
+needed. As a consequence no global sequential history can be defined.</span><a class="headerlink" href="#id9" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>As an alternative, one can use a distributed version control system which
+is schematically represented in <a class="reference internal" href="#dvcs"><span class="std std-numref">Figure 2.2</span></a>. In such a setup, each developer
+keeps his or her own versions in a local repository and exchanges files
+with other repositories when needed. Due to the local repository, one can
+create a new version at any time, even in the absence of an internet connection.
+On the other hand, there exist local version histories and the concept of
+a global sequential revision numbering scheme does not make sense anymore.
+Instead, Git uses hexadecimal hash values to identify versions of individual
+files and sets of files, so-called commits, which reflect changes in the
+code base. The main point to understand here is that the seemingly natural
+sequential numbering scheme cannot work in a distributed version control
+system.</p>
+<figure class="align-center" id="id10">
+<span id="dvcs-github"></span><a class="reference internal image-reference" href="_images/dvcs-github.png"><img alt="_images/dvcs-github.png" src="_images/dvcs-github.png" style="height: 10em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.3 </span><span class="caption-text">A typical setup for the distributed version control system Git uses
+a central server to exchange versions between local repositories.</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>In most cases, a distributed version control system is not implemented
+precisely in the way presented in <a class="reference internal" href="#dvcs"><span class="std std-numref">Figure 2.2</span></a> as it would require
+communication between potentially a large number of local repositories. A setup
+like the one shown in <a class="reference internal" href="#dvcs-github"><span class="std std-numref">Figure 2.3</span></a> is typical instead. The important
+difference as compared to the centralized version control system displayed in
+<a class="reference internal" href="#cvcs"><span class="std std-numref">Figure 2.1</span></a> consists in the existence of local repositories where individual
+developers can manage their code versions even if disconnected with the central
+server. The difference is most obvious in the case of a single developer. Then,
+a local repository is completely sufficient and there is no need to use another
+server.</p>
+<p>A central server for the use with the version control system Git can be set up
+based on GitLab. Many institutions are running a GitLab instance
+<a class="footnote-reference brackets" href="#gitlab-uaux" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.  In addition, there exists the GitHub service at <a class="reference external" href="https://github.com/">github.com</a>. GitHub is popular among developers of open software
+projects for which it provides repositories free of charge. Private
+repositories can be obtained at a monthly rate, but there exists also the
+possibility to apply for temporary free private repositories for academic use.
+In later sections, when discussing collaborative code development with Git, we
+will specifically address GitLab, but the differences to GitHub are usually
+minor.</p>
+<p>In the following sections, we will start by explaining the use of Git in a
+single-user scenario with a local repository. This knowledge also forms the
+basis for work in a multi-developer environment using GitLab or GitHub.</p>
+</section>
+<section id="getting-help">
+<h2><span class="section-number">2.3. </span>Getting help<a class="headerlink" href="#getting-help" title="Link to this heading">¶</a></h2>
+<p>Before starting to explore the version control system Git, it is useful to
+know where one can get help. Generally, Git tries to be quite helpful even
+on the command line by adding useful hints to its output. As the general structure
+of a Git command starts with <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">&lt;command&gt;</span></code>, one can ask for help as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git help
+usage: git [--version] [--help] [-C &lt;path&gt;] [-c &lt;name&gt;=&lt;value&gt;]
+           [--exec-path[=&lt;path&gt;]] [--html-path] [--man-path] [--info-path]
+           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]
+           [--git-dir=&lt;path&gt;] [--work-tree=&lt;path&gt;] [--namespace=&lt;name&gt;]
+           &lt;command&gt; [&lt;args&gt;]
+
+These are common Git commands used in various situations:
+
+start a working area (see also: git help tutorial)
+   clone             Clone a repository into a new directory
+   init              Create an empty Git repository or reinitialize an existing one
+
+work on the current change (see also: git help everyday)
+   add               Add file contents to the index
+   mv                Move or rename a file, a directory, or a symlink
+   restore           Restore working tree files
+   rm                Remove files from the working tree and from the index
+   sparse-checkout   Initialize and modify the sparse-checkout
+
+examine the history and state (see also: git help revisions)
+   bisect            Use binary search to find the commit that introduced a bug
+   diff              Show changes between commits, commit and working tree, etc
+   grep              Print lines matching a pattern
+   log               Show commit logs
+   show              Show various types of objects
+   status            Show the working tree status
+
+grow, mark and tweak your common history
+   branch            List, create, or delete branches
+   commit            Record changes to the repository
+   merge             Join two or more development histories together
+   rebase            Reapply commits on top of another base tip
+   reset             Reset current HEAD to the specified state
+   switch            Switch branches
+   tag               Create, list, delete or verify a tag object signed with GPG
+
+collaborate (see also: git help workflows)
+   fetch             Download objects and refs from another repository
+   pull              Fetch from and integrate with another repository or a local branch
+   push              Update remote refs along with associated objects
+
+&#39;git help -a&#39; and &#39;git help -g&#39; list available subcommands and some
+concept guides. See &#39;git help &lt;command&gt;&#39; or &#39;git help &lt;concept&gt;&#39;
+to read about a specific subcommand or concept.
+See &#39;git help git&#39; for an overview of the system.
+</pre></div>
+</div>
+<p>Information on a specific command is obtained by means of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">help</span> <span class="pre">&lt;command&gt;</span></code>.</p>
+<p>Furthermore, Git provides a number of guides which can be read in a terminal window.
+A list of available guides can easily be obtained:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git help -g
+
+The common Git guides are:
+   attributes          Defining attributes per path
+   cli                 Git command-line interface and conventions
+   core-tutorial       A Git core tutorial for developers
+   cvs-migration       Git for CVS users
+   diffcore            Tweaking diff output
+   everyday            A useful minimum set of commands for Everyday Git
+   glossary            A Git Glossary
+   hooks               Hooks used by Git
+   ignore              Specifies intentionally untracked files to ignore
+   modules             Defining submodule properties
+   namespaces          Git namespaces
+   repository-layout   Git Repository Layout
+   revisions           Specifying revisions and ranges for Git
+   submodules          Mounting one repository inside another
+   tutorial            A tutorial introduction to Git
+   tutorial-2          A tutorial introduction to Git: part two
+   workflows           An overview of recommended workflows with Git
+
+&#39;git help -a&#39; and &#39;git help -g&#39; list available subcommands and some
+concept guides. See &#39;git help &lt;command&gt;&#39; or &#39;git help &lt;concept&gt;&#39;
+to read about a specific subcommand or concept.
+See &#39;git help git&#39; for an overview of the system.
+</pre></div>
+</div>
+<p>For a detailed discussion of Git, the book <em>Pro Git</em> by Scott Chacon and Ben
+Straub is highly recommended. Its second edition is available in printed form
+<a class="reference external" href="https://git-scm.com/book/en/v2">online</a> where also a PDF version can be downloaded
+freely. By the way, the book <em>Pro Git</em> as well as the present lecture notes have
+been written under version control with Git.</p>
+</section>
+<section id="setting-up-a-local-repository">
+<h2><span class="section-number">2.4. </span>Setting up a local repository<a class="headerlink" href="#setting-up-a-local-repository" title="Link to this heading">¶</a></h2>
+<p>The use of a version control system is not limited to large software projects
+but makes sense even for small individual projects. A prerequisite is the
+installation of the Git software which is freely available for Windows, MacOS
+and Unix systems from <a class="reference external" href="https://git-scm.com/">git-scm.com</a>. This Git
+installation can be used for all projects to be put under version control and
+we assume in the following that Git is already installed on the computer. Even
+though some graphical user interfaces exist, we will mostly discuss the use of
+Git on the command line.</p>
+<p>Putting a new project under version control with Git is easy. Once a directory
+exists in which the code will be developed, one initializes the repository by
+means of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git init
+</pre></div>
+</div>
+<p>Note that the dollar sign represents the command line prompt and should not be
+typed. Depending on your operating system setup, the dollar could be replaced by
+some other character(s). Initializing a new repository in this way will create a
+hidden subdirectory called <code class="docutils literal notranslate"><span class="pre">.git</span></code> in the directory where you executed the command.
+The directory is hidden to avoid that it is accidentally deleted.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Never delete the directory <code class="docutils literal notranslate"><span class="pre">.git</span></code> unless you really want to. You will
+lose the complete history of your project if you did not backup the project
+directory or synchronized your work with a GitLab server or GitHub. Removing
+the project directory will remove the subdirectory <code class="docutils literal notranslate"><span class="pre">.git</span></code> as well.</p>
+</div>
+<p>The newly created directory contains a number of files and subdirectories:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ls -a .git
+.  ..  branches  config  description  HEAD  hooks  info  objects  refs
+</pre></div>
+</div>
+<p>Refrain from modifying anything here as you might mess up files and in this
+way lose parts or all of your work.</p>
+<p>After having initialized your project, you should let Git know about your name
+and your email address by using the following commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git config --global user.name &lt;your name&gt;
+$ git config --global user.email &lt;your email&gt;
+</pre></div>
+</div>
+<p>where the part in angle brackets has to be replaced by the corresponding
+information. Enclose the information, in particular your name, in double quotes
+if it contains one or more blanks like in the following example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git config --global user.name &quot;Gert-Ludwig Ingold&quot;
+</pre></div>
+</div>
+<p>This information will be used by Git when new or modified files are committed
+to the repository in order to document who has made the contribution.</p>
+<p>If you have globally defined your name and email address as we did here, you do
+not need to repeat this step for each new repository. However, you can overwrite
+the global configuration locally. This might be useful if you intend to use
+a different email address for a specific project.</p>
+<p>There are more aspects of Git which can be configured and which are documented
+in <a class="reference external" href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration">Section 8.1 of the Git documentation</a>. The presently active configuration can be inspected by means of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git config --list
+</pre></div>
+</div>
+<p>For example, you might consider setting <code class="docutils literal notranslate"><span class="pre">core.editor</span></code> to your preferred editor.</p>
+</section>
+<section id="basic-workflow">
+<h2><span class="section-number">2.5. </span>Basic workflow<a class="headerlink" href="#basic-workflow" title="Link to this heading">¶</a></h2>
+<figure class="align-center" id="id11">
+<span id="addcommit"></span><a class="reference internal image-reference" href="_images/addcommit.png"><img alt="_images/addcommit.png" src="_images/addcommit.png" style="height: 10em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.4 </span><span class="caption-text">The transfer of a file to the repository is a two-step process. First one or
+more files are added to the staging area. In a second step, the files are
+committed to the repository.</span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>A basic step in managing a project under version control is the transfer of one
+or more new or modified files to the repository where all versions together
+with metainformation about them is kept. What looks like a one-step process is
+actually done in Git in two steps. For beginners, this two-step process often
+gives rise to confusion. We therefore go through the process by means of an
+example and make reference to <a class="reference internal" href="#addcommit"><span class="std std-numref">Figure 2.4</span></a> where the two-step process is
+illustrated. A convenient way to check the status of the project files is the
+command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">status</span></code>. When working with Git, you will use this command often
+to make sure that everything works as expected or to remind yourself of the status
+of the project files.</p>
+<p>Suppose that we have just initialized our Git repository as explained in the
+previous section. Then, Git would report the following status:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git status
+On branch master
+
+No commits yet
+
+nothing to commit (create/copy files and use &quot;git add&quot; to track)
+</pre></div>
+</div>
+<p>The output first tells us that we are on a branch called <code class="docutils literal notranslate"><span class="pre">master</span></code>
+<a class="footnote-reference brackets" href="#github-master-main" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Later, we will discuss the concept of branches and it
+will be useful to know this possibility of finding out the current branch. For
+the moment, we can ignore this line. Furthermore, Git informs us that we not
+committed anything yet so that the upcoming commit would be the initial one.
+However, since we have not created any files, there is nothing to commit. As
+promised earlier, Git tries to be helpful and adds some information about what
+we could do. Obviously, we first have to create a file in the project
+directory.</p>
+<p>So let us go ahead and create a very simple Python file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, the status reflects the fact that a new file <code class="docutils literal notranslate"><span class="pre">hello.py</span></code>  exists:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git status
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+        hello.py
+
+nothing added to commit but untracked files present (use &quot;git add&quot; to track)
+</pre></div>
+</div>
+<p>Git has detected the presence of a new file but it is an untracked file which
+will basically be ignored by Git. As we ultimately want to include our small
+script <code class="docutils literal notranslate"><span class="pre">hello.py</span></code> into our repository, we follow the advice and add the
+file. According to <a class="reference internal" href="#addcommit"><span class="std std-numref">Figure 2.4</span></a> this corresponds to moving the file
+to the so-called staging area, a prerequisite to ultimately committing the file
+to the repository. Let us also check the status after adding the file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git add hello.py
+$ git status
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use &quot;git rm --cached &lt;file&gt;...&quot; to unstage)
+        new file:   hello.py
+</pre></div>
+</div>
+<p>Note that Git tells us how we could revert the step of adding a file in case of
+need.  Having added a file to the staging area does not mean that this file has
+vanished from our working directory. As you can easily check, it is still
+there.</p>
+<p>At this point it is worth emphasizing that we could collect several files in
+the staging area. We could then transfer all files to the repository in one single
+commit. Committing the file to the repository would be the next logical step.
+However, for the sake of illustration, we want to first modify our script. Our
+new script could read</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The status now has changed to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git status
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use &quot;git rm --cached &lt;file&gt;...&quot; to unstage)
+        new file:   hello.py
+
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)
+        modified:   hello.py
+</pre></div>
+</div>
+<p>It reflects the fact that now there are two versions of our script <code class="docutils literal notranslate"><span class="pre">hello.py</span></code>.
+The section “Changes to be committed” lists the file or files in the staging area.
+In our example, Git refers to the version which we added, i.e. the script consisting
+of just a simple line. This version differs from the file present in our working
+directory. This two-line script is listed in the section “Changes not staged for commit”.
+We could move it to the staging area right away or at a later point in case we want to commit
+the two versions of the script separately. Note that the most recent version of the script
+is no longer listed as untracked file because a previous version had been added and the
+file is tracked now by Git.</p>
+<p>Having a file in the staging are, we can now commit it by means of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code>.
+Doing so will open an editor allowing to define a commit message describing the
+purpose of the commit. The commit message should consist of a single line with
+preferably at most 50 characters. If necessary, one can add an empty line followed
+by a longer explanatory text. If a single-line commit message suffices, one can
+give the message as a command line argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -m &#39;simple hello world script added&#39;
+[master (root-commit) a5b522b] simple hello world script added
+ 1 file changed, 1 insertion(+)
+ create mode 100644 hello.py
+$ git status
+On branch master
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)
+        modified:   hello.py
+
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+</pre></div>
+</div>
+<p>Checking the status, we see that our two-line script is still unstaged. We could
+add it to the staging area and then commit it. Since Git already tracks this file,
+we can carry out this procedure in one single step. However, this is only possible
+if we do not wish to commit more than one file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -a -m &#39;repetition of hello world implemented&#39;
+[master 011ce76] repetition of hello world implemented
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+(base) gli@gli-tp14-1:~/git_example$ git status
+On branch master
+nothing to commit, working tree clean
+</pre></div>
+</div>
+<p>Now, we have committed two versions of our script as can easily be verified:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log
+commit 011ce76b848d6428e900373f177b1f6b2595a524 (HEAD -&gt; master)
+Author: Gert-Ludwig Ingold &lt;gert.ingold@physik.uni-augsburg.de&gt;
+Date:   Wed Apr 27 15:31:01 2022 +0200
+
+    repetition of hello world implemented
+
+commit a5b522b125baa24f823df389b1b40f28b3a42bee
+Author: Gert-Ludwig Ingold &lt;gert.ingold@physik.uni-augsburg.de&gt;
+Date:   Wed Apr 27 15:28:41 2022 +0200
+
+    simple hello world script added
+</pre></div>
+</div>
+<p>As we had discussed in <a class="reference internal" href="#cvcs-vs-dvcs"><span class="std std-numref">Section 2.2</span></a> the concept of distributed
+version control systems does not allow for sequential revision numbers. Our two
+commits can thus not be numbered as commit 1 and commit 2. Instead, commits in
+Git are identified by their SHA-1 checksum <a class="footnote-reference brackets" href="#sha1" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. The output above lists the
+hashes consisting of 40 hexadecimal digits for the two commits. In practice,
+when referring to a commit, it is often sufficient to restrict oneself to the
+first 6 or 7 digits which typically characterize the commit in a unique way.
+To obtain idea of how sensitive the SHA-1 hash is with respect to small changes,
+consider the following examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ echo Python|sha1sum
+79c4e0b5abbd2f67a369ba6ee0b95438c38eb0cb  -
+$ echo python|sha1sum
+32886514c2621f81e01024aa84d0f829d2ce1fad  -
+</pre></div>
+</div>
+<p>Now that we know how to commit one or more files, one can raise the question of
+how often files should be committed. Generally, the rule is to commit often. A
+good strategy is to combine changes in such a way that they form a logical
+unit.  This approach is particularly helpful if one has to revert to a previous
+version.  If a logical change affects several files, it is easy to revert this
+change. If on the other hand, a big commit comprises many logically different
+changes, one will have to sort out which changes to revert and which ones to
+keep. Therefore, it makes sense to aim at so-called atomic commits where a
+commit collects all file changes associated with a minimal logical change
+<a class="footnote-reference brackets" href="#add-p" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.  On the other hand, in the initial versions of program development,
+it often does not make sense to do atomic commits. The situation may change
+though as the development of the code progresses.</p>
+<p>At the end of this section on the basic workflow, we point out one issue which
+in a sense could already be addressed in the initial setting up of the repository,
+but which we can motivate only now. Having our previous versions safely stored in
+the repository, we might be brave enough to refactor our script by defining a
+function to repeatedly printing a given text. Doing so, we end up with two files</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
+<span class="kn">from</span> <span class="nn">repeat</span> <span class="kn">import</span> <span class="n">repeated_print</span>
+
+<span class="n">repeated_print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We verify that the scripts do what they are supposed to do</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python hello.py
+Hello world!
+Hello world!
+Hello world!
+</pre></div>
+</div>
+<p>Everything works fine so that we add the two files to the staging area and
+check the status before committing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git status
+On branch master
+Changes to be committed:
+  (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)
+        modified:   hello.py
+        new file:   repeat.py
+
+Untracked files:
+  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+        __pycache__/
+</pre></div>
+</div>
+<p>Everything looks fine except for the fact that there is an untracked directory
+<code class="docutils literal notranslate"><span class="pre">__pycache__</span></code>. This directory and its content are created during the import of
+<code class="docutils literal notranslate"><span class="pre">repeat.py</span></code> and should not go into the repository. After all, they are automatically
+generated when needed. Here, it comes in handy to make use of a <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file.
+Each line in this file contains one entry which defines files to be ignored by Git.
+For projects based on Python, Git proposes a <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file starting with
+the following lines:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+</pre></div>
+</div>
+<p>Lines starting with # are interpreted as comments. The second line excludes the
+directory <code class="docutils literal notranslate"><span class="pre">__pycache__</span></code> as well as its content. The star in the last two
+lines can replace any number of characters. The third line will exclude all
+files ending with <code class="docutils literal notranslate"><span class="pre">.pyc</span></code>, <code class="docutils literal notranslate"><span class="pre">.pyo</span></code>, and <code class="docutils literal notranslate"><span class="pre">.pyc</span></code>. For more details see <code class="docutils literal notranslate"><span class="pre">git</span>
+<span class="pre">help</span> <span class="pre">ignore</span></code> and the <a class="reference external" href="https://github.com/github/gitignore">collection of gitignore files</a>, in particular <code class="docutils literal notranslate"><span class="pre">Python.gitignore</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file should be put under version control as it might develop
+over time.</p>
+</section>
+<section id="working-with-branches">
+<span id="git-branches"></span><h2><span class="section-number">2.6. </span>Working with branches<a class="headerlink" href="#working-with-branches" title="Link to this heading">¶</a></h2>
+<p>In the previous section, the result of the command <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">status</span></code> contained in
+its first line the information <code class="docutils literal notranslate"><span class="pre">On</span> <span class="pre">branch</span> <span class="pre">master</span></code>. The existence of one branch
+strongly suggests that there could be more branches and this is actually the case.
+So far, we have been working on the branch which Git had created for us during
+initialization and which happens to be called <code class="docutils literal notranslate"><span class="pre">master</span></code> by default. As the use
+of branches can be very useful, we will discuss them in the following.</p>
+<p>In the previous section, we had created a Git repository and made a few commits.
+Suppose that we have also committed the refactored version of our script as well
+as the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file. The history of our repository then looks as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --graph --decorate --all
+* aac6d17 (HEAD -&gt; master) .gitignore for Python added
+* 98628ce hello world script refactored
+* 011ce76 repetition of hello world implemented
+* a5b522b simple hello world script added
+</pre></div>
+</div>
+<p>Before discussing the output, let us briefly comment on the options used in the
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> command. Usually, this command will be more verbose, giving the full
+hash value of the commit, the name of the author and the date of the commit together
+with the commit message. Using the switch <code class="docutils literal notranslate"><span class="pre">--oneline</span></code>, this information can be
+reduced to a single line. Its content could be configured but we do not need to
+do this here. The options <code class="docutils literal notranslate"><span class="pre">--graph</span></code> and <code class="docutils literal notranslate"><span class="pre">--all</span></code> will have an effect once more
+than one branch is present. Then, we will obtain a graphical representation of
+the commit tree, i.e. the relation between the different branches. In addition,
+we will be shown information about all branches, not only the branch we are on.
+Finally, <code class="docutils literal notranslate"><span class="pre">--decorate</span></code> shows us references existing for certain commits. In our
+case, the commit <code class="docutils literal notranslate"><span class="pre">aac6d17</span></code> is referred to as <code class="docutils literal notranslate"><span class="pre">HEAD</span></code> because that is the version
+we are presently seeing in our working directory. This is also where the branch
+<code class="docutils literal notranslate"><span class="pre">master</span></code> is positioned right now. The usefulness of this information  will become
+clear once we have more than one branch or when even working with remote branches.</p>
+<p>The history documented by the output of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> is linear with the most
+recent commit on top. As we have discussed earlier, Git is a distributed version
+control system. Therefore, we have to expect that other developers are doing
+work in parallel which at some time should connect to our work. Otherwise, we
+could simply ignore these developers. Consequently, in general we cannot expect
+the history of our repository to be as simple as it is up to now.</p>
+<p>However, we do not need other developers to have several lines of development
+running in parallel for some time. Even for a single developer, it makes sense
+to keep different lines of development separated at least for some time.
+Suppose for the moment that you have a working program that is used to produce
+data, the production version of the program. At the same time, you want to
+develop this program further, e.g. in order to add functionality or to improve
+its speed. Such a development should be carried out separately from the
+production version so that the latter can easily be accessed in the repository
+at any time. Or you have a potentially good idea which you would like to try
+out, but you do not know whether this idea will make it into the main code.
+Again, it is useful to keep the exploration of your idea separate from the
+production version of your program. Of course, if the idea turns out to be a
+good one, it should be possible to merge the new code into the production
+version.</p>
+<p>The solution to the needs occurring in these scenarios are branches. In a typical
+scenario, one would keep the production version in the master branch which in
+a sense forms the trunk of a tree. At a certain commit of the master branch,
+a new branch will take that commit as a parent on which further development of,
+e.g., a new aspect of the program is based. There could be different branches
+extending from various commits and a branch can have further branches. The picture
+of a tree thus seems quite appropriate. However, typically branches will not grow
+forever in their own direction. Ideally, the result of the development in a branch
+should ultimately flow back into the production code, a step referred to as
+merging.</p>
+<p>Let us take a look at an example. As branches can become a bit confusing once
+you have several of them, it makes sense to make sure from time to time that you
+are still on the right branch. We have not created a new branch and therefore are
+on the master branch. This can be verified as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git branch
+* master
+</pre></div>
+</div>
+<p>So far, we have only a single branch named <code class="docutils literal notranslate"><span class="pre">master</span></code>. The star in front indicates
+that we are indeed on that branch.</p>
+<p>Now suppose that the idea came up not to greet the whole world but a single person
+instead. This implies a major change of the program and there is a risk that the
+program used in production might not always be working correctly if we do our work
+on the master branch. It is definitely time to create a new branch. We call the
+new branch <code class="docutils literal notranslate"><span class="pre">dev</span></code> for development but we could choose any other name. In general,
+it is a good idea to choose telling names, in particular as the number of branches
+grows.</p>
+<p>The new branch can be created by means of</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git branch dev
+</pre></div>
+</div>
+<p>We can verify the existence of the new branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git branch
+  dev
+* master
+</pre></div>
+</div>
+<p>As the star indicates, we are still on the master branch, but a new branch named
+<code class="docutils literal notranslate"><span class="pre">dev</span></code> exists. Switching back and forth between different branches is done by means
+of the <code class="docutils literal notranslate"><span class="pre">switch</span></code> command. With the following commands, we got to the development
+branch and back to the master branch while verifying where we are after each checkout:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch dev
+Switched to branch &#39;dev&#39;
+$ git branch
+* dev
+  master
+$ git switch master
+Switched to branch &#39;master&#39;
+$ git branch
+  dev
+* master
+</pre></div>
+</div>
+<p>In addition, we can check the history of our repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --graph --decorate --all
+* aac6d17 (HEAD -&gt; master, dev) .gitignore for Python added
+* 98628ce hello world script refactored
+* 011ce76 repetition of hello world implemented
+* a5b522b simple hello world script added
+</pre></div>
+</div>
+<p>Now, commit <code class="docutils literal notranslate"><span class="pre">aac6d17</span></code> is also part of the branch <code class="docutils literal notranslate"><span class="pre">dev</span></code>. For the moment, the
+new branch is not really visible as branch because we have not done any development.</p>
+<p>Above, we have first created a new branch and then switched to the new branch. As one
+typically wants to switch to the new branch immediately after having created it, there
+exists a shortcut:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch -c dev
+Switched to a new branch &#39;dev&#39;
+</pre></div>
+</div>
+<p>The option <code class="docutils literal notranslate"><span class="pre">-c</span></code> demands a new branch to be created.</p>
+<p>Everything is set up now to work on the new idea. Let us suppose that at some point
+you arrive at the following script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
+<span class="kn">from</span> <span class="nn">repeat</span> <span class="kn">import</span> <span class="n">repeated_print</span>
+
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">repeated_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">repeated_print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After committing it, the commit log looks as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --graph --decorate --all
+* f113188 (HEAD -&gt; dev) name as new argument implemented
+* aac6d17 (master) .gitignore for Python added
+* 98628ce hello world script refactored
+* 011ce76 repetition of hello world implemented
+* a5b522b simple hello world script added
+</pre></div>
+</div>
+<p>The history is still linear, but clearly the master branch and the development
+branch are in different states now. The master branch is still at commit
+<code class="docutils literal notranslate"><span class="pre">aac6d17</span></code> while the development branch is at <code class="docutils literal notranslate"><span class="pre">f113188</span></code>.  At this point, it
+is worth going back to the master branch and to check the content of
+<code class="docutils literal notranslate"><span class="pre">hello.py</span></code>. At first, it might appear that we have lost our recent work but
+this is not the case because we had committed the new version in the development
+branch. Switching back to <code class="docutils literal notranslate"><span class="pre">dev</span></code>, we indeed find the new version of the
+script.</p>
+<p>During the development of the new script, we realized that it is a good idea
+to define a default value for the number of repetitions and we decide that it
+is a good idea to make a corresponding change in the master branch. Before
+continuing to work in the development branch, we perform the following steps:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>check out the master branch</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch master
+</pre></div>
+</div>
+</li>
+<li><p>make modifications to <code class="docutils literal notranslate"><span class="pre">repeat.py</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>commit the new version of the script</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -a -m &#39;default value for number of repetitions defined&#39;
+</pre></div>
+</div>
+</li>
+<li><p>check out the development branch</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch dev
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+<p>The commit history is no longer linear but has clearly separated into two branches:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --graph --decorate --all
+* 1d9a25f (master) default value for number of repetitions defined
+| * f113188 (HEAD -&gt; dev) name as new argument implemented
+|/
+* aac6d17 .gitignore for Python added
+* 98628ce hello world script refactored
+* 011ce76 repetition of hello world implemented
+* a5b522b simple hello world script added
+</pre></div>
+</div>
+<p>Now it is time to complete the script <code class="docutils literal notranslate"><span class="pre">hello.py</span></code> by adding an exclamation mark
+after the name and calling the new function <code class="docutils literal notranslate"><span class="pre">hello</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
+<span class="kn">from</span> <span class="nn">repeat</span> <span class="kn">import</span> <span class="n">repeated_print</span>
+
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;Hello, &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;!&quot;</span>
+        <span class="n">repeated_print</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">repeated_print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">hello</span><span class="p">(</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Before committing the new version, we start thinking about atomic commits. Strictly
+speaking, we made two different kinds of changes. We have added the exclamation mark
+and added the function call. Instead of going back and making the changes one after
+the other, we can recall that the option <code class="docutils literal notranslate"><span class="pre">-p</span></code> allows to choose which changes to
+add to the staging area:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git add -p hello.py
+diff --git a/hello.py b/hello.py
+index b2ee076..c287658 100644
+--- a/hello.py
++++ b/hello.py
+@@ -3,6 +3,9 @@ from repeat import repeated_print
+
+ def hello(name=&quot;&quot;, repetitions=1):
+     if name:
+-        repeated_print(f&quot;Hello, {name}&quot;, repetitions)
++        repeated_print(f&quot;Hello, {name}!&quot;, repetitions)
+     else:
+         repeated_print(&quot;Hello world!&quot;, repetitions)
++
++if __name__ == &quot;__main__&quot;:
++    hello(&quot;Alice&quot;, 3)
+(1/1) Stage this hunk [y,n,q,a,d,s,e,?]?
+</pre></div>
+</div>
+<p>Answering the question with <code class="docutils literal notranslate"><span class="pre">s</span></code>, i.e. <code class="docutils literal notranslate"><span class="pre">split</span></code>, we are offered the
+possibility to add the two changes separately to the changing area. In this
+way, we can create two separate commits. After actually doing the commits, we
+arrive at the following history:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --graph --decorate --all
+* a807c98 (HEAD -&gt; dev) function call added
+* d07dbda exclamation mark added
+* f113188 name as new argument implemented
+| * 1d9a25f (master) default value for number of repetitions defined
+|/
+* aac6d17 .gitignore for Python added
+* 98628ce hello world script refactored
+* 011ce76 repetition of hello world implemented
+* a5b522b simple hello world script added
+</pre></div>
+</div>
+<p>Now, it is time to make the new functionality available for production, i.e. to
+merge the commits from the development branch into the master branch. To this
+end, we switch to the master branch and merge the development branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch master
+Switched to branch &#39;master&#39;
+$ git merge dev
+Merge made by the &#39;recursive&#39; strategy.
+ hello.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+$ git log --oneline --graph --decorate --all
+*   53e12db (HEAD -&gt; master) Merge branch &#39;dev&#39;
+|\
+| * a807c98 (dev) function call added
+| * d07dbda exclamation mark added
+| * f113188 name as new argument implemented
+* | 1d9a25f default value for number of repetitions defined
+|/
+* aac6d17 .gitignore for Python added
+* 98628ce hello world script refactored
+* 011ce76 repetition of hello world implemented
+* a5b522b simple hello world script added
+</pre></div>
+</div>
+<p>In this case, Git has made a so-called three-way merge based on the common ancestor
+of the two branches (<code class="docutils literal notranslate"><span class="pre">aac6d17</span></code>) and the current versions in the two branches
+(<code class="docutils literal notranslate"><span class="pre">1d9a25f</span></code>) and (<code class="docutils literal notranslate"><span class="pre">a807c98</span></code>). It is interesting to compare the script <code class="docutils literal notranslate"><span class="pre">repeat.py</span></code>
+in these three versions. The version in the common ancestor was:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py aac6d17</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the master branch, we have</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py 1d9a25f</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>while in the development branch, the script reads</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py a807c98</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that in <code class="docutils literal notranslate"><span class="pre">1d9a25f</span></code> a default value for the variable <code class="docutils literal notranslate"><span class="pre">repetitions</span></code> is
+present while it is not in <code class="docutils literal notranslate"><span class="pre">a807c98</span></code>. The common ancestor serves to resolve
+this discrepancy.  Obviously, a change was made in the master branch while it
+was not done in the development branch. Therefore, the change is kept.  The
+other modifications in the branches were not in contradiction, so that the
+merge could be done automatically and produced the desired result.</p>
+<p>The life of the development branch does not necessarily end here if we decide
+to continue to work on it. In fact, the branch <code class="docutils literal notranslate"><span class="pre">dev</span></code> continues to exist until
+we decide to delete it. Since all work done in the development branch is now
+present in the master branch, we decide to delete the branch <code class="docutils literal notranslate"><span class="pre">dev</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git branch -d dev
+Deleted branch dev (was a807c98).
+</pre></div>
+</div>
+<p>An attempt to delete a branch which was not fully merged, will be rejected. This
+could be the case if the idea developed in a branch turns out not to be a good
+idea after all. The deletion of the branch can be forced by replacing the option
+<code class="docutils literal notranslate"><span class="pre">-d</span></code> by <code class="docutils literal notranslate"><span class="pre">-D</span></code>.</p>
+<p>In general, one cannot expect a merge to run as smoothly as in our example. Frequently,
+a so-called merge conflict arises. This is quite common if different developers work
+in the same part of the code and their results are incompatible. For the sake of example,
+let us assume that we add a doc string to the <code class="docutils literal notranslate"><span class="pre">repeated_print</span></code> function but choose
+a different text in the master branch and in the development branch. In the master branch
+we have</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py in master</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text repeatedly</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>while in the development branch we have chosen a different doc string</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py in dev</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text several times&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The commit history of which we only show the more recent part now becomes a bit
+more complex:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">c3ab8cb</span> <span class="p">(</span><span class="n">HEAD</span> <span class="o">-&gt;</span> <span class="n">dev</span><span class="p">)</span> <span class="n">added</span> <span class="n">a</span> <span class="n">doc</span> <span class="n">string</span>
+<span class="o">|</span> <span class="o">*</span> <span class="n">cc484da</span> <span class="p">(</span><span class="n">master</span><span class="p">)</span> <span class="n">doc</span> <span class="n">string</span> <span class="n">added</span>
+<span class="o">|</span> <span class="o">*</span>   <span class="mf">53e12</span><span class="n">db</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">&#39;dev&#39;</span>
+<span class="o">|</span> <span class="o">|</span>\
+<span class="o">|</span> <span class="o">|/</span>
+<span class="o">|/|</span>
+<span class="o">*</span> <span class="o">|</span> <span class="n">a807c98</span> <span class="n">function</span> <span class="n">call</span> <span class="n">added</span>
+<span class="o">*</span> <span class="o">|</span> <span class="n">d07dbda</span> <span class="n">exclamation</span> <span class="n">mark</span> <span class="n">added</span>
+<span class="o">*</span> <span class="o">|</span> <span class="n">f113188</span> <span class="n">name</span> <span class="k">as</span> <span class="n">new</span> <span class="n">argument</span> <span class="n">implemented</span>
+<span class="o">|</span> <span class="o">*</span> <span class="mi">1</span><span class="n">d9a25f</span> <span class="n">default</span> <span class="n">value</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">repetitions</span> <span class="n">defined</span>
+<span class="o">|/</span>
+<span class="o">*</span> <span class="n">aac6d17</span> <span class="o">.</span><span class="n">gitignore</span> <span class="k">for</span> <span class="n">Python</span> <span class="n">added</span>
+</pre></div>
+</div>
+<p>We switch to the master branch and try to merge once more the development branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch master
+Switched to branch &#39;master&#39;
+$ git merge dev
+Auto-merging repeat.py
+CONFLICT (content): Merge conflict in repeat.py
+Automatic merge failed; fix conflicts and then commit the result.
+</pre></div>
+</div>
+<p>This time, the merge fails and Git informs us about a merge conflict. At this point,
+Git needs to be told which version of the doc string should be used in the master
+branch. Let us take a look at our script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
+<span class="o">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> <span class="n">HEAD</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text repeatedly</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<span class="o">=======</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text several times&quot;&quot;&quot;</span>
+<span class="o">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> <span class="n">dev</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There are two blocks separated by <code class="docutils literal notranslate"><span class="pre">=======</span></code>. The first block starting with
+<code class="docutils literal notranslate"><span class="pre">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> <span class="pre">HEAD</span></code> is the present version in the master branch where we are right
+now. The second block terminated by <code class="docutils literal notranslate"><span class="pre">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> <span class="pre">dev</span></code> stems from the development
+branch. The reason for the conflict lies in the different doc strings. In such a
+situation, Git needs help. The script should now be brought into the desired
+form by using an editor or a tool to handle merge conflicts. We choose</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
+<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text repeatedly</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>but the other version or a version with further modifications would have been
+possible as well. In order to tell Git that the version conflict has been
+resolved, we add it to the staging area and commit it as usual. The history
+now looks as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span>   <span class="n">d10bdbb</span> <span class="p">(</span><span class="n">HEAD</span> <span class="o">-&gt;</span> <span class="n">master</span><span class="p">)</span> <span class="n">merge</span> <span class="n">conflict</span> <span class="n">resolved</span>
+<span class="o">|</span>\
+<span class="o">|</span> <span class="o">*</span> <span class="n">c3ab8cb</span> <span class="p">(</span><span class="n">dev</span><span class="p">)</span> <span class="n">added</span> <span class="n">a</span> <span class="n">doc</span> <span class="n">string</span>
+<span class="o">*</span> <span class="o">|</span> <span class="n">cc484da</span> <span class="n">doc</span> <span class="n">string</span> <span class="n">added</span>
+<span class="o">*</span> <span class="o">|</span> <span class="mf">53e12</span><span class="n">db</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">&#39;dev&#39;</span>
+<span class="o">|</span>\<span class="o">|</span>
+<span class="o">|</span> <span class="o">*</span> <span class="n">a807c98</span> <span class="n">function</span> <span class="n">call</span> <span class="n">added</span>
+<span class="o">|</span> <span class="o">*</span> <span class="n">d07dbda</span> <span class="n">exclamation</span> <span class="n">mark</span> <span class="n">added</span>
+<span class="o">|</span> <span class="o">*</span> <span class="n">f113188</span> <span class="n">name</span> <span class="k">as</span> <span class="n">new</span> <span class="n">argument</span> <span class="n">implemented</span>
+<span class="o">*</span> <span class="o">|</span> <span class="mi">1</span><span class="n">d9a25f</span> <span class="n">default</span> <span class="n">value</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">repetitions</span> <span class="n">defined</span>
+<span class="o">|/</span>
+<span class="o">*</span> <span class="n">aac6d17</span> <span class="o">.</span><span class="n">gitignore</span> <span class="k">for</span> <span class="n">Python</span> <span class="n">added</span>
+</pre></div>
+</div>
+<p>While the use of branches can be an extremely valuable technique even for a
+single developer, branches will inevitably appear in a multi-developer environment.
+A good understanding of branches will therefore be helpful in the following section.</p>
+</section>
+<section id="collaborative-code-development-with-gitlab">
+<h2><span class="section-number">2.7. </span>Collaborative code development with GitLab<a class="headerlink" href="#collaborative-code-development-with-gitlab" title="Link to this heading">¶</a></h2>
+<p>So far, we have only worked within a single developer scenario and a local Git
+repository was sufficient. However, scientific research is often carried out in
+teams with several persons working on the same project at the same time. While
+a distributed version control system like Git allows each person to work with
+her or his local repository for some time, it will become necessary at some
+point to share code. One way would be to grant all persons on the project
+read access to all local repositories. However, in general such an approach
+will result in a significant administrative load. It is much more common to
+exchange code via a central server, typically a GitLab server run by an
+institution or a service like <a class="reference external" href="https://github.com/">GitHub</a>.</p>
+<figure class="align-center" id="id12">
+<span id="gitlab"></span><a class="reference internal image-reference" href="_images/gitlab.png"><img alt="_images/gitlab.png" src="_images/gitlab.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.5 </span><span class="caption-text">Workflow for collaborative development in a distributed version control system
+with a GitLab instance as central server.</span><a class="headerlink" href="#id12" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Independently of whether one uses a GitLab server or GitHub, the typical setup
+looks like depicted in <a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a> and consists of three repositories. In
+order to understand this setup, we introduce to roles. The user is representative
+of one of the individual developers while the maintainer controls the main project
+repository. As a consequence of their respective roles, the user has read and
+write access to her or his local repository while the maintainer has read and
+write access to the main project repository, often referred to as <code class="docutils literal notranslate"><span class="pre">upstream</span></code>.
+Within a project team, every member should be able to access the common code
+base and therefore should have read access to <code class="docutils literal notranslate"><span class="pre">upstream</span></code>. In order to avoid that
+the maintainer needs read access to the user’s local repository, it is common
+to create a third repository often called <code class="docutils literal notranslate"><span class="pre">origin</span></code> to which the user has read
+and write access while the maintainer has read access. In order to facilitate
+the rights management, <code class="docutils literal notranslate"><span class="pre">origin</span></code> and <code class="docutils literal notranslate"><span class="pre">upstream</span></code> are usually hosted on the same
+central server. At same point in time, the user creates <code class="docutils literal notranslate"><span class="pre">origin</span></code> by a process
+called forking, thereby creating her or his own copy of <code class="docutils literal notranslate"><span class="pre">upstream</span></code>. This process
+needs only to be done once. Afterwards, the code can flow in counter-clockwise
+direction in <a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a>. The individual steps are as follows:</p>
+<ol class="arabic simple">
+<li><p>The user can always get the code from the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> repository, e.g. to
+use it as basis for the future development. There are two options, namely
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code> and the two-step process <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">fetch</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">merge</span></code> which
+we will discuss below.</p></li>
+<li><p>Having read and write access both on the local repository and the <code class="docutils literal notranslate"><span class="pre">origin</span></code>
+repository, the user can <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> to move code to the central server.
+With <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>, code can also be brought from the central server to a
+local repository. The latter is particularly useful if the user is working
+on several machines with individual local repositories.</p></li>
+<li><p>As long as the user has no write access to <code class="docutils literal notranslate"><span class="pre">upstream</span></code>, only the maintainer
+can transfer code from the user’s <code class="docutils literal notranslate"><span class="pre">origin</span></code> to <code class="docutils literal notranslate"><span class="pre">upstream</span></code>. Usually, the
+user will inform the maintainer by means of a merge request that code is being
+ready to be merged into the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> repository <a class="footnote-reference brackets" href="#merge-pull" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>. After an
+optional discussion of the suitability of the code, the maintainer can merge
+the code into the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> repository.</p></li>
+</ol>
+<p>After these conceptual considerations, we discuss a more practical example. The
+maintainer of the project will be called Big Boss with username <code class="docutils literal notranslate"><span class="pre">boss</span></code> and
+she or he starts by creating a repository for a project named <code class="docutils literal notranslate"><span class="pre">example</span></code>. We
+will first go through the steps required to set up the project and then focus
+on how one remotely interacts with this repository either as an owner of the
+repository or a collaborator who contributes code via his or her repository.</p>
+<figure class="align-center" id="id13">
+<span id="gitlab-create-project-1"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-1.png"><img alt="_images/gitlab-create-project-1.png" src="_images/gitlab-create-project-1.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.6 </span><span class="caption-text">Creation of a new project in a GitLab repository.</span><a class="headerlink" href="#id13" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id14">
+<span id="gitlab-create-project-2"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-2.png"><img alt="_images/gitlab-create-project-2.png" src="_images/gitlab-create-project-2.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.7 </span><span class="caption-text">During the creation of a project its name and its visibility level need to
+be defined. In addition, it makes sense to add a project description and to
+initialize the repository with a README file.</span><a class="headerlink" href="#id14" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>After logging into a GitLab server, one finds in the dashboard on the top of
+the screen the possibility to create a new project as shown in
+<a class="reference internal" href="#gitlab-create-project-1"><span class="std std-numref">Figure 2.6</span></a>. In order to actually create a new project,
+some basic information is needed as shown in <a class="reference internal" href="#gitlab-create-project-2"><span class="std std-numref">Figure 2.7</span></a>.
+Mandatory are the name as well as the visibility level of the project. A
+private project will only be visible to the owner and members who were invited
+to join the project. Public projects, on the other hand, can be accessed
+without any authentication. It is recommended to add a short description of the
+project so that its purpose becomes apparent to visitors of the project page.
+In addition, it is useful to add at least a short README file. This README file
+initially will contain the name of the repository and the project description.
+It can be extended over time by adding information useful for visitors of the
+project page. Creating a README file also ensures that the repository contains
+at least one file.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Markup can be used to format the README page. Markup features include
+headers, lists, web links and more. GitLab and GitHub recognize markdown
+(file extension <code class="docutils literal notranslate"><span class="pre">.md</span></code>) and  restructured text (file extension <code class="docutils literal notranslate"><span class="pre">.rst</span></code>).
+We recommend to take a look at the <a class="reference external" href="https://about.gitlab.com/handbook/product/technical-writing/markdown-guide/">Markdown Style Guide of GitLab</a>
+and to experiment with different formatting possibilities. This is also a
+good opportunity to exercise your version control skills. You can check the
+effect of the markup by taking a look at the project page.</p>
+</div>
+<figure class="align-center" id="id15">
+<span id="gitlab-create-project-3"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-3.png"><img alt="_images/gitlab-create-project-3.png" src="_images/gitlab-create-project-3.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.8 </span><span class="caption-text">The new repository can be accessed via the HTTP and SSH protocols. Users with
+access to the repository can also fork it.</span><a class="headerlink" href="#id15" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The project page shown in <a class="reference internal" href="#gitlab-create-project-3"><span class="std std-numref">Figure 2.8</span></a> contains relevant
+elements for users collaborating on the project. There is the possibility to
+create a fork of the project. According to the workflow represented in
+<a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a>, forking a project creates a new repository usually referred
+to as <code class="docutils literal notranslate"><span class="pre">origin</span></code> which is based on the repository referred to as <code class="docutils literal notranslate"><span class="pre">upstream</span></code>.
+The key point in forking is to create a repository to which the user has write
+access, which need not be the case for the original project.</p>
+<p>Furthermore, the screen depicted in <a class="reference internal" href="#gitlab-create-project-3"><span class="std std-numref">Figure 2.8</span></a> contains
+information about the URL under which the repository can be accessed. We will
+need this information later on. As the figure shows, the repository can be
+accessed via the HTTP protocol which will ask for the username and password, if
+necessary. An alternative is the SSH protocol which requires that a public SSH
+key of the user is stored on the GitLab server. Finally,
+<a class="reference internal" href="#gitlab-create-project-3"><span class="std std-numref">Figure 2.8</span></a> demonstrates how the information entered when
+setting up the project is used to create a minimal README file which is displayed
+in a formatted way at the bottom of the project page.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Information on how to create a SSH key can be found for example in the
+section <a class="reference external" href="https://docs.gitlab.com/ee/ssh/">GitLab and SSH keys</a> of the
+GitLab documentation.</p>
+</div>
+<figure class="align-center" id="id16">
+<span id="gitlab-create-project-4"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-4.png"><img alt="_images/gitlab-create-project-4.png" src="_images/gitlab-create-project-4.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.9 </span><span class="caption-text">On the setting page, other users can be invited to join the project and their
+permissions can be defined.</span><a class="headerlink" href="#id16" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id17">
+<span id="gitlab-create-project-5"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-5.png"><img alt="_images/gitlab-create-project-5.png" src="_images/gitlab-create-project-5.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.10 </span><span class="caption-text">A new team member has been added to the project as developer.</span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The previous discussion had already the idea of collaborative work on the
+project in mind. However, for the moment nobody has access to the project
+except the owner who had created the project. Additional team members can be
+invited in the settings menu by accessing the members page shown in
+<a class="reference internal" href="#gitlab-create-project-4"><span class="std std-numref">Figure 2.9</span></a>. Here, team members can be invited and their
+permissions can be defined. If a new team member should be able to contribute
+code to the project, he or she while typically take on the role of a developer.
+<a class="reference internal" href="#gitlab-create-project-5"><span class="std std-numref">Figure 2.10</span></a> shows that a new team member has been successfully
+added in the role of a developer. The project maintainer can remove team members
+at any time by clicking on the red icon on the right.</p>
+<p>We are now in a position to explore the collaborative workflow shown in
+<a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a>. There exists an alternative approach relying on protected branches
+which we do not cover here <a class="footnote-reference brackets" href="#protected-branches" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>.</p>
+<p>For the following discussion, we assume that user <code class="docutils literal notranslate"><span class="pre">boss</span></code> has created a
+project called <code class="docutils literal notranslate"><span class="pre">example</span></code> which can be accessed as indicated in
+<a class="reference internal" href="#gitlab-create-project-3"><span class="std std-numref">Figure 2.8</span></a>.  In our case, the HTTP access would be via
+the address <code class="docutils literal notranslate"><span class="pre">http://localhost:30080/boss/example.git</span></code> and for SSH access we
+would use <code class="docutils literal notranslate"><span class="pre">ssh://git&#64;localhost:30080/boss/example.git</span></code>. In a real
+application, be sure to replace these addresses by the addresses indicated on
+the project page. Maintainer <code class="docutils literal notranslate"><span class="pre">boss</span></code> has invited developer <code class="docutils literal notranslate"><span class="pre">gert</span></code> to the
+project team and the latter now has to set up his system to be able to
+contribute to project <code class="docutils literal notranslate"><span class="pre">example</span></code>. During the discussion, it might be useful to
+occasionally take a look at <a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a> in order to connect the details to
+the overall picture.</p>
+<figure class="align-center" id="id18">
+<span id="gitlab-developer-1"></span><a class="reference internal image-reference" href="_images/gitlab-developer-1.png"><img alt="_images/gitlab-developer-1.png" src="_images/gitlab-developer-1.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.11 </span><span class="caption-text">In order to navigate to a repository, one can for example search for it or
+use a direct link if one has joined the project recently. This page can be
+accessed by choosing “Profile” from the avatar menu in the upper right
+corner.</span><a class="headerlink" href="#id18" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>In a first step, user <code class="docutils literal notranslate"><span class="pre">gert</span></code> logs into the GitLab server and goes to the
+project <code class="docutils literal notranslate"><span class="pre">example</span></code> of user <code class="docutils literal notranslate"><span class="pre">boss</span></code>. A possibility to do so consists in
+searching for the project name in the dashboard as shown in
+<a class="reference internal" href="#gitlab-developer-1"><span class="std std-numref">Figure 2.11</span></a>. On the user’s profile page, there might be
+alternative ways like in <a class="reference internal" href="#gitlab-developer-1"><span class="std std-numref">Figure 2.11</span></a> where the repository is
+listed because the user joined it recently. At a later stage, it would also be
+possible to go via the forked repository or the list of contributed projects.
+In any case, the user <code class="docutils literal notranslate"><span class="pre">gert</span></code> will see a page looking almost like the one
+displayed in <a class="reference internal" href="#gitlab-create-project-3"><span class="std std-numref">Figure 2.8</span></a>. In particular, there will be a
+fork button which initiates the creation of a fork of the original project as
+a project of user <code class="docutils literal notranslate"><span class="pre">gert</span></code>. In the notation of <a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a>, a repository
+<code class="docutils literal notranslate"><span class="pre">origin</span></code> has been created as a copy of the present state of the repository
+<code class="docutils literal notranslate"><span class="pre">upstream</span></code>.</p>
+<p>According to <a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a>, the developer now needs to create a local
+repository for the project based on his or her own repository on the GitLab
+server, i.e. the repository referred to as <code class="docutils literal notranslate"><span class="pre">origin</span></code>. Using the URL shown
+in <a class="reference internal" href="#gitlab-create-project-3"><span class="std std-numref">Figure 2.8</span></a>, the repository is cloned into a local
+directory as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone ssh://git@localhost:30022/gert/example.git
+Cloning into &#39;example&#39; ...
+remote: Enumerating objects: 3, done.
+remote: Counting objects: 100% (3/3), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 3 (delta 0)
+Receiving objects: 100% (3/3), done.
+$ ls -a example
+.  ..  .git  README.md
+</pre></div>
+</div>
+<p>In the third line, the passphrase for the SSH key needs to be given. If the
+HTTP protocol were used, username and password would have been requested. In
+the last line we see that the directory <cite>.git</cite> has been created without the
+need of initializing the repository. By default, <cite>git clone</cite> transfers the
+repository with its complete history, unless only part of the history is
+requested by means of the <code class="docutils literal notranslate"><span class="pre">--depth</span></code> argument.</p>
+<p>In contrast to the previous sections, we are no longer only working with a
+local repository but also with the two remote repositories <code class="docutils literal notranslate"><span class="pre">origin</span></code> and
+<code class="docutils literal notranslate"><span class="pre">upstream</span></code> on the GitLab server. To find out which remote repositories are
+locally known, we go to the directory where the repository is located and use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git remote -v
+origin  ssh://git@localhost:30022/gert/example.git (fetch)
+origin  ssh://git@localhost:30022/gert/example.git (push)
+</pre></div>
+</div>
+<p>These lines tell us that the developer’s repository <code class="docutils literal notranslate"><span class="pre">example</span></code> on the remote
+server is available for read and write under the name <code class="docutils literal notranslate"><span class="pre">origin</span></code>. However, we
+also need access to the repository usually referred to as <code class="docutils literal notranslate"><span class="pre">upstream</span></code>. This
+can be achieved by telling Git about this remote repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git remote add upstream ssh://git@localhost:30022/boss/example.git
+$ git remote -v
+origin  ssh://git@localhost:30022/gert/example.git (fetch)
+origin  ssh://git@localhost:30022/gert/example.git (push)
+upstream        ssh://git@localhost:30022/boss/example.git (fetch)
+upstream        ssh://git@localhost:30022/boss/example.git (push)
+</pre></div>
+</div>
+<p>Now we can refer to the original remote repository as <code class="docutils literal notranslate"><span class="pre">upstream</span></code>. The existence
+of a channel for pushing does not necessarily imply that we have the permission
+to actually write to <code class="docutils literal notranslate"><span class="pre">upstream</span></code>.</p>
+<p>Being a developer on the <code class="docutils literal notranslate"><span class="pre">example</span></code> project, we want to contribute code to the
+project. Already in our discussion of the workflow within a purely local
+repository we have seen that it might be useful to do development work in
+dedicated branches. The same is true in a setup involving remote repositories.
+In the discussion of merge requests we will give an additional argument in
+favor of using dedicated branches for different aspects of development. While
+various approaches to the use of branches are possible, a judicious choice
+would be to attribute a special role to the master branch by keeping it in sync
+with the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> repository. By branching off from the <code class="docutils literal notranslate"><span class="pre">master</span></code> repository,
+the development activities can be kept close to the code on <code class="docutils literal notranslate"><span class="pre">upstream</span></code>, thereby
+facilitating a later merge into the main code base.</p>
+<p>The developer decides to contribute a “Hello world” script to the <code class="docutils literal notranslate"><span class="pre">example</span></code> project
+and first creates a new branch named <code class="docutils literal notranslate"><span class="pre">hello</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout -b hello
+Switched to a new branch &#39;hello&#39;
+$ git branch
+* hello
+  master
+</pre></div>
+</div>
+<p>We already now how to commit a script to the new branch. After doing so, the content
+of the main directory is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ls -a
+.  ..  .git  hello.py  README.md
+</pre></div>
+</div>
+<p>and the history reads:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --decorate
+* 313a6a5 (HEAD -&gt; hello) hello world script added
+* 7219a23 (origin/master, origin/HEAD, master) Initial commit
+</pre></div>
+</div>
+<p>The local branch <code class="docutils literal notranslate"><span class="pre">master</span></code> as well as the remote branch <code class="docutils literal notranslate"><span class="pre">origin/master</span></code> are still
+at the initial commit <code class="docutils literal notranslate"><span class="pre">7219a23</span></code> while the local branch <code class="docutils literal notranslate"><span class="pre">hello</span></code> is one commit
+ahead. The remote repository <code class="docutils literal notranslate"><span class="pre">origin</span></code> is not aware of the new branch yet. Furthermore,
+the local repository has not yet any information about the remote repository <code class="docutils literal notranslate"><span class="pre">upstream</span></code>.</p>
+<p>In a next step, the developer pushes the new commit or several of them to the
+remote repository <code class="docutils literal notranslate"><span class="pre">origin</span></code> where he or she has write permission:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push -u origin hello
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 328 bytes | 328.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+remote:
+remote: To create a merge request for hello, visit:
+remote:   http://localhost:30080/gert/example/merge_requests/new?merge_request%5Bsource_branch%5D=hello
+remote:
+To ssh://localhost:30022/gert/example.git
+ * [new branch]      hello -&gt; hello
+Branch &#39;hello&#39; set up to track remote branch &#39;hello&#39; from &#39;origin&#39;.
+</pre></div>
+</div>
+<figure class="align-center" id="id19">
+<span id="gitlab-developer-2"></span><a class="reference internal image-reference" href="_images/gitlab-developer-2.png"><img alt="_images/gitlab-developer-2.png" src="_images/gitlab-developer-2.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.12 </span><span class="caption-text">The script <code class="docutils literal notranslate"><span class="pre">hello.py</span></code> has been successfully pushed to the remote branch
+<code class="docutils literal notranslate"><span class="pre">origin/hello</span></code>. It can now be brought to the remote repository <code class="docutils literal notranslate"><span class="pre">upstream</span></code>
+by means of a merge request.</span><a class="headerlink" href="#id19" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Actually, two things have happened here at the same time. The commit <code class="docutils literal notranslate"><span class="pre">313a6a5</span></code> was
+pushed to the branch <code class="docutils literal notranslate"><span class="pre">hello</span></code> on <code class="docutils literal notranslate"><span class="pre">origin</span></code>. Because of the option <code class="docutils literal notranslate"><span class="pre">-u</span></code>, the local
+branch was associated with the remote branch. From now on, if one wants to push
+commits from the local branch <code class="docutils literal notranslate"><span class="pre">hello</span></code> to the corresponding remote branch, it suffices
+to use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code>. This is not only shorter to type but also avoids to accidentally
+push commits to the wrong branch. We can verify that the commit is now present on the
+remote server either by means of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --decorate
+313a6a5 (HEAD -&gt; hello, origin/hello) hello world script added
+7219a23 (origin/master, origin/HEAD, master) Initial commit
+</pre></div>
+</div>
+<p>where commit <code class="docutils literal notranslate"><span class="pre">313a6a5</span></code> now also refers to <code class="docutils literal notranslate"><span class="pre">origin/hello</span></code>. Alternatively,
+one can take a look at the project page on the GitLab server which will look
+like <a class="reference internal" href="#gitlab-developer-2"><span class="std std-numref">Figure 2.12</span></a>. Make sure that the branch has been changed
+from <code class="docutils literal notranslate"><span class="pre">master</span></code> to <code class="docutils literal notranslate"><span class="pre">hello</span></code> because that is where the script has been pushed
+to. It is not and should not be present in <code class="docutils literal notranslate"><span class="pre">origin/master</span></code> at this point.</p>
+<p>Following the workflow displayed in <a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a>, the developer might now want
+to contribute the new script to the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> repository. If the developer has
+no write access to this repository, he or she can make a merge request as we will
+explain now. If, on the other hand, the developer has write access to the <code class="docutils literal notranslate"><span class="pre">upstream</span></code>
+repository, he or she could push the script directly there. However, even with
+with write access it might be preferable to contribute code via a merge request
+and this could be the general policy applying even to maintainers. The advantage
+of merge requests is that other team members can automatically be informed about
+new contributions and have a chance to discuss them before they become part of
+the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> repository. As long as the person merging the submitted code
+is different from the submitter, a second pair of eyes can take a look at the
+code and spot potential problems. In the end, the project team or the team leaders
+have to decide which policy to follow.</p>
+<figure class="align-center" id="id20">
+<span id="gitlab-developer-3"></span><a class="reference internal image-reference" href="_images/gitlab-developer-3.png"><img alt="_images/gitlab-developer-3.png" src="_images/gitlab-developer-3.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.13 </span><span class="caption-text">GitLab page for the preparation of a new merge request.</span><a class="headerlink" href="#id20" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>On the project page shown in <a class="reference internal" href="#gitlab-developer-2"><span class="std std-numref">Figure 2.12</span></a>, there is a button in the
+upper right with the title “Create merge request” which does precisely what this
+title says. Clicking this button will bring up a page like the one depicted in
+<a class="reference internal" href="#gitlab-developer-3"><span class="std std-numref">Figure 2.13</span></a>. It is important to give a descriptive title as it
+will appear in a list of potentially many merge requests. In addition, the purpose
+of the merge request as well as additional relevant information like design
+considerations should be stated in the description field. Optionally, labels can
+be attributed to the merge request or merge requests can be assigned to milestones.
+As these possibilities are mostly of interest in larger projects, we will not
+discuss them any further here.</p>
+<p>At this point, it is appropriate to give the use of branches a bit more consideration.
+Suppose that the merge request is not merged into <code class="docutils literal notranslate"><span class="pre">upstream</span></code> right away and
+that the developer is continuing development. After some time, he or she will
+commit the new work to the <code class="docutils literal notranslate"><span class="pre">hello</span></code> branch on <code class="docutils literal notranslate"><span class="pre">origin</span></code>. Then this new commit
+will automatically be part of the present merge request even though the new
+commit might not be logically related to the merge request. In such a situation,
+it is better to start a new branch, probably based on the local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch.</p>
+<figure class="align-center" id="id21">
+<span id="gitlab-developer-4"></span><a class="reference internal image-reference" href="_images/gitlab-developer-4.png"><img alt="_images/gitlab-developer-4.png" src="_images/gitlab-developer-4.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.14 </span><span class="caption-text">A merge request can be discussed. It can be merged and closed or even closed
+without merging if the code has been found to be unsuitable for the project.
+The page shown here assumes that the user logged in has write permission for
+the project.</span><a class="headerlink" href="#id21" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Even though the merge request is based on code in the repository <code class="docutils literal notranslate"><span class="pre">origin</span></code>, it
+will appear in the list of merge requests for the repository <code class="docutils literal notranslate"><span class="pre">upstream</span></code> because
+that is where the code should be merged. The page of an open merge request looks
+similar to <a class="reference internal" href="#gitlab-developer-4"><span class="std std-numref">Figure 2.14</span></a>. It offers the possibility to view the
+commits included in the merge request and to comment on them. Persons with write
+permission on <code class="docutils literal notranslate"><span class="pre">upstream</span></code> have the possibility to merge the commits contained
+in the merge request and to close it afterwards. If the code should not be
+included in <code class="docutils literal notranslate"><span class="pre">upstream</span></code>, the merge request can also be closed without merging.
+In this case, reasons should of course be given in the discussion section.
+Let us assume that the maintainer merges the commits in the merge request without
+further discussion and closes the merge request.</p>
+<p>The developer’s code has successfully found its way to the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> repository.
+However, his or her local repository does not yet reflect this change. It is now
+time to complete the circle depicted in <a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a> and to get the changes
+from the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> repository into the local repository. We will assume that
+we organise our branches in such a way that the local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch should be
+kept in sync with the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch in the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> repository. If we
+are still in the development branch <code class="docutils literal notranslate"><span class="pre">hello</span></code>, it is now time to go back to the
+<code class="docutils literal notranslate"><span class="pre">master</span></code> branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout master
+Switched to branch &#39;master&#39;
+Your branch is up-to-date with &#39;origin/master&#39;.
+</pre></div>
+</div>
+<p>Now, we have two options. With <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span> <span class="pre">upstream</span> <span class="pre">master</span></code>, the present state
+of the remote branch <code class="docutils literal notranslate"><span class="pre">master</span></code> on <code class="docutils literal notranslate"><span class="pre">upstream</span></code> would be downloaded and merged
+into the present local branch. For a better control of the process, one can split
+it into two steps:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git fetch upstream
+remote: Enumerating objects: 1, done.
+remote: Counting objects: 100% (1/1), done.
+remote: Total 1 (delta 0), reused 0 (delta 0)
+Unpacking objects: 100% (1/1), done.
+ * [new branch]    master     -&gt; upstream/master
+$ git merge upstream/master
+Updating 7219a23..e55831a
+Fast-forward
+ hello.py | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 hello.py
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">fetch</span></code> gets new objects from the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch and <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">merge</span> <span class="pre">upstream/master</span></code>
+merges the objects from the remote branch <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>. The history of the
+local <code class="docutils literal notranslate"><span class="pre">master</span></code> repository looks as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --graph --decorate --all
+*   e55831a (HEAD -&gt; master, upstream/master) Merge branch &#39;hello&#39; into &#39;master&#39;
+|\
+| * 313a6a5 (origin/hello, hello) hello world script added
+|/
+* 7219a23 (origin/master, origin/HEAD) Initial commit
+</pre></div>
+</div>
+<p>As we can see, the local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch and the remote <code class="docutils literal notranslate"><span class="pre">master</span></code> branch on the <code class="docutils literal notranslate"><span class="pre">upstream</span></code>
+repository are in sync while the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch on the <code class="docutils literal notranslate"><span class="pre">origin</span></code> repository is still
+in its original state. This makes sense because the hello world script was pushed to
+the <code class="docutils literal notranslate"><span class="pre">hello</span></code> repository on the <code class="docutils literal notranslate"><span class="pre">origin</span></code> repository, but not its <code class="docutils literal notranslate"><span class="pre">master</span></code> branch.
+We can change this by pushing the local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch to <code class="docutils literal notranslate"><span class="pre">origin</span></code>.</p>
+<p>Before doing so, let us remove the <code class="docutils literal notranslate"><span class="pre">hello</span></code> branch which we do not need anymore:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push origin --delete hello
+To ssh://localhost:30022/gert/example.git
+ - [deleted]         hello
+$ git branch -d hello
+Deleted branch hello (war 313a6a5).
+</pre></div>
+</div>
+<figure class="align-center" id="id22">
+<span id="gitlab-developer-5"></span><a class="reference internal image-reference" href="_images/gitlab-developer-5.png"><img alt="_images/gitlab-developer-5.png" src="_images/gitlab-developer-5.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.15 </span><span class="caption-text">At the tab “Settings - Branches” individual branches or all merged branches can
+be removed.</span><a class="headerlink" href="#id22" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The first command deleted the remote branch. As an alternative way, one can use
+the GitLab web interface as shown in <a class="reference internal" href="#gitlab-developer-5"><span class="std std-numref">Figure 2.15</span></a>. There
+individual branches or all merged branches can be removed. However, the local
+references to the remote branches are not yet deleted. If one wants to remove
+references to branches on <code class="docutils literal notranslate"><span class="pre">origin</span></code> which do no longer exist, one can use
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">remote</span> <span class="pre">prune</span> <span class="pre">origin</span></code>. The second command above deletes the local
+branch, provided that no unmerged commits are still present. One can force
+deletion of the branch with the option <code class="docutils literal notranslate"><span class="pre">-D</span></code> but may risk the loss of data.
+Using <code class="docutils literal notranslate"><span class="pre">-D</span></code> instead of <code class="docutils literal notranslate"><span class="pre">-d</span></code> should thus be done with care.</p>
+<p>After pushing the local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch to <code class="docutils literal notranslate"><span class="pre">origin</span></code>, the log looks as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push origin master
+Counting objects: 1, done.
+Writing objects: 100% (1/1), 281 bytes | 281.00 KiB/s, done.
+Total 1 (delta 0), reused 0 (delta 0)
+To ssh://localhost:30022/gert/example.git
+   7219a23..e55831a  master -&gt; master
+$ git log --oneline --decorate --graph
+*   e55831a (HEAD -&gt; master, upstream/master, origin/master, origin/HEAD) Merge branch &#39;hello&#39; into &#39;master&#39;
+|\
+| * 313a6a5 hello world script added
+|/
+* 7219a23 Initial commit
+</pre></div>
+</div>
+<p>All three <code class="docutils literal notranslate"><span class="pre">master</span></code> branches are now in the same state and we have completed a basic
+development cycle.</p>
+</section>
+<section id="sundry-topics">
+<h2><span class="section-number">2.8. </span>Sundry topics<a class="headerlink" href="#sundry-topics" title="Link to this heading">¶</a></h2>
+<section id="stashing">
+<h3><span class="section-number">2.8.1. </span>Stashing<a class="headerlink" href="#stashing" title="Link to this heading">¶</a></h3>
+<p>In the previous sections, we have only discussed the basic workflows with Git
+and certainly did not even attempt to be complete. In the day-to-day work with
+a Git repository, certain problems occasionally arise. Some of them will be
+discussed in this section.</p>
+<p>For the first scenario, let us assume that we have created a <code class="docutils literal notranslate"><span class="pre">dev</span></code> branch
+where we modified the <code class="docutils literal notranslate"><span class="pre">hello.py</span></code> script and committed the new version. We
+can then change between branches without any problem:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout -b dev
+Switched to a new branch &#39;dev&#39;
+$ cat hello.py
+print(&quot;Hello world!&quot;)
+print(&quot;Hello world!&quot;)
+print(&quot;Hello world!&quot;)
+$ git commit -a -m&#39;repetitive output of message&#39;
+[dev 01dc5a1] repetitive output of message
+ 1 file changed, 2 insertions(+)
+$ git checkout master
+Switched to branch &#39;master&#39;
+Your branch is up-to-date with &#39;origin/master&#39;.
+$ git checkout dev
+Switched to branch &#39;dev&#39;
+</pre></div>
+</div>
+<p>The situation is different if we do not commit the changes. In the following
+example, we have implemented the repetitive output by means of a for loop
+but did not commit the change. Git now does not allow us to change to the
+<code class="docutils literal notranslate"><span class="pre">master</span></code> branch because we might lose data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat hello.py
+for _ in range(3):
+    print(&quot;Hello world!&quot;)
+$ git checkout master
+error: Your local changes to the following files would be overwritten by checkout:
+        hello.py
+Please commit your changes or stash them before you switch branches.
+Aborting
+</pre></div>
+</div>
+<p>We could force Git to change branches by means of the option <code class="docutils literal notranslate"><span class="pre">-f</span></code> but probably
+it is a better idea to follow the advice given by Git and to commit or stash the changes. We
+know about committing but what does stashing mean? The idea is to pack away the
+uncommitted changes so that they can be retrieved when we return to the <code class="docutils literal notranslate"><span class="pre">dev</span></code>
+branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git stash
+Saved working directory and index state WIP on dev: 01dc5a1 repetitive output of message
+$ git checkout master
+Switched to branch &#39;master&#39;
+Your branch is up-to-date with &#39;origin/master&#39;.
+$ git checkout dev
+Switched to branch &#39;dev&#39;
+$ cat hello.py
+print(&quot;Hello world!&quot;)
+print(&quot;Hello world!&quot;)
+print(&quot;Hello world!&quot;)
+</pre></div>
+</div>
+<p>After stashing the changes, Git allowed us to switch back and forth between the
+<code class="docutils literal notranslate"><span class="pre">master</span></code> and <code class="docutils literal notranslate"><span class="pre">dev</span></code> branch. However, after returning to the <code class="docutils literal notranslate"><span class="pre">dev</span></code> branch
+it looks as if the script with the for loop were lost. Fortunately, this is not
+the case as becomes clear from listing the content of the stash. One can retrieve
+the modified script by popping it from the stash:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git stash list
+stash@{0}: WIP on dev: 01dc5a1 repetitive output of message
+$ git stash pop
+On branch dev
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+
+        modified:       hello.py
+
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+Dropped refs/stash@{0} (049ca57b4dda40d0869129482e2d216f82186d75)
+$ cat hello.py
+for _ in range(3):
+    print(&quot;Hello world!&quot;)
+</pre></div>
+</div>
+<p>As the code example given above demonstrates, one can list the content of the
+stash. However, after some time it is easy to forget that one has stashed code
+in the first place. Therefore, stashing is most suited for brief interruptions
+where one needs to change branches for a short period of time. Otherwise,
+committing the changes might be a better solution.</p>
+</section>
+<section id="tagging">
+<h3><span class="section-number">2.8.2. </span>Tagging<a class="headerlink" href="#tagging" title="Link to this heading">¶</a></h3>
+<p>As we know, a specific revision of the code can be specified by means of its
+SHA1 value. Occasionally, it is useful to tag a revision with a name for easier
+reference. For example, one might want to introduce different versions of the
+code tagged by labels like <code class="docutils literal notranslate"><span class="pre">v1</span></code>, <code class="docutils literal notranslate"><span class="pre">v2</span></code> and so on.</p>
+<p>The present revision can be tagged as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git tag -a v1 -m &quot;first production release&quot;
+</pre></div>
+</div>
+<p>Here, the option <code class="docutils literal notranslate"><span class="pre">-a</span></code> means that an annotated tag is created which will
+have additional information very similar to a commit. There can be e.g. a message,
+here given by means of the option <code class="docutils literal notranslate"><span class="pre">-m</span></code>, the name of the tagger and the date.
+This information and more can be displayed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git show v1
+tag v1
+Tagger: Gert-Ludwig Ingold &lt;gert.ingold@physik.uni-augsburg.de&gt;
+Date:   Wed Oct 24 14:23:44 2018 +0200
+
+first production release
+
+commit d08b08646d933e0b7240cbbdbb194143ede1f29c (HEAD -&gt; master, tag: v1)
+Merge: a459aec 7a7b8f7
+Author: Gert-Ludwig Ingold &lt;gert.ingold@physik.uni-augsburg.de&gt;
+Date:   Mon Oct 22 09:28:03 2018 +0200
+
+    Merge branch &#39;dev&#39;
+</pre></div>
+</div>
+<p>It is also possible to tag older revisions by referring to a specific commit like
+in the following example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git tag -a v0.1 -m &quot;prerelease version&quot; a459aec
+$ git tag
+v0.1
+v1
+$ git log --oneline -n5
+d08b086 (HEAD -&gt; master, tag: v1) Merge branch &#39;dev&#39;
+7a7b8f7 added doc string
+a459aec (tag: v0.1) doc string added
+ac805d5 Merge branch &#39;dev&#39;
+41e9e21 function call added
+</pre></div>
+</div>
+<p>The logs demonstrate that indeed the tags are connected with a certain commit.
+In addition to annotated tags, there are also so-called light-weight tags which
+cannot contain further attributes. Usually, light-weight tags are employed if
+they are only temporarily needed.</p>
+<p>So far, the tag is only known to the local Git repository. In order for the tag
+to be known also on a remote repository like <code class="docutils literal notranslate"><span class="pre">origin</span></code>, one needs to push the
+information about the tag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push origin v1
+Enumerating objects: 1, done.
+Counting objects: 100% (1/1), done.
+Writing objects: 100% (1/1), 187 bytes | 187.00 KiB/s, done.
+Total 1 (delta 0), reused 0 (delta 0)
+To ssh://localhost:30022/gert/myrepo.git
+ * [new tag]         v1 -&gt; v1
+</pre></div>
+</div>
+<p>The tag is now also visible on the project’s web page as shown in <a class="reference internal" href="#gitlab-tag"><span class="std std-numref">Figure 2.16</span></a>.</p>
+<figure class="align-center" id="id23">
+<span id="gitlab-tag"></span><a class="reference internal image-reference" href="_images/gitlab-tag.png"><img alt="_images/gitlab-tag.png" src="_images/gitlab-tag.png" style="width: 30em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 2.16 </span><span class="caption-text">After a tag has been pushed to the remote repository, it can be used on the
+project’s web page to navigate to the commit associated with the tag.</span><a class="headerlink" href="#id23" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="detached-head-state">
+<h3><span class="section-number">2.8.3. </span>Detached head state<a class="headerlink" href="#detached-head-state" title="Link to this heading">¶</a></h3>
+<p>In <a class="reference internal" href="#git-branches"><span class="std std-numref">Section 2.6</span></a>, we have seen that we can move between the last commits
+in different branches. However, we may not only be interested in the most recent
+version of the code. After all, the whole point in keeping the history of a project
+is to be able to inspect older versions.</p>
+<p>There is a number of different ways of specifying commits in Git and we will only
+mention a few ones. One possibility is to use the SHA1 value of the commit. In general,
+the seven first hex digits will be sufficient. If a commit has been tagged as
+described in the previous section, the tag can be used instead. It is also possible
+to use a relative notation. For example, the first ancestor of <code class="docutils literal notranslate"><span class="pre">HEAD</span></code> can be
+obtained by means of <code class="docutils literal notranslate"><span class="pre">HEAD^</span></code>. Note though that if the commit was generated by
+a merge, more than one ancestors can exist. For details of how in such situation
+to address a commit relative to another commit is explained in the git documentation,
+see e.g.,</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$git help revisions
+GITREVISIONS(7)                   Git Manual                   GITREVISIONS(7)
+
+NAME
+       gitrevisions - Specifying revisions and ranges for Git
+
+SYNOPSIS
+       gitrevisions
+
+DESCRIPTION
+       Many Git commands take revision parameters as arguments. Depending on
+       the command, they denote a specific commit or, for commands which walk
+       the revision graph (such as git-log(1)), all commits which are
+       reachable from that commit. For commands that walk the revision graph
+       one can also specify a range of revisions explicitly.
+
+       In addition, some Git commands (such as git-show(1)) also take revision
+       parameters which denote other objects than commits, e.g. blobs
+       (&quot;files&quot;) or trees (&quot;directories of files&quot;).
+
+SPECIFYING REVISIONS
+       A revision parameter &lt;rev&gt; typically, but not necessarily, names a
+       commit object. It uses what is called an extended SHA-1 syntax. Here
+       [...]
+</pre></div>
+</div>
+<p>Here, we reproduced only part of the help text.</p>
+<p>Now let us suppose that the recent history of our repository looks as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d08b086</span> <span class="p">(</span><span class="n">HEAD</span> <span class="o">-&gt;</span> <span class="n">master</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="n">v1</span><span class="p">)</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">&#39;dev&#39;</span>
+<span class="mi">7</span><span class="n">a7b8f7</span> <span class="n">added</span> <span class="n">doc</span> <span class="n">string</span>
+<span class="n">a459aec</span> <span class="p">(</span><span class="n">tag</span><span class="p">:</span> <span class="n">v0</span><span class="mf">.1</span><span class="p">)</span> <span class="n">doc</span> <span class="n">string</span> <span class="n">added</span>
+<span class="n">ac805d5</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">&#39;dev&#39;</span>
+<span class="mf">41e9</span><span class="n">e21</span> <span class="n">function</span> <span class="n">call</span> <span class="n">added</span>
+<span class="mi">1</span><span class="n">bac36d</span> <span class="n">exclamation</span> <span class="n">mark</span> <span class="n">appended</span>
+<span class="n">d8d7313</span> <span class="n">default</span> <span class="n">value</span> <span class="k">for</span> <span class="n">repetitions</span> <span class="n">added</span>
+<span class="n">c95fa0e</span> <span class="n">new</span> <span class="n">argument</span> <span class="s1">&#39;name&#39;</span> <span class="n">added</span>
+</pre></div>
+</div>
+<p>For some reason, we want to take a look at commit <code class="docutils literal notranslate"><span class="pre">41e9e21</span></code> and decide to
+check this commit out:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout 41e9e21
+Note: checking out &#39;41e9e21&#39;.
+
+You are in &#39;detached HEAD&#39; state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b &lt;new-branch-name&gt;
+
+HEAD is now at 41e9e21 function call added
+$ git branch
+* (HEAD detached at 41e9e21)
+  master
+</pre></div>
+</div>
+<p>The important point here is that the branch is in a so-called “detached head state”.
+At first sight, this branch behaves like a usual branch where we can look around
+and even commit changes. However, once we leave the branch, there is no way to
+get back to these commits. As Git explains in the message reproduced above, one
+needs to check out the branch into a regular new branch if one wants to keep
+the commits generated in a branch in a “detached head state”. If one forgets
+to do so, Git will give the following warning:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout master
+Warning: you are leaving 1 commit behind, not connected to
+any of your branches:
+
+  4d252a9 &#39;how are you&#39; added
+
+If you want to keep it by creating a new branch, this may be a good time
+to do so with:
+
+ git branch &lt;new-branch-name&gt; 4d252a9
+
+Switched to branch &#39;master&#39;
+</pre></div>
+</div>
+<p>The new branch needs to be created before garbage collection destroys the
+commit <code class="docutils literal notranslate"><span class="pre">4d252a9</span></code>.</p>
+</section>
+<section id="manipulating-history">
+<h3><span class="section-number">2.8.4. </span>Manipulating history<a class="headerlink" href="#manipulating-history" title="Link to this heading">¶</a></h3>
+<p>Travelling back in time and changing the past can have strange effects on the
+future. What is well known to readers of science fiction also applies to some
+extent to users of Git. Occasionally, it is tempting to correct the history of
+the repository. Reasons can be for example typos in commit messages or stupid
+mistakes in the code. When code is concerned, it usually is preferable to
+simply correct mistakes in a new commit. On the other hand, it sometimes might
+make sense to remove a certain commit from the history. It also happens that
+right after committing code one realizes that there was a typo in the commit
+message. Correcting the message is still possible and usually is not harmful.</p>
+<p>Generally speaking, one can get away with manipulations of the history of a
+repository as long as the part of the history affected by the manipulations
+is still completely local. Once the relevant commits have been pushed to
+a remote repository and others have pulled these commits into their own
+repositories, changing the history is a potentially great way to make
+fellow developers very unhappy, something which you definitely want to avoid.</p>
+<p>Frequently it happens that one commits code and realizes immediately that
+the commit message contains a typo. It is rather straightforward to correct
+such a mistake locally. Suppose that “How are you?” has been added to the
+output of the script <code class="docutils literal notranslate"><span class="pre">hello.py</span></code> and that the recent history looks as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline -n5
+c7be5c2 (HEAD -&gt; master) &#39;Who are you&#39; added
+89f459f Merge branch &#39;dev&#39;
+7a7b8f7 added doc string
+a459aec (tag: v0.1) doc string added
+ac805d5 Merge branch &#39;dev&#39;
+</pre></div>
+</div>
+<p>Clearly, the commit message is wrong and even worse, it is misleading. The commit
+message of the last commit can be amended in the following way:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit --amend -m&quot;&#39;How are you?&#39; added&quot;
+[master 3eec1a6] &#39;How are you?&#39; added
+ Date: Fri Oct 26 14:49:03 2018 +0200
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+$ git log --oneline -n5
+3eec1a6 (HEAD -&gt; master) &#39;How are you?&#39; added
+89f459f Merge branch &#39;dev&#39;
+7a7b8f7 added doc string
+a459aec (tag: v0.1) doc string added
+ac805d5 Merge branch &#39;dev&#39;
+</pre></div>
+</div>
+<p>If the option <code class="docutils literal notranslate"><span class="pre">-m</span></code> is omitted, an editor will be opened to allow you to enter
+the new commit message.</p>
+<p>If you have made a commit erroneously and want to get rid of it, <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">reset</span></code> can
+be used to reset <code class="docutils literal notranslate"><span class="pre">HEAD</span></code> to another commit. For example, <code class="docutils literal notranslate"><span class="pre">HEAD^</span></code> denotes the
+first parent of <code class="docutils literal notranslate"><span class="pre">HEAD</span></code> so that the last commit can be removed by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git reset --hard HEAD^
+HEAD is now at 89f459f Merge branch &#39;dev&#39;
+$ git log --oneline -n5
+89f459f (HEAD -&gt; master) Merge branch &#39;dev&#39;
+7a7b8f7 added doc string
+a459aec (tag: v0.1) doc string added
+ac805d5 Merge branch &#39;dev&#39;
+41e9e21 function call added
+</pre></div>
+</div>
+<p>As a result, commit <code class="docutils literal notranslate"><span class="pre">3eec1a6</span></code> is gone.</p>
+<p>More general changes are possible by means of an interactive rebase. Rebase applies
+commits on top of a base tip and doing so interactively allows to decide which
+commits should actually be applied. While a rebase can be done within a single
+branch, we will directly proceed to the discussion of a rebase across two branches.
+Suppose that we have the following history:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --graph --all
+* 06933ed (master) headline modified
+| * e0ac1ba (HEAD -&gt; dev) add __name__ to output
+| * 8c167c1 Test output amended
+|/
+* 99091f2 Test script added
+</pre></div>
+</div>
+<p>The test script <code class="docutils literal notranslate"><span class="pre">test.py</span></code> should output some headline and the content of the
+variable <code class="docutils literal notranslate"><span class="pre">__name__</span></code>.  In the development branch, this headline has been
+modified and a print statement for the variable <code class="docutils literal notranslate"><span class="pre">__name__</span></code> was added. On the
+other hand, the headline has been modified in the master branch as well. For
+further development, the headline from the master branch should be used, so
+commit <code class="docutils literal notranslate"><span class="pre">8c167c1</span></code> should be replaced by <code class="docutils literal notranslate"><span class="pre">06933ed</span></code>. So solve this issue, an
+interactive rebase is done on <code class="docutils literal notranslate"><span class="pre">master</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git rebase -i master
+</pre></div>
+</div>
+<p>An editor opens and displays the following information:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pick 8c167c1 Test output amended
+pick e0ac1ba add __name__ to output
+
+# Rebase 06933ed..e0ac1ba onto 06933ed (2 commands)
+#
+# Commands:
+# p, pick &lt;commit&gt; = use commit
+# r, reword &lt;commit&gt; = use commit, but edit the commit message
+# e, edit &lt;commit&gt; = use commit, but stop for amending
+# s, squash &lt;commit&gt; = use commit, but meld into previous commit
+# f, fixup &lt;commit&gt; = like &quot;squash&quot;, but discard this commit&#39;s log message
+# x, exec &lt;command&gt; = run command (the rest of the line) using shell
+# d, drop &lt;commit&gt; = remove commit
+# l, label &lt;label&gt; = label current HEAD with a name
+# t, reset &lt;label&gt; = reset HEAD to a label
+# m, merge [-C &lt;commit&gt; | -c &lt;commit&gt;] &lt;label&gt; [# &lt;oneline&gt;]
+# .       create a merge commit using the original merge commit&#39;s
+# .       message (or the oneline, if no original merge commit was
+# .       specified). Use -c &lt;commit&gt; to reword the commit message.
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+#       However, if you remove everything, the rebase will be aborted.
+#
+#
+# Note that empty commits are commented out
+</pre></div>
+</div>
+<p>Replacing <code class="docutils literal notranslate"><span class="pre">pick</span></code> by <code class="docutils literal notranslate"><span class="pre">drop</span></code> in front of commit <code class="docutils literal notranslate"><span class="pre">8c167c1</span></code> and leaving the
+editor, git answers</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Auto-merging test.py
+CONFLICT (content): Merge conflict in test.py
+error: could not apply e0ac1ba... add __name__ to output
+
+Resolve all conflicts manually, mark them as resolved with
+&quot;git add/rm &lt;conflicted_files&gt;&quot;, then run &quot;git rebase --continue&quot;.
+You can instead skip this commit: run &quot;git rebase --skip&quot;.
+To abort and get back to the state before &quot;git rebase&quot;, run &quot;git rebase --abort&quot;.
+
+Could not apply e0ac1ba... add __name__ to output
+</pre></div>
+</div>
+<p>The merge conflict needs to be resolved in the usual way so that the rebase can be
+continued:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git add test.py
+$ git rebase --continue
+[detached HEAD 7c9c8d1] add __name__ to output
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+Successfully rebased and updated refs/heads/dev.
+</pre></div>
+</div>
+<p>The rebase operation was successfully carried out and the new history is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --graph --all
+* 7c9c8d1 (HEAD -&gt; dev) add __name__ to output
+* 06933ed (master) headline modified
+* 99091f2 Test script added
+</pre></div>
+</div>
+<p>Now, commit <code class="docutils literal notranslate"><span class="pre">7c9c8d1</span></code> is following directly after commit <code class="docutils literal notranslate"><span class="pre">06933ed</span></code>.</p>
+<p>Two comments are in order here. The SHA1 hash of the commit with the commit
+message <code class="docutils literal notranslate"><span class="pre">add</span> <span class="pre">__name__</span> <span class="pre">to</span> <span class="pre">output</span></code> has changed from <code class="docutils literal notranslate"><span class="pre">e0ac1ba</span></code> to <code class="docutils literal notranslate"><span class="pre">7c9c8d1</span></code>.
+Rebasing thus will create significant problems if the commits of the development
+branch have been pushed to a remote branch and pulled from there by other developers
+before the rebasing has been carried out. It is therefore strongly recommended
+that rebasing is done only if local commits are applied. On the other hand, as we
+have seen, a rebase gives us the opportunity to take into account what has happened
+in the master branch and to resolve merge conflicts. In this way it can be avoided
+that a merge request containing commits from the development branch will contain
+merge conflicts with the master branch.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="gitlab-uaux" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>The computing center of the University of Augsburg is running
+a GitLab server at <code class="docutils literal notranslate"><span class="pre">git.rz.uni-augsburg.de</span></code> which is accessible to anybody
+in possession of a valid user-ID of the computing center.</p>
+</aside>
+<aside class="footnote brackets" id="github-master-main" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>On Github, the default branch nowadays is called <code class="docutils literal notranslate"><span class="pre">main</span></code>
+instead of <code class="docutils literal notranslate"><span class="pre">master</span></code>.</p>
+</aside>
+<aside class="footnote brackets" id="sha1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>SHA-1 is a hash checksum which characterizes an object but does not
+allow to reconstruct it. Consisting of 160 bits, it allows for
+<span class="math notranslate nohighlight">\(2^{160}\approx 10^{48}\)</span> different values.</p>
+</aside>
+<aside class="footnote brackets" id="add-p" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>Occasionally, one has made several changes which should be separated
+into different atomic commits. In such a case <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span> <span class="pre">-p</span></code> might come in
+handy as it allows to select chunks of code while adding a file to the
+staging area.</p>
+</aside>
+<aside class="footnote brackets" id="merge-pull" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>On GitHub, instead of “merge request” the term “pull request” is
+used, meaning the same.</p>
+</aside>
+<aside class="footnote brackets" id="protected-branches" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
+<p>More information on working with protected branches can
+be found at <a class="reference external" href="https://docs.gitlab.com/ee/user/project/protected_branches.html">Protected Branches</a>
+in the GitLab documentation.</p>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="introduction.html"><span class="section-number">1. </span>Introduction</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="testing.html"><span class="section-number">3. </span>Testing of code</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2018—2022, Gert-Ludwig Ingold, license: CC BY 4.0 International.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

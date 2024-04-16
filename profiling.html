@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>5. Run-time analysis &#8212; Tools for Scientific Computing 0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=e491ac2d" />
+    <script src="_static/documentation_options.js?v=b489f392"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="6. Documentation of code" href="documenting.html" />
+    <link rel="prev" title="4. Scientific computing with NumPy and SciPy" href="numpy.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Tools for Scientific Computing 0.3 documentation</span></a></h1>
+        <h2 class="heading"><span>5. Run-time analysis</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="numpy.html"><span class="section-number">4. </span>Scientific computing with NumPy and SciPy</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="documenting.html"><span class="section-number">6. </span>Documentation of code</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <section id="run-time-analysis">
+<span id="profiling"></span><h1><span class="section-number">5. </span>Run-time analysis<a class="headerlink" href="#run-time-analysis" title="Link to this heading">¶</a></h1>
+<section id="general-remarks">
+<h2><span class="section-number">5.1. </span>General remarks<a class="headerlink" href="#general-remarks" title="Link to this heading">¶</a></h2>
+<p>Frequently, the numerical treatment of scientific problems can lead to
+time-consuming code and the question arises how its performance can be
+improved. There exist a variety of different kinds of approaches. One could for
+example choose to make use of more powerful hardware or distribute the task on
+numerous compute nodes of a compute cluster. Even though today, human resources
+tend to be more costly than hardware resource, the latter should not be wasted
+by very inefficient code.</p>
+<p>In certain cases, speed can be improved by making use of graphical processors (GPU)
+which are able to handle larger data sets in parallel. While writing code for
+GPUs may be cumbersome, there exists for example the CuPy library <a class="footnote-reference brackets" href="#cupy" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> which
+can serve as a drop-in replacement for most of the NumPy library and will run
+on NVIDIA GPUs.</p>
+<p>On the software side, an option is to make use of optimized code provided by
+numerical libraries like NumPy and SciPy discussed in
+<a class="reference internal" href="numpy.html#scientific-libraries"><span class="std std-numref">Section 4</span></a>. Sometimes, it can make sense to implement
+particularly time-consuming parts in the programming language C for which
+highly optimizing compilers are available. This approach does not necessarily
+require to write proper C code. One can make use of Cython <a class="footnote-reference brackets" href="#cython" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> instead,
+which will autogenerate C code from Python-like code.</p>
+<p>Another option is the use of <em>just in time</em> (JIT) compilers as is done in PyPy
+<a class="footnote-reference brackets" href="#pypy" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> and Numba <a class="footnote-reference brackets" href="#numba" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>. The latter is readily available through the
+Anaconda distribution and offers an easy approach to speeding up time-critical
+parts of the code by simply adding a decorator to a function. Generally, JIT
+compilers analyze the code before its first execution and create machine code
+allowing to run the code faster in subsequent calls.</p>
+<p>While some of the methods just mentioned can easily be implemented, others may
+require a significant investment of time. One therefore needs to assess whether
+the gain in compute time really exceeds the cost in developer time. It is worth
+following the advice of the eminent computer scientist Donald E. Knuth
+<a class="footnote-reference brackets" href="#dek-tex" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> who wrote already 45 years ago <a class="footnote-reference brackets" href="#knuth-quote" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a></p>
+<blockquote>
+<div><p>There is no doubt that the grail of efficiency leads to abuse. Programmers
+waste enormous amounts of time thinking about, or worrying about, the speed
+of noncritical parts of their programs, and these attempts at efficiency
+actually have a strong negative impact when debugging and maintenance are
+considered. We <em>should</em> forget about small efficiencies, say about 97 % of the
+time: premature optimization is the root of all evil.</p>
+<p>Yet we should not pass up our opportunities in that critical 3 %. A good
+programmer will not be lulled into complacency by such reasoning, he will be
+wise to look carefully at the critical code; but only after that code has
+been identified.</p>
+</div></blockquote>
+<p>Before beginning to optimize code, it is important to identify the parts where
+most of the time is spent and the rest of this chapter will be devoted to
+techniques allowing to do so. At this point, it is worth emphasizing that a
+piece of code executed relatively fast can be more relevant than a piece of
+code executed slowly if the first one is executed very often while the second
+one is executed only once.</p>
+<p>Code optimization often entails a risk for bugs to enter the code. Obviously,
+fast-running code is not worth anything if it does not produce correct results.
+It can then be very reassuring if one can rely on a comprehensive test suite
+(<a class="reference internal" href="testing.html#testing"><span class="std std-numref">Section 3</span></a>) and if one has made use of a version control system
+(<a class="reference internal" href="git.html#version-control"><span class="std std-numref">Section 2</span></a>) during code development and code optimization.</p>
+<p>Before discussing techniques for timing code execution, we will discuss a few
+potential pitfalls.</p>
+</section>
+<section id="some-pitfalls-in-run-time-analysis">
+<h2><span class="section-number">5.2. </span>Some pitfalls in run-time analysis<a class="headerlink" href="#some-pitfalls-in-run-time-analysis" title="Link to this heading">¶</a></h2>
+<p>A simple approach to performing a run-time analysis of code could consist in taking
+the time before and after the code is executed. The <code class="docutils literal notranslate"><span class="pre">time</span></code> module in the Python
+standard library offers the possibility to determine the current time:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">()</span>
+<span class="go">&#39;Thu Dec 27 11:13:33 2018&#39;</span>
+</pre></div>
+</div>
+<p>While this result is nicely readable, it is not well suited to calculate time differences.
+For this purpose, the seconds passed since the beginning of the epoch are better suited.
+On Unix systems, the epoch starts on January, 1970 at 00:00:00 UTC:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="go">1545905769.0189064</span>
+</pre></div>
+</div>
+<p>Now, it is straightforward to determine the time elapsed during the execution of a
+piece of code. The following code repeats the execution several times to convey an
+idea of the fluctuations to be expected.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">sum_of_ints</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000000</span><span class="p">):</span>
+        <span class="n">sum_of_ints</span> <span class="o">=</span> <span class="n">sum_of_ints</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="si">:</span><span class="s1">5.3f</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;  &#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Executing this code yields:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.142</span><span class="n">s</span>  <span class="mf">0.100</span><span class="n">s</span>  <span class="mf">0.093</span><span class="n">s</span>  <span class="mf">0.093</span><span class="n">s</span>  <span class="mf">0.093</span><span class="n">s</span>  <span class="mf">0.093</span><span class="n">s</span>  <span class="mf">0.092</span><span class="n">s</span>  <span class="mf">0.091</span><span class="n">s</span>  <span class="mf">0.091</span><span class="n">s</span>  <span class="mf">0.091</span><span class="n">s</span>
+</pre></div>
+</div>
+<p>Doing a second run on the same hardware, we obtained:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.131</span><span class="n">s</span>  <span class="mf">0.095</span><span class="n">s</span>  <span class="mf">0.085</span><span class="n">s</span>  <span class="mf">0.085</span><span class="n">s</span>  <span class="mf">0.088</span><span class="n">s</span>  <span class="mf">0.085</span><span class="n">s</span>  <span class="mf">0.084</span><span class="n">s</span>  <span class="mf">0.085</span><span class="n">s</span>  <span class="mf">0.085</span><span class="n">s</span>  <span class="mf">0.085</span><span class="n">s</span>
+</pre></div>
+</div>
+<p>While these numbers give an idea of the execution time, they should not be taken too
+literally. In particular, it makes sense to average over several loops. This is
+facilitated by the <code class="docutils literal notranslate"><span class="pre">timeit</span></code> module in the Python standard library which we will
+discuss in the following section.</p>
+<p>When performing run-time analysis as just described, one should be aware that a
+computer may be occupied by other tasks as well. In general, the total elapsed
+time will thus differ from the time actually needed to execute a specific piece
+of code. The <code class="docutils literal notranslate"><span class="pre">time</span></code> module therefore provides two functions. In addition to
+the <code class="docutils literal notranslate"><span class="pre">time</span></code> function which records the wall clock time, there exist a
+<code class="docutils literal notranslate"><span class="pre">process_time</span></code> function which counts the time attributed to the specific
+process running our Python script. The following example demonstrates the
+difference by intentionally letting the program pause for a second once in a
+while. Note, that although the execution of <code class="docutils literal notranslate"><span class="pre">time.sleep</span></code> occurs within the
+process under consideration, the time needed is ignored by <code class="docutils literal notranslate"><span class="pre">process_time</span></code>.
+Therefore, we can use <code class="docutils literal notranslate"><span class="pre">time.sleep</span></code> to simulate other activities of the computer,
+even if it is done in a somewhat inappropriate way.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">sum_of_ints</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">start_proc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">):</span>
+        <span class="n">sum_of_ints</span> <span class="o">=</span> <span class="n">sum_of_ints</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">end_proc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;total time:   </span><span class="si">{</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="si">:</span><span class="s1">5.3f</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;process time: </span><span class="si">{</span><span class="n">end_proc</span><span class="o">-</span><span class="n">start_proc</span><span class="si">:</span><span class="s1">5.3f</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In a run on the same hardware as used before, we find the following result:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">total</span> <span class="n">time</span><span class="p">:</span>   <span class="mf">10.207</span><span class="n">s</span>
+<span class="n">process</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.197</span><span class="n">s</span>
+</pre></div>
+</div>
+<p>The difference basically consists of the ten seconds spent while the code was
+sleeping.</p>
+<p>One should also be aware that enclosing the code in question in a function will
+lead to an additional contribution to the execution time. This particularly poses
+a problem if the execution of the code itself requires only little time. We compare
+the two scripts</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">sum_of_ints</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">start_proc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000000</span><span class="p">):</span>
+    <span class="n">sum_of_ints</span> <span class="o">=</span> <span class="n">sum_of_ints</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">end_proc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;process time: </span><span class="si">{</span><span class="n">end_proc</span><span class="o">-</span><span class="n">start_proc</span><span class="si">:</span><span class="s1">5.3f</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">def</span> <span class="nf">increment_by_one</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="n">sum_of_ints</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">start_proc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000000</span><span class="p">):</span>
+    <span class="n">increment_by_one</span><span class="p">(</span><span class="n">sum_of_ints</span><span class="p">)</span>
+<span class="n">end_proc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;process time: </span><span class="si">{</span><span class="n">end_proc</span><span class="o">-</span><span class="n">start_proc</span><span class="si">:</span><span class="s1">5.3f</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Tht first script takes on average over 10 runs 0.9 seconds while the second script
+takes 1.1 seconds and thus runs about 20% slower.</p>
+<p>Independently of the methods used and even if one of the methods discussed later is
+employed, a run-time analysis will always influence the execution of the code. The
+measured run time therefore will be larger than without doing any timing. However,
+we should still be able to identify the parts of the code which take most of the time.</p>
+<p>A disadvantage of the methods discussed so far consists in the fact that they require
+a modification of the code. Usually, it is desirable to avoid such modifications as
+much as possible. In the following sections, we will present a few timing techniques
+which can be used according to the specific needs.</p>
+</section>
+<section id="the-timeit-module">
+<h2><span class="section-number">5.3. </span>The <code class="docutils literal notranslate"><span class="pre">timeit</span></code> module<a class="headerlink" href="#the-timeit-module" title="Link to this heading">¶</a></h2>
+<p>Short isolated pieces of code can conveniently be analyzed by functions provided
+by the <code class="docutils literal notranslate"><span class="pre">timeit</span></code> module. By default, the average code execution time will be determined
+on the basis of one million of runs. As a first example, let us determine the execution
+time for the evaluation of the square of 0.5:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">timeit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="s1">&#39;0.5**2&#39;</span><span class="p">)</span>
+<span class="go">0.02171438499863143</span>
+</pre></div>
+</div>
+<p>The result is given in seconds. In view of one million of code executions, we obtain
+an execution time of 22 nanoseconds. If we want to use an argument, we cannot define
+it in the outer scope:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="s1">&#39;x**2&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;/opt/anaconda3/lib/python3.6/timeit.py&quot;</span>, line <span class="m">233</span>, in <span class="n">timeit</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">Timer</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">setup</span><span class="p">,</span> <span class="n">timer</span><span class="p">,</span> <span class="nb">globals</span><span class="p">)</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/anaconda3/lib/python3.6/timeit.py&quot;</span>, line <span class="m">178</span>, in <span class="n">timeit</span>
+<span class="w">    </span><span class="n">timing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="p">)</span>
+  File <span class="nb">&quot;&lt;timeit-src&gt;&quot;</span>, line <span class="m">6</span>, in <span class="n">inner</span>
+<span class="gr">NameError</span>: <span class="n">name &#39;x&#39; is not defined</span>
+</pre></div>
+</div>
+<p>Instead, we can pass the global namespace through the <code class="docutils literal notranslate"><span class="pre">globals</span></code> argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="s1">&#39;x**2&#39;</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
+<span class="go">0.103586286000791</span>
+</pre></div>
+</div>
+<p>As an alternative, one can explicitly assign the variable <code class="docutils literal notranslate"><span class="pre">x</span></code> in the second
+argument intended for setup code. Its execution time is not taken into account:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="s1">&#39;x**2&#39;</span><span class="p">,</span> <span class="s1">&#39;x=0.5&#39;</span><span class="p">)</span>
+<span class="go">0.08539198899961775</span>
+</pre></div>
+</div>
+<p>If we want to compare with the <code class="docutils literal notranslate"><span class="pre">pow</span></code> function of the <code class="docutils literal notranslate"><span class="pre">math</span></code> module, we have to
+add the import statement to the setup code as well:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="s1">&#39;math.pow(x, 2)&#39;</span><span class="p">,</span> <span class="s1">&#39;import math; x=0.5&#39;</span><span class="p">)</span>
+<span class="go">0.2346674630025518</span>
+</pre></div>
+</div>
+<p>A more complex example of the use of the <code class="docutils literal notranslate"><span class="pre">timeit</span></code> module compares the
+evaluation of a trigonometric function by means of a NumPy universal function
+with the use of the corresponding function of the <code class="docutils literal notranslate"><span class="pre">math</span></code> module:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">timeit</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="k">def</span> <span class="nf">f_numpy</span><span class="p">(</span><span class="n">nmax</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">nmax</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">f_math</span><span class="p">(</span><span class="n">nmax</span><span class="p">):</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="n">nmax</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">dx</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nmax</span><span class="p">)]</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="mf">0.31</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">300</span><span class="p">):</span>
+    <span class="n">nint</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">t_numpy</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="s1">&#39;f_numpy(nint)&#39;</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
+    <span class="n">t_math</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;f_math(nint)&quot;</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nint</span><span class="p">)</span>
+    <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_math</span><span class="o">/</span><span class="n">t_numpy</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;vector size&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$t_\mathrm</span><span class="si">{math}</span><span class="s1">/t_\mathrm</span><span class="si">{numpy}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The result is displayed in <a class="reference internal" href="#timeit-numpy"><span class="std std-numref">Figure 5.1</span></a>.</p>
+<figure class="align-center" id="id10">
+<span id="timeit-numpy"></span><a class="reference internal image-reference" href="_images/timeit_numpy.png"><img alt="_images/timeit_numpy.png" src="_images/timeit_numpy.png" style="width: 20em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 5.1 </span><span class="caption-text">Comparison of execution times of the sine functions taken from the NumPy
+package and from the <code class="docutils literal notranslate"><span class="pre">math</span></code> module for a range of vector sizes.</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>We close this section with two remarks. If one wants to assess the fluctuations of the
+measure execution times, one can replace the <code class="docutils literal notranslate"><span class="pre">timeit</span></code> function by the <code class="docutils literal notranslate"><span class="pre">repeat</span></code> function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="s1">&#39;x**2&#39;</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
+<span class="go">[0.1035151930009306, 0.07390781700087246, 0.06162133299949346,</span>
+<span class="go"> 0.05376200799946673, 0.05260805999932927, 0.05276966699966579,</span>
+<span class="go"> 0.05227632500100299, 0.052304120999906445, 0.0523306600007345,</span>
+<span class="go"> 0.05286436900132685]</span>
+</pre></div>
+</div>
+<p>For users of the IPython shell or the Jupyter notebook, the magics <code class="docutils literal notranslate"><span class="pre">%timeit</span></code> and <code class="docutils literal notranslate"><span class="pre">%%timeit</span></code>
+provide a simple way to time the execution of a single line of code or a code cell, respectively.
+These magics choose a reasonable number of repetitions to obtain good statistics within a
+reasonable amount of time.</p>
+</section>
+<section id="the-cprofile-module">
+<span id="cprofile"></span><h2><span class="section-number">5.4. </span>The <code class="docutils literal notranslate"><span class="pre">cProfile</span></code> module<a class="headerlink" href="#the-cprofile-module" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">timeit</span></code> module discussed in the previous section is useful to determine the
+execution time of one-liners or very short code segments. It is not very useful though
+to determine the compute-time intensive parts of a bigger program. If the program is
+nicely modularized in functions and methods, the <code class="docutils literal notranslate"><span class="pre">cProfile</span></code> module will be of help.
+It determines, how much time is spent in the individual functions and methods and thereby
+gives valuable information about which parts will benefit from code optimization.</p>
+<p>We consider as a specific example the quantum mechanical time evolution of a
+narrow Gaussian wave packet initially localized at the center of an infinite
+potential well <a class="footnote-reference brackets" href="#carpets" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>. The initial state is decomposed in the
+appropriately truncated eigenbasis of the potential well. Once the coefficients
+of the expansion are known, it is straightforward to determine the state at any
+later time. The time evolution of the probability density is shown in
+<a class="reference internal" href="#carpet"><span class="std std-numref">Figure 5.2</span></a>.</p>
+<figure class="align-center" id="id11">
+<span id="carpet"></span><a class="reference internal image-reference" href="_images/carpet.png"><img alt="_images/carpet.png" src="_images/carpet.png" style="width: 35em;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 5.2 </span><span class="caption-text">Time evolution of the probability density of an initial Gaussian wave packet
+positioned at the center of an infinite potential well. Brighter colors imply
+larger probability densities.</span><a class="headerlink" href="#id11" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>This figure has been obtained by means of the following Python script called
+<code class="docutils literal notranslate"><span class="pre">carpet.py</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">sqrt</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">cmath</span> <span class="kn">import</span> <span class="n">exp</span> <span class="k">as</span> <span class="n">cexp</span>
+<span class="linenos"> 3</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 4</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="k">class</span> <span class="nc">InfiniteWell</span><span class="p">:</span>
+<span class="linenos"> 8</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">nbase</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+<span class="linenos"> 9</span>        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+<span class="linenos">10</span>        <span class="bp">self</span><span class="o">.</span><span class="n">nbase</span> <span class="o">=</span> <span class="n">nbase</span>
+<span class="linenos">11</span>        <span class="bp">self</span><span class="o">.</span><span class="n">nint</span> <span class="o">=</span> <span class="n">nint</span>
+<span class="linenos">12</span>        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coeffs</span><span class="p">(</span><span class="n">psi0</span><span class="p">)</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span>    <span class="k">def</span> <span class="nf">eigenfunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="linenos">15</span>        <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
+<span class="linenos">16</span>            <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">((</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+<span class="linenos">17</span>        <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">((</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+<span class="linenos">18</span>
+<span class="linenos">19</span>    <span class="k">def</span> <span class="nf">get_coeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+<span class="linenos">20</span>        <span class="n">coeffs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">21</span>        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">):</span>
+<span class="linenos">22</span>            <span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">psi</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="linenos">23</span>            <span class="n">c</span> <span class="o">=</span> <span class="n">trapezoidal</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint</span><span class="p">)</span>
+<span class="linenos">24</span>            <span class="n">coeffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="linenos">25</span>        <span class="k">return</span> <span class="n">coeffs</span>
+<span class="linenos">26</span>
+<span class="linenos">27</span>    <span class="k">def</span> <span class="nf">psi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="linenos">28</span>        <span class="n">psit</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">29</span>        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">):</span>
+<span class="linenos">30</span>            <span class="n">psit</span> <span class="o">=</span> <span class="n">psit</span> <span class="o">+</span> <span class="n">c</span><span class="o">*</span><span class="n">cexp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="linenos">31</span>        <span class="k">return</span> <span class="n">psit</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span><span class="k">def</span> <span class="nf">trapezoidal</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+<span class="linenos">34</span>    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="n">nint</span>
+<span class="linenos">35</span>    <span class="n">integral</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">+</span><span class="n">func</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="linenos">36</span>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+<span class="linenos">37</span>        <span class="n">integral</span> <span class="o">=</span> <span class="n">integral</span><span class="o">+</span><span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">k</span><span class="o">*</span><span class="n">delta</span><span class="p">)</span>
+<span class="linenos">38</span>    <span class="k">return</span> <span class="n">delta</span><span class="o">*</span><span class="n">integral</span>
+<span class="linenos">39</span>
+<span class="linenos">40</span><span class="k">def</span> <span class="nf">psi0</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="linenos">41</span>    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.005</span>
+<span class="linenos">42</span>    <span class="k">return</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="mf">0.25</span>
+<span class="linenos">43</span>
+<span class="linenos">44</span><span class="n">w</span> <span class="o">=</span> <span class="n">InfiniteWell</span><span class="p">(</span><span class="n">psi0</span><span class="o">=</span><span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nbase</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nint</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="linenos">45</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="linenos">46</span><span class="n">ntmax</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="linenos">47</span><span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">500</span><span class="p">,</span> <span class="n">ntmax</span><span class="p">))</span>
+<span class="linenos">48</span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntmax</span><span class="p">):</span>
+<span class="linenos">49</span>    <span class="n">t</span> <span class="o">=</span> <span class="mf">0.25</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">n</span><span class="o">/</span><span class="p">(</span><span class="n">ntmax</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="linenos">50</span>    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
+<span class="linenos">51</span>    <span class="n">z</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+<span class="linenos">52</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="linenos">53</span><span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">54</span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">hot</span><span class="p">)</span>
+<span class="linenos">55</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$t$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="linenos">56</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$x$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="linenos">57</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This code is by no means optimal. After all, we want to discuss strategies to find
+out where most of the compute time is spent and what we can do to improve the situation.
+Before doing so, let us get a general idea of how the code works.</p>
+<p>The initial wave function is the Gaussian defined in the function <code class="docutils literal notranslate"><span class="pre">psi0</span></code> in
+lines 40-42.  Everything related to the basis functions is collected in the
+class <code class="docutils literal notranslate"><span class="pre">InfiniteWell</span></code>. During the instantiation, we define the initial wave
+function <code class="docutils literal notranslate"><span class="pre">psi0</span></code>, the total width of the well <code class="docutils literal notranslate"><span class="pre">width</span></code>, the number of basis
+states <code class="docutils literal notranslate"><span class="pre">nbase</span></code>, and the number of integration points <code class="docutils literal notranslate"><span class="pre">nint</span></code> to be used when
+determining the coefficients. The expansion coefficients of the initial state
+are determined in <code class="docutils literal notranslate"><span class="pre">get_coeffs</span></code> defined in lines 19-25 and called from line
+12. The value of the eigenfunction corresponding to eigenvalue <code class="docutils literal notranslate"><span class="pre">n</span></code> at
+position <code class="docutils literal notranslate"><span class="pre">x</span></code> is obtained by means of the method <code class="docutils literal notranslate"><span class="pre">eigenfunction</span></code> defined
+in line 14-17.  The integration is carried out very simply according to the
+trapezoidal rule as defined in function <code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code> in lines 33-38.
+The wave function at a given point <code class="docutils literal notranslate"><span class="pre">x</span></code> and a given time <code class="docutils literal notranslate"><span class="pre">t</span></code> is
+calculated by method <code class="docutils literal notranslate"><span class="pre">psi</span></code> defined in lines 27-31.  The code from line 44
+to the end serves to calculate the time evolution and to render the image
+shown in <a class="reference internal" href="#carpet"><span class="std std-numref">Figure 5.2</span></a>.</p>
+<p>In this version of the code, we deliberately do not make use of NumPy except to
+obtain the image.  Of course, NumPy would provide a significant speedup right
+away and one would probably never write the code in the way shown here. But it
+provides a good starting point to learn about run-time analysis. Where does the
+code spend most of its time?</p>
+<p>To address this question, we make use of the <code class="docutils literal notranslate"><span class="pre">cProfile</span></code> module contained in the
+Python standard library. Among the various ways of using this module, we choose
+one which avoids having to change our script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">cProfile</span> <span class="o">-</span><span class="n">o</span> <span class="n">carpet</span><span class="o">.</span><span class="n">prof</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>This command runs the script <code class="docutils literal notranslate"><span class="pre">carpet.py</span></code> under the control of the <code class="docutils literal notranslate"><span class="pre">cProfile</span></code> module.
+The option <code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">carpet.prof</span></code> indicates that the results of this profiling run are
+stored in the file <code class="docutils literal notranslate"><span class="pre">carpet.prof</span></code>. This binary file allows to analyze the obtained
+data in various ways by means of the <code class="docutils literal notranslate"><span class="pre">pstats</span></code> module. Let us try it out:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pstats</span>
+  <span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pstats</span><span class="o">.</span><span class="n">Stats</span><span class="p">(</span><span class="s1">&#39;carpet.prof&#39;</span><span class="p">)</span>
+  <span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">print_stats</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+  <span class="n">Tue</span> <span class="n">Jan</span> <span class="mi">22</span> <span class="mi">17</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">46</span> <span class="mi">2019</span>    <span class="n">carpet</span><span class="o">.</span><span class="n">prof</span>
+
+        <span class="mi">202073424</span> <span class="n">function</span> <span class="n">calls</span> <span class="p">(</span><span class="mi">202065686</span> <span class="n">primitive</span> <span class="n">calls</span><span class="p">)</span> <span class="ow">in</span> <span class="mf">633.175</span> <span class="n">seconds</span>
+
+  <span class="n">Ordered</span> <span class="n">by</span><span class="p">:</span> <span class="n">internal</span> <span class="n">time</span>
+  <span class="n">List</span> <span class="n">reduced</span> <span class="kn">from</span> <span class="mi">3684</span> <span class="n">to</span> <span class="mi">15</span> <span class="n">due</span> <span class="n">to</span> <span class="n">restriction</span> <span class="o">&lt;</span><span class="mi">15</span><span class="o">&gt;</span>
+
+  <span class="n">ncalls</span>  <span class="n">tottime</span>  <span class="n">percall</span>  <span class="n">cumtime</span>  <span class="n">percall</span> <span class="n">filename</span><span class="p">:</span><span class="n">lineno</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+<span class="mi">50100100</span>  <span class="mf">232.867</span>    <span class="mf">0.000</span>  <span class="mf">354.468</span>    <span class="mf">0.000</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">14</span><span class="p">(</span><span class="n">eigenfunction</span><span class="p">)</span>
+  <span class="mi">500000</span>  <span class="mf">184.931</span>    <span class="mf">0.000</span>  <span class="mf">623.191</span>    <span class="mf">0.001</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">27</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+<span class="mi">50000000</span>   <span class="mf">84.417</span>    <span class="mf">0.000</span>   <span class="mf">84.417</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">cmath</span><span class="o">.</span><span class="n">exp</span><span class="p">}</span>
+<span class="mi">50100101</span>   <span class="mf">55.301</span>    <span class="mf">0.000</span>   <span class="mf">55.301</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">}</span>
+<span class="mi">25050064</span>   <span class="mf">33.170</span>    <span class="mf">0.000</span>   <span class="mf">33.170</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">}</span>
+<span class="mi">25050064</span>   <span class="mf">33.129</span>    <span class="mf">0.000</span>   <span class="mf">33.129</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">}</span>
+       <span class="mi">1</span>    <span class="mf">3.326</span>    <span class="mf">3.326</span>    <span class="mf">4.341</span>    <span class="mf">4.341</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">exec_</span><span class="p">}</span>
+    <span class="mi">1000</span>    <span class="mf">1.878</span>    <span class="mf">0.002</span>  <span class="mf">625.763</span>    <span class="mf">0.626</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">50</span><span class="p">(</span><span class="o">&lt;</span><span class="n">listcomp</span><span class="o">&gt;</span><span class="p">)</span>
+  <span class="mi">503528</span>    <span class="mf">0.699</span>    <span class="mf">0.000</span>    <span class="mf">0.699</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">abs</span><span class="p">}</span>
+    <span class="mi">1430</span>    <span class="mf">0.372</span>    <span class="mf">0.000</span>    <span class="mf">0.372</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;read&#39;</span> <span class="n">of</span> <span class="s1">&#39;_io.BufferedReader&#39;</span> <span class="n">objects</span><span class="p">}</span>
+  <span class="mi">100100</span>    <span class="mf">0.348</span>    <span class="mf">0.000</span>    <span class="mf">1.386</span>    <span class="mf">0.000</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">22</span><span class="p">(</span><span class="o">&lt;</span><span class="k">lambda</span><span class="o">&gt;</span><span class="p">)</span>
+       <span class="mi">2</span>    <span class="mf">0.300</span>    <span class="mf">0.150</span>    <span class="mf">0.300</span>    <span class="mf">0.150</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">statusBar</span><span class="p">}</span>
+  <span class="mi">100100</span>    <span class="mf">0.294</span>    <span class="mf">0.000</span>    <span class="mf">0.413</span>    <span class="mf">0.000</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">40</span><span class="p">(</span><span class="n">psi0</span><span class="p">)</span>
+     <span class="mi">100</span>    <span class="mf">0.154</span>    <span class="mf">0.002</span>    <span class="mf">1.540</span>    <span class="mf">0.015</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">33</span><span class="p">(</span><span class="n">trapezoidal</span><span class="p">)</span>
+  <span class="mi">100101</span>    <span class="mf">0.119</span>    <span class="mf">0.000</span>    <span class="mf">0.119</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>After having imported the <code class="docutils literal notranslate"><span class="pre">pstats</span></code> module, we load our profiling file
+<code class="docutils literal notranslate"><span class="pre">carpet.prof</span></code> to obtain a statistics object <code class="docutils literal notranslate"><span class="pre">p</span></code>. The data can then be
+sorted with the <code class="docutils literal notranslate"><span class="pre">sort_stats</span></code> method according to different criteria. Here, we
+have chosen the time spent in a function. Since the list is potentially very
+long, we have restricted the output to 15 entries by means of the
+<code class="docutils literal notranslate"><span class="pre">print_stats</span></code> method.</p>
+<p>Let us take a look at the information provided by the run-time statistics. Each
+line corresponds to one of the 15 most time-consuming functions and methods out
+of a total of 3695. The total time of about 667 seconds is mostly spent in the
+function <code class="docutils literal notranslate"><span class="pre">psi</span></code> listed in the second line. There are actually two times given
+here. The total time (<code class="docutils literal notranslate"><span class="pre">tottime</span></code>) of 196 seconds counts only the time actually
+spent inside the function. The time required to execute functions called from
+<code class="docutils literal notranslate"><span class="pre">psi</span></code> are not counted. In contrast, these times count towards the cumulative
+time (<code class="docutils literal notranslate"><span class="pre">cumtime</span></code>). An important part of the difference can be explained by the
+evaluation of the eigenfunctions as listed in the first line.</p>
+<p>Since we have sorted according to <code class="docutils literal notranslate"><span class="pre">time</span></code>, which actually corresponds to <code class="docutils literal notranslate"><span class="pre">tottime</span></code>,
+the first line lists the method consuming most of the time. Even though the time
+needed per call is so small that it is given as 0.000 seconds, this function is
+called very often. In the column <code class="docutils literal notranslate"><span class="pre">ncalls</span></code> the corresponding value is listed as
+50100100. In such a situation, it makes sense to check whether this number can be
+understood.</p>
+<p>In a first step, the expansion coefficients need to be determined. We use 100 basis
+functions as specified by <code class="docutils literal notranslate"><span class="pre">nbase</span></code> and 1001 nodes which is one more than the value
+of <code class="docutils literal notranslate"><span class="pre">nint</span></code>. This results in a total of 100100 evaluations of eigenfunctions, actually
+less than a percent of the total number of evaluations of eigenfunctions. In order
+to determine the data displayed in <a class="reference internal" href="#carpet"><span class="std std-numref">Figure 5.2</span></a>, we evaluate 100 eigenfunctions on
+a grid of size 500×1000, resulting in a total of 50000000 evaluations.</p>
+<p>These considerations show that we do not need to bother with improving the code
+determining the expansion coefficients. However, the situation might be quite
+different if we would not want to calculate data for a relatively large grid.
+Thinking a bit more about it, we realize that the number of 50000000
+evaluations for the time evolution is much too big. After all, we are
+evaluating the eigenfunctions at 500 different positions and we are considering
+100 eigenfunctions, resulting in only 50000 evaluations.  For each of the 1000
+time values, we are unnecessarily recalculating eigenfunctions for the same arguments.
+Avoiding this waste of compute time could speed up our script significantly.</p>
+<p>There are basically two ways to do so. We could restructure our program in such
+a way that we evaluate the grid for constant position along the time direction.
+Then, we just need to keep the values of the 100 eigenfunctions at a given
+position.  If we want to have the freedom to evaluate the wave function at a
+given position and time on a certain grid, we could also store the values of
+all eigenfunctions at all positions on the grid in a cache for later reuse.
+This is an example of trading compute time against memory.  We will implement
+the latter idea in the next version of our script listed below. <a class="footnote-reference brackets" href="#lru-cache" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">sqrt</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">cmath</span> <span class="kn">import</span> <span class="n">exp</span> <span class="k">as</span> <span class="n">cexp</span>
+<span class="linenos"> 3</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 4</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="k">class</span> <span class="nc">InfiniteWell</span><span class="p">:</span>
+<span class="linenos"> 8</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">nbase</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+<span class="linenos"> 9</span>        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+<span class="linenos">10</span>        <span class="bp">self</span><span class="o">.</span><span class="n">nbase</span> <span class="o">=</span> <span class="n">nbase</span>
+<span class="linenos">11</span>        <span class="bp">self</span><span class="o">.</span><span class="n">nint</span> <span class="o">=</span> <span class="n">nint</span>
+<span class="linenos">12</span>        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coeffs</span><span class="p">(</span><span class="n">psi0</span><span class="p">)</span>
+<span class="linenos">13</span>        <span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction_cache</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span>    <span class="k">def</span> <span class="nf">eigenfunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="linenos">16</span>        <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
+<span class="linenos">17</span>            <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">((</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+<span class="linenos">18</span>        <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">((</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+<span class="linenos">19</span>
+<span class="linenos">20</span>    <span class="k">def</span> <span class="nf">get_coeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+<span class="linenos">21</span>        <span class="n">coeffs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">22</span>        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">):</span>
+<span class="linenos">23</span>            <span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">psi</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="linenos">24</span>            <span class="n">c</span> <span class="o">=</span> <span class="n">trapezoidal</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint</span><span class="p">)</span>
+<span class="linenos">25</span>            <span class="n">coeffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="linenos">26</span>        <span class="k">return</span> <span class="n">coeffs</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="k">def</span> <span class="nf">psi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="linenos">29</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction_cache</span><span class="p">:</span>
+<span class="linenos">30</span>            <span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction_cache</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="linenos">31</span>                                           <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">)]</span>
+<span class="linenos">32</span>        <span class="n">psit</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="linenos">33</span>        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">ef</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction_cache</span><span class="p">[</span><span class="n">x</span><span class="p">])):</span>
+<span class="linenos">34</span>            <span class="n">psit</span> <span class="o">=</span> <span class="n">psit</span> <span class="o">+</span> <span class="n">c</span><span class="o">*</span><span class="n">ef</span><span class="o">*</span><span class="n">cexp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+<span class="linenos">35</span>        <span class="k">return</span> <span class="n">psit</span>
+<span class="linenos">36</span>
+<span class="linenos">37</span><span class="k">def</span> <span class="nf">trapezoidal</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+<span class="linenos">38</span>    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="n">nint</span>
+<span class="linenos">39</span>    <span class="n">integral</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">+</span><span class="n">func</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="linenos">40</span>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+<span class="linenos">41</span>        <span class="n">integral</span> <span class="o">=</span> <span class="n">integral</span><span class="o">+</span><span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">k</span><span class="o">*</span><span class="n">delta</span><span class="p">)</span>
+<span class="linenos">42</span>    <span class="k">return</span> <span class="n">delta</span><span class="o">*</span><span class="n">integral</span>
+<span class="linenos">43</span>
+<span class="linenos">44</span><span class="k">def</span> <span class="nf">psi0</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="linenos">45</span>    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.005</span>
+<span class="linenos">46</span>    <span class="k">return</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="mf">0.25</span>
+<span class="linenos">47</span>
+<span class="linenos">48</span><span class="n">w</span> <span class="o">=</span> <span class="n">InfiniteWell</span><span class="p">(</span><span class="n">psi0</span><span class="o">=</span><span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nbase</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nint</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="linenos">49</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="linenos">50</span><span class="n">ntmax</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="linenos">51</span><span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">500</span><span class="p">,</span> <span class="n">ntmax</span><span class="p">))</span>
+<span class="linenos">52</span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntmax</span><span class="p">):</span>
+<span class="linenos">53</span>    <span class="n">t</span> <span class="o">=</span> <span class="mf">0.25</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">n</span><span class="o">/</span><span class="p">(</span><span class="n">ntmax</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="linenos">54</span>    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
+<span class="linenos">55</span>    <span class="n">z</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+<span class="linenos">56</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="linenos">57</span><span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">58</span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">hot</span><span class="p">)</span>
+<span class="linenos">59</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$t$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="linenos">60</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$x$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="linenos">61</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now, we check in method <code class="docutils literal notranslate"><span class="pre">psi</span></code> whether the eigenfunction cache already contains
+data for a given position <code class="docutils literal notranslate"><span class="pre">x</span></code>. If this is not the case, the required values are
+calculated and the cache is updated.</p>
+<p>As a result of this modification of the code, the profiling data change considerably:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Tue</span> <span class="n">Jan</span> <span class="mi">22</span> <span class="mi">17</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">33</span> <span class="mi">2019</span>    <span class="n">carpet</span><span class="o">.</span><span class="n">prof</span>
+
+         <span class="mi">52205250</span> <span class="n">function</span> <span class="n">calls</span> <span class="p">(</span><span class="mi">52197669</span> <span class="n">primitive</span> <span class="n">calls</span><span class="p">)</span> <span class="ow">in</span> <span class="mf">185.581</span> <span class="n">seconds</span>
+
+   <span class="n">Ordered</span> <span class="n">by</span><span class="p">:</span> <span class="n">internal</span> <span class="n">time</span>
+   <span class="n">List</span> <span class="n">reduced</span> <span class="kn">from</span> <span class="mi">3670</span> <span class="n">to</span> <span class="mi">15</span> <span class="n">due</span> <span class="n">to</span> <span class="n">restriction</span> <span class="o">&lt;</span><span class="mi">15</span><span class="o">&gt;</span>
+
+   <span class="n">ncalls</span>  <span class="n">tottime</span>  <span class="n">percall</span>  <span class="n">cumtime</span>  <span class="n">percall</span> <span class="n">filename</span><span class="p">:</span><span class="n">lineno</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+   <span class="mi">500000</span>   <span class="mf">97.612</span>    <span class="mf">0.000</span>  <span class="mf">177.453</span>    <span class="mf">0.000</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">28</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+ <span class="mi">50000000</span>   <span class="mf">79.415</span>    <span class="mf">0.000</span>   <span class="mf">79.415</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">cmath</span><span class="o">.</span><span class="n">exp</span><span class="p">}</span>
+     <span class="mi">1000</span>    <span class="mf">2.162</span>    <span class="mf">0.002</span>  <span class="mf">180.342</span>    <span class="mf">0.180</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">54</span><span class="p">(</span><span class="o">&lt;</span><span class="n">listcomp</span><span class="o">&gt;</span><span class="p">)</span>
+        <span class="mi">1</span>    <span class="mf">1.176</span>    <span class="mf">1.176</span>    <span class="mf">2.028</span>    <span class="mf">2.028</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">exec_</span><span class="p">}</span>
+   <span class="mi">503528</span>    <span class="mf">0.732</span>    <span class="mf">0.000</span>    <span class="mf">0.732</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">abs</span><span class="p">}</span>
+   <span class="mi">150100</span>    <span class="mf">0.596</span>    <span class="mf">0.000</span>    <span class="mf">0.954</span>    <span class="mf">0.000</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">15</span><span class="p">(</span><span class="n">eigenfunction</span><span class="p">)</span>
+   <span class="mi">100100</span>    <span class="mf">0.353</span>    <span class="mf">0.000</span>    <span class="mf">1.349</span>    <span class="mf">0.000</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">23</span><span class="p">(</span><span class="o">&lt;</span><span class="k">lambda</span><span class="o">&gt;</span><span class="p">)</span>
+     <span class="mi">1430</span>    <span class="mf">0.323</span>    <span class="mf">0.000</span>    <span class="mf">0.323</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;read&#39;</span> <span class="n">of</span> <span class="s1">&#39;_io.BufferedReader&#39;</span> <span class="n">objects</span><span class="p">}</span>
+        <span class="mi">2</span>    <span class="mf">0.301</span>    <span class="mf">0.151</span>    <span class="mf">0.301</span>    <span class="mf">0.151</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">statusBar</span><span class="p">}</span>
+   <span class="mi">100100</span>    <span class="mf">0.278</span>    <span class="mf">0.000</span>    <span class="mf">0.396</span>    <span class="mf">0.000</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">44</span><span class="p">(</span><span class="n">psi0</span><span class="p">)</span>
+   <span class="mi">150101</span>    <span class="mf">0.171</span>    <span class="mf">0.000</span>    <span class="mf">0.171</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">}</span>
+      <span class="mi">100</span>    <span class="mf">0.140</span>    <span class="mf">0.001</span>    <span class="mf">1.489</span>    <span class="mf">0.015</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">37</span><span class="p">(</span><span class="n">trapezoidal</span><span class="p">)</span>
+   <span class="mi">100101</span>    <span class="mf">0.119</span>    <span class="mf">0.000</span>    <span class="mf">0.119</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">}</span>
+    <span class="mi">75064</span>    <span class="mf">0.095</span>    <span class="mf">0.000</span>    <span class="mf">0.095</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">}</span>
+    <span class="mi">75064</span>    <span class="mf">0.093</span>    <span class="mf">0.000</span>    <span class="mf">0.093</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>We observe a speed-up of a factor of 3.6 by investing about 500×100×8 bytes of
+memory, i.e. roughly 400 kB. The exact value will be slightly different because
+we have stored the data in a dictionary and not in an array, but clearly we are
+not talking about a huge amount of memory. The time needed to evaluate the
+eigenfunctions has dropped so much that it can be neglected compared to the
+time required by the method <code class="docutils literal notranslate"><span class="pre">psi</span></code> and the evaluation of the complex
+exponential function.</p>
+<p>The compute could be reduced further by caching the values of the complex exponential
+functions. In fact, we unnecessarily recalculate each value 500 times. However, there
+are still almost 96 seconds left which are spent in the rest of the <code class="docutils literal notranslate"><span class="pre">psi</span></code> method.
+We will see in the following section how one can find out which line of the code is
+responsible for this important contribution to the total run time.</p>
+<p>Before doing so, we want to present a version of the code designed to profit from
+NumPy from the very beginning</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+
+<span class="k">class</span> <span class="nc">InfiniteWell</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">nbase</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nbase</span> <span class="o">=</span> <span class="n">nbase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nint</span> <span class="o">=</span> <span class="n">nint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="n">trapezoidal</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">psi0</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+                                  <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">eigenfunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">normalization</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">normalization</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">normalization</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">psi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">eigenvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">tvals</span> <span class="o">=</span> <span class="n">t</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">psit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">coeffs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                      <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">eigenvals</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tvals</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">psit</span>
+
+<span class="k">def</span> <span class="nf">trapezoidal</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="n">nint</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">nint</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">integrand</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">integrand</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">integrand</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">integrand</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">integrand</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">delta</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">psi0</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.005</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="mf">0.25</span>
+
+<span class="n">w</span> <span class="o">=</span> <span class="n">InfiniteWell</span><span class="p">(</span><span class="n">psi0</span><span class="o">=</span><span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nbase</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nint</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">hot</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$t$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$x$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The structure of the code is essentially unchanged, but we are making use of
+universal functions in several places. In the method <code class="docutils literal notranslate"><span class="pre">psi</span></code>, a three-dimensional
+array is used with axis 0 to 2 given by time, eigenvalue, and position. A run-time
+analysis yields the following result:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Tue</span> <span class="n">Jan</span> <span class="mi">22</span> <span class="mi">17</span><span class="p">:</span><span class="mi">12</span><span class="p">:</span><span class="mi">41</span> <span class="mi">2019</span>    <span class="n">carpet</span><span class="o">.</span><span class="n">prof</span>
+
+         <span class="mi">457912</span> <span class="n">function</span> <span class="n">calls</span> <span class="p">(</span><span class="mi">450291</span> <span class="n">primitive</span> <span class="n">calls</span><span class="p">)</span> <span class="ow">in</span> <span class="mf">4.644</span> <span class="n">seconds</span>
+
+   <span class="n">Ordered</span> <span class="n">by</span><span class="p">:</span> <span class="n">internal</span> <span class="n">time</span>
+   <span class="n">List</span> <span class="n">reduced</span> <span class="kn">from</span> <span class="mi">3682</span> <span class="n">to</span> <span class="mi">15</span> <span class="n">due</span> <span class="n">to</span> <span class="n">restriction</span> <span class="o">&lt;</span><span class="mi">15</span><span class="o">&gt;</span>
+
+   <span class="n">ncalls</span>  <span class="n">tottime</span>  <span class="n">percall</span>  <span class="n">cumtime</span>  <span class="n">percall</span> <span class="n">filename</span><span class="p">:</span><span class="n">lineno</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+        <span class="mi">1</span>    <span class="mf">1.707</span>    <span class="mf">1.707</span>    <span class="mf">2.543</span>    <span class="mf">2.543</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">exec_</span><span class="p">}</span>
+        <span class="mi">1</span>    <span class="mf">0.410</span>    <span class="mf">0.410</span>    <span class="mf">0.481</span>    <span class="mf">0.481</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">23</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+     <span class="mi">1430</span>    <span class="mf">0.284</span>    <span class="mf">0.000</span>    <span class="mf">0.284</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;read&#39;</span> <span class="n">of</span> <span class="s1">&#39;_io.BufferedReader&#39;</span> <span class="n">objects</span><span class="p">}</span>
+        <span class="mi">2</span>    <span class="mf">0.276</span>    <span class="mf">0.138</span>    <span class="mf">0.276</span>    <span class="mf">0.138</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">statusBar</span><span class="p">}</span>
+      <span class="mi">407</span>    <span class="mf">0.074</span>    <span class="mf">0.000</span>    <span class="mf">0.074</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;reduce&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ufunc&#39;</span> <span class="n">objects</span><span class="p">}</span>
+    <span class="mi">48</span><span class="o">/</span><span class="mi">46</span>    <span class="mf">0.056</span>    <span class="mf">0.001</span>    <span class="mf">0.061</span>    <span class="mf">0.001</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">_imp</span><span class="o">.</span><span class="n">create_dynamic</span><span class="p">}</span>
+    <span class="mi">35469</span>    <span class="mf">0.049</span>    <span class="mf">0.000</span>    <span class="mf">0.053</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">isinstance</span><span class="p">}</span>
+      <span class="mi">284</span>    <span class="mf">0.048</span>    <span class="mf">0.000</span>    <span class="mf">0.048</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">marshal</span><span class="o">.</span><span class="n">loads</span><span class="p">}</span>
+        <span class="mi">1</span>    <span class="mf">0.039</span>    <span class="mf">0.039</span>    <span class="mf">0.040</span>    <span class="mf">0.040</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">show</span><span class="p">}</span>
+        <span class="mi">2</span>    <span class="mf">0.036</span>    <span class="mf">0.018</span>    <span class="mf">0.210</span>    <span class="mf">0.105</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.7</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">matplotlib</span><span class="o">/</span><span class="n">font_manager</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1198</span><span class="p">(</span><span class="n">_findfont_cached</span><span class="p">)</span>
+  <span class="mi">418</span><span class="o">/</span><span class="mi">185</span>    <span class="mf">0.028</span>    <span class="mf">0.000</span>    <span class="mf">0.099</span>    <span class="mf">0.001</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">anaconda3</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.7</span><span class="o">/</span><span class="n">sre_parse</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">475</span><span class="p">(</span><span class="n">_parse</span><span class="p">)</span>
+    <span class="mi">23838</span>    <span class="mf">0.028</span>    <span class="mf">0.000</span>    <span class="mf">0.028</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;lower&#39;</span> <span class="n">of</span> <span class="s1">&#39;str&#39;</span> <span class="n">objects</span><span class="p">}</span>
+       <span class="mi">63</span>    <span class="mf">0.027</span>    <span class="mf">0.000</span>    <span class="mf">0.027</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">}</span>
+    <span class="mi">21637</span>    <span class="mf">0.025</span>    <span class="mf">0.000</span>    <span class="mf">0.025</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;startswith&#39;</span> <span class="n">of</span> <span class="s1">&#39;str&#39;</span> <span class="n">objects</span><span class="p">}</span>
+<span class="mi">1169</span><span class="o">/</span><span class="mi">1101</span>    <span class="mf">0.025</span>    <span class="mf">0.000</span>    <span class="mf">0.200</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">__build_class__</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Since the run time obtained by profiling is longer than the actual run time, we
+have measured the latter for the first version of the script and the NumPy
+version, resulting in an speed up by a factor of 90. Even though this
+improvement is impressive, the code given above could be improved even further.
+However, as this is not the main purpose of the chapter, we rather turn our
+attention to how one can do profiling on a line-by-line basis.</p>
+</section>
+<section id="line-oriented-run-time-analysis">
+<h2><span class="section-number">5.5. </span>Line oriented run-time analysis<a class="headerlink" href="#line-oriented-run-time-analysis" title="Link to this heading">¶</a></h2>
+<p>In the second version of the script discussed in the previous section, we had seen that
+by far most of the time was spent in the method <code class="docutils literal notranslate"><span class="pre">psi</span></code>. Almost half of the time was spent
+in the complex exponential function so that a significant amount of time must be spent
+elsewhere in the function. At this point, the <code class="docutils literal notranslate"><span class="pre">cProfile</span></code> module is not of much help as
+it only works on the function level.</p>
+<p>Fortunately, there is a line profiling tool available. However, it is not part of the
+Anaconda distribution and needs to be installed separately. The package is called
+<code class="docutils literal notranslate"><span class="pre">line_profiler</span></code> and can be found on the <a class="reference external" href="https://pypi.org/">Python package index (PyPI)</a>.
+It can be installed either into a virtual environment or in a conda environment.</p>
+<p>Line profiling adds some overhead to the code execution and it makes sense to limit
+it to the most important function or a few of them. This can easily be done by decorating
+the function in question with <code class="docutils literal notranslate"><span class="pre">&#64;profile</span></code>. Since we know that the <code class="docutils literal notranslate"><span class="pre">psi</span></code> method constitutes
+the bottleneck of our calculation, we only decorate that method. Running the line profiler
+on our script called carpet.py is done by <a class="footnote-reference brackets" href="#kern" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ kernprof -l -v carpet.py
+</pre></div>
+</div>
+<p>Here, the option <code class="docutils literal notranslate"><span class="pre">-l</span></code> requests the line-by-line profiler and <code class="docutils literal notranslate"><span class="pre">-v</span></code> allows to immediately
+view the results in addition to storing them in a file with extension <code class="docutils literal notranslate"><span class="pre">lprof</span></code>. We obtain
+the following result:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Wrote</span> <span class="n">profile</span> <span class="n">results</span> <span class="n">to</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="o">.</span><span class="n">lprof</span>
+<span class="n">Timer</span> <span class="n">unit</span><span class="p">:</span> <span class="mf">1e-06</span> <span class="n">s</span>
+
+<span class="n">Total</span> <span class="n">time</span><span class="p">:</span> <span class="mf">306.266</span> <span class="n">s</span>
+<span class="n">File</span><span class="p">:</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span>
+<span class="n">Function</span><span class="p">:</span> <span class="n">psi</span> <span class="n">at</span> <span class="n">line</span> <span class="mi">27</span>
+
+<span class="n">Line</span> <span class="c1">#      Hits         Time  Per Hit   % Time  Line Contents</span>
+<span class="o">==============================================================</span>
+    <span class="mi">27</span>                                               <span class="nd">@profile</span>
+    <span class="mi">28</span>                                               <span class="k">def</span> <span class="nf">psi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="mi">29</span>    <span class="mi">500000</span>    <span class="mf">1171076.0</span>      <span class="mf">2.3</span>      <span class="mf">0.4</span>          <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">:</span>
+    <span class="mi">30</span>         <span class="mi">1</span>     <span class="mf">348711.0</span> <span class="mf">348711.0</span>      <span class="mf">0.1</span>              <span class="bp">self</span><span class="o">.</span><span class="n">get_coeffs</span><span class="p">(</span><span class="n">psi0</span><span class="p">)</span>
+    <span class="mi">31</span>    <span class="mi">500000</span>    <span class="mf">1435067.0</span>      <span class="mf">2.9</span>      <span class="mf">0.5</span>          <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction_cache</span><span class="p">:</span>
+    <span class="mi">32</span>       <span class="mi">500</span>       <span class="mf">1256.0</span>      <span class="mf">2.5</span>      <span class="mf">0.0</span>              <span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction_cache</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="mi">33</span>       <span class="mi">500</span>     <span class="mf">105208.0</span>    <span class="mf">210.4</span>      <span class="mf">0.0</span>                                             <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">)]</span>
+    <span class="mi">34</span>    <span class="mi">500000</span>    <span class="mf">1190160.0</span>      <span class="mf">2.4</span>      <span class="mf">0.4</span>          <span class="n">psit</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="mi">35</span>  <span class="mi">50500000</span>  <span class="mf">132196091.0</span>      <span class="mf">2.6</span>     <span class="mf">43.2</span>          <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">ef</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigenfunction_cache</span><span class="p">[</span><span class="n">x</span><span class="p">])):</span>
+    <span class="mi">36</span>  <span class="mi">50000000</span>  <span class="mf">168606042.0</span>      <span class="mf">3.4</span>     <span class="mf">55.1</span>              <span class="n">psit</span> <span class="o">=</span> <span class="n">psit</span> <span class="o">+</span> <span class="n">c</span><span class="o">*</span><span class="n">ef</span><span class="o">*</span><span class="n">cexp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+    <span class="mi">37</span>    <span class="mi">500000</span>    <span class="mf">1212643.0</span>      <span class="mf">2.4</span>      <span class="mf">0.4</span>          <span class="k">return</span> <span class="n">psit</span>
+</pre></div>
+</div>
+<p>The timing information only refers to the function on which the line profiler is run.
+We can see here that the for loop is responsible for a significant portion of the
+execution time. Making use of NumPy arrays can improve the performance of the code
+dramatically as we have seen at the end of the previous section.</p>
+<p>By using the option <code class="docutils literal notranslate"><span class="pre">-v</span></code>, we were able to immediately see the result of the profiling run.
+In addition, a file <code class="docutils literal notranslate"><span class="pre">carpet.py.lprof</span></code> has been created. It is possible to obtain the
+profiling result from it later by means of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">line_profiler</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span><span class="o">.</span><span class="n">lprof</span>
+</pre></div>
+</div>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="cupy" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>For more information, see the <a class="reference external" href="https://cupy.chainer.org">CuPy homepage</a>.</p>
+</aside>
+<aside class="footnote brackets" id="cython" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>For more information, see <a class="reference external" href="https://cython.org/">Cython – C-Extensions for Python</a>.</p>
+</aside>
+<aside class="footnote brackets" id="pypy" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>For more information, see the <a class="reference external" href="https://pypy.org">PyPy homepage</a>.</p>
+</aside>
+<aside class="footnote brackets" id="numba" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>For more information, see the <a class="reference external" href="https://numpy.pydta.org">Numba homepage</a>.</p>
+</aside>
+<aside class="footnote brackets" id="dek-tex" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>Donald E. Knuth is well known far beyond the computer science
+community as the author of the typesetting system TeX.</p>
+</aside>
+<aside class="footnote brackets" id="knuth-quote" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
+<p>D.E. Knuth, Computing Surveys <strong>6</strong>, 261 (1974). The quote
+can be found on page 268.</p>
+</aside>
+<aside class="footnote brackets" id="carpets" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">7</a><span class="fn-bracket">]</span></span>
+<p>For more details, see e.g. W. Kinzel, <a class="reference external" href="https://doi.org/10.1002/phbl.19950511215">Bilder elementarer Quantenmechanik</a>, Phys. Bl. <strong>51</strong>, 1190 (1995)
+and I. Marzoli, F. Saif, I. Bialynicki-Birula,
+O. M. Friesch, A. E. Kaplan, W. P. Schleich, <a class="reference external" href="http://www.physics.sk/aps/pubs/1998/aps_1998_48_3_323.pdf">Quantum carpets made
+simple</a>,
+Acta Phys. Slov. <strong>48</strong>, 323 (1998).</p>
+</aside>
+<aside class="footnote brackets" id="lru-cache" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">8</a><span class="fn-bracket">]</span></span>
+<p>An alternative approach to caching would consist in using the
+<code class="docutils literal notranslate"><span class="pre">functools.lru_cache</span></code> decorator. However, in our specific case it
+turns out that the overhead introduced by the <code class="docutils literal notranslate"><span class="pre">lru_cache</span></code> has a
+significant impact on the performance. The situation might be different
+if it is more time consuming to obtain the results to be cached.</p>
+</aside>
+<aside class="footnote brackets" id="kern" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">9</a><span class="fn-bracket">]</span></span>
+<p>The command name <code class="docutils literal notranslate"><span class="pre">kernprof</span></code> makes reference to the author of the package
+Robert Kern.</p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="numpy.html"><span class="section-number">4. </span>Scientific computing with NumPy and SciPy</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="documenting.html"><span class="section-number">6. </span>Documentation of code</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2018—2022, Gert-Ludwig Ingold, license: CC BY 4.0 International.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

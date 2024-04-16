@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>8. Appendix &#8212; Tools for Scientific Computing 0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=e491ac2d" />
+    <script src="_static/documentation_options.js?v=b489f392"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="7. Aspects of parallel computing" href="parallel.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Tools for Scientific Computing 0.3 documentation</span></a></h1>
+        <h2 class="heading"><span>8. Appendix</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="parallel.html"><span class="section-number">7. </span>Aspects of parallel computing</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <section id="appendix">
+<h1><span class="section-number">8. </span>Appendix<a class="headerlink" href="#appendix" title="Link to this heading">¶</a></h1>
+<section id="decorators">
+<span id="appendixdecorators"></span><h2><span class="section-number">8.1. </span>Decorators<a class="headerlink" href="#decorators" title="Link to this heading">¶</a></h2>
+<p>In this appendix, we give a short introduction to decorators so that we have an idea
+of what they are about when making use of them. Decorators are a way to modify the
+behavior of functions, methods, or classes. We will restrict our discussion to functions.
+The effect of a decorator is then to replace the function by a modified version of
+the original function. Some examples will demonstrate how this works.</p>
+<p>For the first example we assume that our script defines a couple of functions which we
+would like to register. To keep things simple, registering a function shall simply mean
+that an appropriate message is printed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="linenos"> 2</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> registered&#39;</span><span class="p">)</span>
+<span class="linenos"> 3</span>    <span class="k">return</span> <span class="n">func</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nd">@register</span>
+<span class="linenos"> 6</span><span class="k">def</span> <span class="nf">myfunc</span><span class="p">():</span>
+<span class="linenos"> 7</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;executing myfunc&#39;</span><span class="p">)</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="nd">@register</span>
+<span class="linenos">10</span><span class="k">def</span> <span class="nf">myotherfunc</span><span class="p">():</span>
+<span class="linenos">11</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;executing myotherfunc&#39;</span><span class="p">)</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">40</span><span class="p">)</span>
+<span class="linenos">14</span><span class="n">myfunc</span><span class="p">()</span>
+<span class="linenos">15</span><span class="n">myotherfunc</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In lines 1-3 we define a decorator called <code class="docutils literal notranslate"><span class="pre">register</span></code> which is then applied in lines
+5 and 9 to two functions <code class="docutils literal notranslate"><span class="pre">myfunc</span></code> and <code class="docutils literal notranslate"><span class="pre">myotherfunc</span></code>. Running the script produces
+the following output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">myfunc</span> <span class="n">registered</span>
+<span class="n">myotherfunc</span> <span class="n">registered</span>
+<span class="o">----------------------------------------</span>
+<span class="n">executing</span> <span class="n">myfunc</span>
+<span class="n">executing</span> <span class="n">myotherfunc</span>
+</pre></div>
+</div>
+<p>What has happened? Before running the code in lines 13-15, Python has defined the functions
+in the lines 1-11. When getting to <code class="docutils literal notranslate"><span class="pre">myfunc</span></code>, the decorator <code class="docutils literal notranslate"><span class="pre">register</span></code> will come into
+action. Its argument <code class="docutils literal notranslate"><span class="pre">func</span></code> will be the function <code class="docutils literal notranslate"><span class="pre">myfunc</span></code>, i.e. the argument of a decorator
+is implicitly given by the function following the decorator statement. Then, <code class="docutils literal notranslate"><span class="pre">register</span></code>
+is executed, first printing a message which contains the name of the decorated function.
+Then it returns the function <code class="docutils literal notranslate"><span class="pre">myfunc</span></code> unmodified. The effect of the decorator thus is
+simply to print a message that the function <code class="docutils literal notranslate"><span class="pre">myfunc</span></code> has been registered. As the output
+reproduced above shows, this is only done once, namely when Python processes the function
+code. Later, the function is executed which was returned by the decorator. In our case, this
+is simply the original function.</p>
+<p>The decorator can also be used to modify the function so that a desired effect
+occurs each time the function is executed. In the following example, we define
+a somewhat more complex decorator named <code class="docutils literal notranslate"><span class="pre">logging</span></code> which prints a message when
+the function is starting execution and another message indicating the time of
+execution just before the function finishes execution. The interest of using
+the <code class="docutils literal notranslate"><span class="pre">logging</span></code> decorator is to analyse how the execution of a recursive function
+works.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">logging</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="k">def</span> <span class="nf">func_with_log</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="linenos"> 6</span>        <span class="n">arguments</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">repr</span><span class="p">,</span> <span class="n">chain</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
+<span class="linenos"> 7</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;calling </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">(</span><span class="si">{</span><span class="n">arguments</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+<span class="linenos"> 8</span>        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="linenos"> 9</span>        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="linenos">10</span>        <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start</span>
+<span class="linenos">11</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;got </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">(</span><span class="si">{</span><span class="n">arguments</span><span class="si">}</span><span class="s1">) = </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s1"> &#39;</span>
+<span class="linenos">12</span>              <span class="sa">f</span><span class="s1">&#39;in </span><span class="si">{</span><span class="n">elapsed</span><span class="o">*</span><span class="mi">1000</span><span class="si">:</span><span class="s1">5.3f</span><span class="si">}</span><span class="s1"> ms&#39;</span><span class="p">)</span>
+<span class="linenos">13</span>        <span class="k">return</span> <span class="n">result</span>
+<span class="linenos">14</span>    <span class="k">return</span> <span class="n">func_with_log</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="nd">@logging</span>
+<span class="linenos">17</span><span class="k">def</span> <span class="nf">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="linenos">18</span>    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<span class="linenos">19</span>        <span class="k">return</span> <span class="mi">1</span>
+<span class="linenos">20</span>    <span class="k">else</span><span class="p">:</span>
+<span class="linenos">21</span>        <span class="k">return</span> <span class="n">n</span><span class="o">*</span><span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="linenos">22</span>
+<span class="linenos">23</span><span class="n">factorial</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The main difference to our first example consists in the fact that the
+decorator in lines 5-14 defines a new function. As a consequence, the
+modifications apply whenever the decorated function is run. Then new function
+<code class="docutils literal notranslate"><span class="pre">func_with_log</span></code> is written in a rather general way to allow its use for
+arbitrary functions. In particular, the decorated function can take an
+arbitrary number of arguments including keyword arguments. Whenever the
+decorated function is executed, it will print a message including the arguments
+with which the function was called. In addition, the starting time is stored.
+Then, the original function, in our case <code class="docutils literal notranslate"><span class="pre">factorial</span></code>, is run and when it
+returns, the elapsed time is determined. Before quitting, the result
+together with the elapsed time are printed.</p>
+<p>Running the script, we obtain the following output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calling</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">calling</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">calling</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">calling</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">calling</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">got</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">1</span> <span class="ow">in</span> <span class="mf">0.001</span> <span class="n">ms</span>
+<span class="n">got</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span> <span class="ow">in</span> <span class="mf">0.042</span> <span class="n">ms</span>
+<span class="n">got</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="mi">6</span> <span class="ow">in</span> <span class="mf">0.069</span> <span class="n">ms</span>
+<span class="n">got</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">=</span> <span class="mi">24</span> <span class="ow">in</span> <span class="mf">0.094</span> <span class="n">ms</span>
+<span class="n">got</span> <span class="n">factorial</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">=</span> <span class="mi">120</span> <span class="ow">in</span> <span class="mf">0.127</span> <span class="n">ms</span>
+</pre></div>
+</div>
+<p>It nicely demonstrates how the function <code class="docutils literal notranslate"><span class="pre">factorial</span></code> is called recursively
+until the recursion comes to an end when the argument equals 1.</p>
+<p>A decorator could even go as far as not running the decorated function at all
+and possibly returning a result nevertheless. A situation where such a decorator
+could make sense is during testing. Suppose that we want to test a program which
+relies on obtaining data from a measuring device. If we are not interested in
+testing the connection to the device but only how received data are handled, an
+appropriate decorator would allows us to test the program even without connection
+to the measuring device as long as the decorator provides us with appropriate
+data.</p>
+</section>
+</section>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="parallel.html"><span class="section-number">7. </span>Aspects of parallel computing</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2018—2022, Gert-Ludwig Ingold, license: CC BY 4.0 International.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1. Introduction &#8212; Tools for Scientific Computing 0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=e491ac2d" />
+    <script src="_static/documentation_options.js?v=b489f392"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2. Version Control with Git" href="git.html" />
+    <link rel="prev" title="Lecture notes »Tools for Scientific Computing«" href="index.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Tools for Scientific Computing 0.3 documentation</span></a></h1>
+        <h2 class="heading"><span>1. Introduction</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Lecture notes »Tools for Scientific Computing«</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="git.html"><span class="section-number">2. </span>Version Control with Git</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content" role="main">
+        
+        
+  <section id="introduction">
+<h1><span class="section-number">1. </span>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
+<p>The daily routine in scientific work is characterized by careful checks and detailed
+documentation. Experimentalists calibrate their apparatuses and note all relevant aspects
+of an experiment in a lab book, either on paper or digitally. Theorists check their
+calculations and consider limiting cases to ensure the correctness of their results.
+On the other hand, it can frequently be observed that not the same standards are applied
+to scientific computational work, even though appropriate tools exist. Furthermore, knowledge
+of these tools can be an important asset when looking for a job outside of academia.</p>
+<p>The present lecture notes cover a number of tools useful in scientific
+computing. In view of the aspects just discussed, we specifically mention the
+use of a version control system like Git introduced in <a class="reference internal" href="git.html#version-control"><span class="std std-numref">Chapter 2</span></a>, testing of code discussed in <a class="reference internal" href="testing.html#testing"><span class="std std-numref">Chapter 3</span></a>, and the documentation of code covered in <a class="reference internal" href="documenting.html#documenting"><span class="std std-numref">Chapter 6</span></a>.  The discussion of the version control system Git is completely
+independent of the specific programming language used. On the other hand, the
+tools covered in the chapter on testing – doctests and the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> package –
+are specific to the programming language Python. However, the basic ideas should
+be transferable to other programming languages. For the purpose of documentation, we
+introduce the Sphinx documentation generator. Despite its origin as a tool to generate
+the Python documentation, it is very flexible and can be used also for other programming
+languages. In fact, even the present lecture notes where produced with Sphinx.</p>
+<p>The other chapters are concerned more with the performance of programs. This is an
+important issue when using Python as a programming language. Python has gained a significant
+popularity in scientific computing despite its reputation of not being the fastest
+language. However, there exist a variety of approaches to bring Python up to speed.
+One possibility is the use of scientific numerical libraries like NumPy and SciPy which
+are discussed in <a class="reference internal" href="numpy.html#scientific-libraries"><span class="std std-numref">Chapter 4</span></a>. This chapter is rather
+specific to Python apart from the aspect of illustrating the use of numerical libraries.</p>
+<p><a class="reference internal" href="profiling.html#profiling"><span class="std std-numref">Chapter 5</span></a> is devoted to the run-time analysis of code
+with the aim of identifying the most time-consuming parts of a program. Here
+again, the tools are specific to Python but the concepts can be applied to
+other languages as well. Finally, <a class="reference internal" href="parallel.html#parallel-computing"><span class="std std-numref">Chapter 7</span></a>
+gives a brief introduction to aspects of parallel computing in Python. In view
+of the existence of the global interpreter lock, this discussion is rather specific
+to Python. In addition, possibilities offered by just-in-time compilers to increase
+the performance of programs are highlighted.</p>
+<p>These lecture notes present material covered in a one-semester method course
+<em>Tools for scientific computing</em> taught at the Universität Augsburg consisting
+of a two-hour lecture and four-hour practical work per week. The material is
+thus intended for a total of 30 hours of lectures.</p>
+<p>The sources of the lecture notes are publicly available on Github at
+<a class="reference external" href="https://github.com/gertingold/tools4scicomp">https://github.com/gertingold/tools4scicomp</a>. Suggestions for improvements
+through Github issues or pull request are welcome.</p>
+</section>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Lecture notes »Tools for Scientific Computing«</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="git.html"><span class="section-number">2. </span>Version Control with Git</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2018—2022, Gert-Ludwig Ingold, license: CC BY 4.0 International.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>
