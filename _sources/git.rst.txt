@@ -1290,7 +1290,7 @@ and first creates a new branch named ``hello``::
     * hello
       master
 
-We already now how to commit a script to the new branch. After doing so, the content
+We already know how to commit a script to the new branch. After doing so, the content
 of the main directory is::
 
    $ ls -a
