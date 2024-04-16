@@ -1061,7 +1061,7 @@ direction in :numref:`gitlab`. The individual steps are as follows:
 1. The user can always get the code from the ``upstream`` repository, e.g. to
    use it as basis for the future development. There are two options, namely
    ``git pull`` and the two-step process ``git fetch`` and ``git merge`` which
-   will discuss below.
+   we will discuss below.
 2. Having read and write access both on the local repository and the ``origin``
    repository, the user can ``git push`` to move code to the central server.
    With ``git pull``, code can also be brought from the central server to a
