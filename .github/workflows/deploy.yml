@@ -19,6 +19,7 @@ jobs:
 
     - name: install dependencies
       run: |
+        conda install -y python=3.11
         conda env update --file environment.yml --name base
         echo $CONDA/bin >> $GITHUB_PATH
 
