@@ -1689,5 +1689,222 @@ $ git log --oneline --graph --decorate --all
  </div>
 </div>
 
+---
+
+# Creating a new project on GitLab
+
+<div class="grid grid-cols-[30%_1fr] gap-8">
+ <div><img src="images/gitlab-create-project-1.png" style="width: 100%; margin: auto"></div>
+ <div><img src="images/gitlab-create-project-2.png" style="width: 100%; margin: auto"></div>
+</div>
+
+* Create blank project  
+  - add a README file to allow for cloning locally
+  - do not add a README file to push a local repository
+* Create from template  
+  sets up a structure for certain application scenarios (not relevant for us
+* Import project  
+  access via https, http, or git protocol to existing repository necessary
+
+---
+
+# Setting up the project
+
+<div><img src="images/gitlab-create-project-3.png" style="width: 90%; margin: auto"></div>
+
 <br>
+
+* For the purposes of the method course, make the repository private and add collaborators
+  manually.
+
+---
+
+# The initial commit
+
+<div><img src="images/gitlab-create-project-4.png" style="width: 60%; margin: auto"></div>
+
+<br>
+
+* README file can be edited using markdown syntax (see [commonmark.org/help](https://commonmark.org/help))
+* »Code« button lists addresses for cloning via http and ssh protocols
+* at the top right, the repository can be forked
+
+---
+
+# Inviting collaborators
+
+<div class="grid grid-cols-[60%_1fr] gap-8">
+<div><img src="images/gitlab-create-project-5.png" style="width: 100%; margin: auto"></div>
+<div><img src="images/gitlab-create-project-6.png" style="width: 100%; margin: auto"></div>
+</div><br>
+<div><img src="images/gitlab-create-project-7.png" style="width: 100%; margin: auto"></div>
+
+---
+
+# The `upstream` repository
+
+<div><img src="images/gitlab-developer-1.png" style="width: 100%; margin: auto"></div>
+
+<br>
+
+* The repository belonging to Big Boss in this example is usually referred to as `upstream`.
+* A user with access to this repository can fork it. This “copy” is usually referred to as
+  `origin`.
+
+---
+
+# A reminder of the overall picture
+
+<div><img src="images/gitlab.png" style="width: 80%; margin: auto"></div>
+
+---
+
+# Forking the repository
+
+<img src="images/gitlab-developer-2.png" style="width: 80%; margin: auto">
+
+<br>
+
+<img src="images/gitlab-developer-3.png" style="width: 60%; margin: auto">
+
+---
+
+# Cloning a remote repository
+
+* After forking the `upstream` repository, the repositories `upstream` and `origin` have the
+  same content, so that we can clone either one to a local repository.
+
+```text
+$ git clone ssh://git@gitlab.local:30022/ingold/example.git
+Cloning into 'example'...
+remote: Enumerating objects: 3, done.
+remote: Counting objects: 100% (3/3), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0
+Receiving objects: 100% (3/3), done
+```
+
+<br>
+
+* The repository has been cloned into a subdirectory with the name of the repository. A different
+  name could be given as an extra argument.
+
+```text
+$ ls -a example
+.  ..  .git  README.md
+```
+
+---
+
+# Remote repositories
+
+```text
+$ cd example
+$ git remote -v
+origin  ssh://git@gitlab.local:30022/ingold/example.git (fetch)
+origin  ssh://git@gitlab.local:30022/ingold/example.git (push)
+```
+
+* The option `-v` stands for verbose.
+* `origin` is known as a remote branch because we clone the repository from there.
+* `upstream` is not yet known to Git, but we can add it as a remote repository.
+
+<br>
+
+```text
+$ git remote add upstream ssh://git@gitlab.local:30022/boss/example.git
+$ git remote -v
+origin  ssh://git@gitlab.local:30022/ingold/example.git (fetch)
+origin  ssh://git@gitlab.local:30022/ingold/example.git (push)
+upstream        ssh://git@gitlab.local:30022/boss/example.git (fetch)
+upstream        ssh://git@gitlab.local:30022/boss/example.git (push)
+```
+* Additional remote repositories can be declared, if needed.
+
+---
+
+# Make a contribution to the project
+
+```text
+$ git switch -c hello
+Switched to a new branch 'hello'
+```
+
+... editing a script `hello.py` ...
+
+```text
+$ ls -a
+.  ..  .git  README.md  hello.py
+```
+
+... and commit it ...
+
+```text
+$ git log --oneline --decorate
+51e0462 (HEAD -> hello) hello world script added
+af3f1b4 (origin/main, origin/HEAD, main) Initial commit
+```
+
+<br>
+
+* so far, the new script exists only in the local repository
+
+---
+
+# Pushing the commit to `origin`
+
+```text
+$ git push -u origin hello
+Enumerating objects: 4, done.
+Counting objects: 100% (4/4), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 329 bytes | 329.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+remote: 
+remote: To create a merge request for hello, visit:
+remote:   http://gitlab.local:30080/ingold/example/-/merge_requests/new?merge_request%5Bsource_branch%5D=hello
+remote:
+To ssh://gitlab.local:30022/ingold/example.git
+ * [new branch]      hello -> hello
+Branch 'hello' set up to track remote branch 'hello' from 'origin'.
+```
+
+<br>
+
+* The first time the upstream branch associated with the local branch has to be defined by
+  using the option `-u` or `--set-upstream`.
+* For later `push` operations from this branch, `git push` will be sufficient.
+
+---
+
+# The state on `origin`
+
+```text
+$ git log --oneline --decorate
+* 51e0462 (HEAD -> hello, origin/hello) hello world script added
+* af3f1b4 (origin/main, origin/HEAD, main) Initial commit
+```
+
+* The changes are only present in `hello` and `origin/hello`, but not in `main` and
+  `origin/main`
+* A request to merge the new commit(s) in the `hello` branch into the `upstream/main`
+  branch can be made.
+
+<br>
+
+<img src="images/gitlab-developer-4.png" style="width: 60%; margin: auto">
+
+---
+
+# A merge request
+
+<img src="images/gitlab-developer-5a.png" style="width: 80%; margin: auto">
+
+
+---
+
+# A merge request (continued)
+
+<img src="images/gitlab-developer-5b.png" style="width: 80%; margin: auto">
 
