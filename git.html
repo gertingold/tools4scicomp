@@ -7,9 +7,9 @@
 
     <title>2. Version Control with Git &#8212; Tools for Scientific Computing 0.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=e491ac2d" />
+    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=dfa0e015" />
     <script src="_static/documentation_options.js?v=b489f392"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -109,7 +109,8 @@ detail in this chapter, is a distributed version control system. In order to
 better understand some of its aspects, it is useful to contrast it with a
 centralized version control system like Subversion.</p>
 <figure class="align-center" id="id8">
-<span id="cvcs"></span><a class="reference internal image-reference" href="_images/cvcs.png"><img alt="_images/cvcs.png" src="_images/cvcs.png" style="width: 30em;" /></a>
+<span id="cvcs"></span><a class="reference internal image-reference" href="_images/cvcs.png"><img alt="_images/cvcs.png" src="_images/cvcs.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.1 </span><span class="caption-text">A centralized version control system contains a well defined set of
 files at any given moment in time which can be referred to by a
@@ -135,7 +136,8 @@ create a new revision. A developer cannot create new revisions of the code
 while working off-line, an important drawback of centralized version control
 systems.</p>
 <figure class="align-center" id="id9">
-<span id="dvcs"></span><a class="reference internal image-reference" href="_images/dvcs.png"><img alt="_images/dvcs.png" src="_images/dvcs.png" style="width: 30em;" /></a>
+<span id="dvcs"></span><a class="reference internal image-reference" href="_images/dvcs.png"><img alt="_images/dvcs.png" src="_images/dvcs.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.2 </span><span class="caption-text">In a distributed version control system each user keeps file versions in
 a local repository and exchanges versions with other repositories when
@@ -155,7 +157,8 @@ code base. The main point to understand here is that the seemingly natural
 sequential numbering scheme cannot work in a distributed version control
 system.</p>
 <figure class="align-center" id="id10">
-<span id="dvcs-github"></span><a class="reference internal image-reference" href="_images/dvcs-github.png"><img alt="_images/dvcs-github.png" src="_images/dvcs-github.png" style="height: 10em;" /></a>
+<span id="dvcs-github"></span><a class="reference internal image-reference" href="_images/dvcs-github.png"><img alt="_images/dvcs-github.png" src="_images/dvcs-github.png" style="height: 10em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.3 </span><span class="caption-text">A typical setup for the distributed version control system Git uses
 a central server to exchange versions between local repositories.</span><a class="headerlink" href="#id10" title="Link to this image">¶</a></p>
@@ -337,7 +340,8 @@ in <a class="reference external" href="https://git-scm.com/book/en/v2/Customizin
 <section id="basic-workflow">
 <h2><span class="section-number">2.5. </span>Basic workflow<a class="headerlink" href="#basic-workflow" title="Link to this heading">¶</a></h2>
 <figure class="align-center" id="id11">
-<span id="addcommit"></span><a class="reference internal image-reference" href="_images/addcommit.png"><img alt="_images/addcommit.png" src="_images/addcommit.png" style="height: 10em;" /></a>
+<span id="addcommit"></span><a class="reference internal image-reference" href="_images/addcommit.png"><img alt="_images/addcommit.png" src="_images/addcommit.png" style="height: 10em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.4 </span><span class="caption-text">The transfer of a file to the repository is a two-step process. First one or
 more files are added to the staging area. In a second step, the files are
@@ -1009,7 +1013,8 @@ will result in a significant administrative load. It is much more common to
 exchange code via a central server, typically a GitLab server run by an
 institution or a service like <a class="reference external" href="https://github.com/">GitHub</a>.</p>
 <figure class="align-center" id="id12">
-<span id="gitlab"></span><a class="reference internal image-reference" href="_images/gitlab.png"><img alt="_images/gitlab.png" src="_images/gitlab.png" style="width: 30em;" /></a>
+<span id="gitlab"></span><a class="reference internal image-reference" href="_images/gitlab.png"><img alt="_images/gitlab.png" src="_images/gitlab.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.5 </span><span class="caption-text">Workflow for collaborative development in a distributed version control system
 with a GitLab instance as central server.</span><a class="headerlink" href="#id12" title="Link to this image">¶</a></p>
@@ -1056,13 +1061,15 @@ will first go through the steps required to set up the project and then focus
 on how one remotely interacts with this repository either as an owner of the
 repository or a collaborator who contributes code via his or her repository.</p>
 <figure class="align-center" id="id13">
-<span id="gitlab-create-project-1"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-1.png"><img alt="_images/gitlab-create-project-1.png" src="_images/gitlab-create-project-1.png" style="width: 30em;" /></a>
+<span id="gitlab-create-project-1"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-1.png"><img alt="_images/gitlab-create-project-1.png" src="_images/gitlab-create-project-1.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.6 </span><span class="caption-text">Creation of a new project in a GitLab repository.</span><a class="headerlink" href="#id13" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id14">
-<span id="gitlab-create-project-2"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-2.png"><img alt="_images/gitlab-create-project-2.png" src="_images/gitlab-create-project-2.png" style="width: 30em;" /></a>
+<span id="gitlab-create-project-2"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-2.png"><img alt="_images/gitlab-create-project-2.png" src="_images/gitlab-create-project-2.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.7 </span><span class="caption-text">During the creation of a project its name and its visibility level need to
 be defined. In addition, it makes sense to add a project description and to
@@ -1094,7 +1101,8 @@ good opportunity to exercise your version control skills. You can check the
 effect of the markup by taking a look at the project page.</p>
 </div>
 <figure class="align-center" id="id15">
-<span id="gitlab-create-project-3"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-3.png"><img alt="_images/gitlab-create-project-3.png" src="_images/gitlab-create-project-3.png" style="width: 30em;" /></a>
+<span id="gitlab-create-project-3"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-3.png"><img alt="_images/gitlab-create-project-3.png" src="_images/gitlab-create-project-3.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.8 </span><span class="caption-text">The new repository can be accessed via the HTTP and SSH protocols. Users with
 access to the repository can also fork it.</span><a class="headerlink" href="#id15" title="Link to this image">¶</a></p>
@@ -1123,14 +1131,16 @@ section <a class="reference external" href="https://docs.gitlab.com/ee/ssh/">Git
 GitLab documentation.</p>
 </div>
 <figure class="align-center" id="id16">
-<span id="gitlab-create-project-4"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-4.png"><img alt="_images/gitlab-create-project-4.png" src="_images/gitlab-create-project-4.png" style="width: 30em;" /></a>
+<span id="gitlab-create-project-4"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-4.png"><img alt="_images/gitlab-create-project-4.png" src="_images/gitlab-create-project-4.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.9 </span><span class="caption-text">On the setting page, other users can be invited to join the project and their
 permissions can be defined.</span><a class="headerlink" href="#id16" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id17">
-<span id="gitlab-create-project-5"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-5.png"><img alt="_images/gitlab-create-project-5.png" src="_images/gitlab-create-project-5.png" style="width: 30em;" /></a>
+<span id="gitlab-create-project-5"></span><a class="reference internal image-reference" href="_images/gitlab-create-project-5.png"><img alt="_images/gitlab-create-project-5.png" src="_images/gitlab-create-project-5.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.10 </span><span class="caption-text">A new team member has been added to the project as developer.</span><a class="headerlink" href="#id17" title="Link to this image">¶</a></p>
 </figcaption>
@@ -1160,7 +1170,8 @@ contribute to project <code class="docutils literal notranslate"><span class="pr
 occasionally take a look at <a class="reference internal" href="#gitlab"><span class="std std-numref">Figure 2.5</span></a> in order to connect the details to
 the overall picture.</p>
 <figure class="align-center" id="id18">
-<span id="gitlab-developer-1"></span><a class="reference internal image-reference" href="_images/gitlab-developer-1.png"><img alt="_images/gitlab-developer-1.png" src="_images/gitlab-developer-1.png" style="width: 30em;" /></a>
+<span id="gitlab-developer-1"></span><a class="reference internal image-reference" href="_images/gitlab-developer-1.png"><img alt="_images/gitlab-developer-1.png" src="_images/gitlab-developer-1.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.11 </span><span class="caption-text">In order to navigate to a repository, one can for example search for it or
 use a direct link if one has joined the project recently. This page can be
@@ -1281,7 +1292,8 @@ Branch &#39;hello&#39; set up to track remote branch &#39;hello&#39; from &#39;o
 </pre></div>
 </div>
 <figure class="align-center" id="id19">
-<span id="gitlab-developer-2"></span><a class="reference internal image-reference" href="_images/gitlab-developer-2.png"><img alt="_images/gitlab-developer-2.png" src="_images/gitlab-developer-2.png" style="width: 30em;" /></a>
+<span id="gitlab-developer-2"></span><a class="reference internal image-reference" href="_images/gitlab-developer-2.png"><img alt="_images/gitlab-developer-2.png" src="_images/gitlab-developer-2.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.12 </span><span class="caption-text">The script <code class="docutils literal notranslate"><span class="pre">hello.py</span></code> has been successfully pushed to the remote branch
 <code class="docutils literal notranslate"><span class="pre">origin/hello</span></code>. It can now be brought to the remote repository <code class="docutils literal notranslate"><span class="pre">upstream</span></code>
@@ -1319,7 +1331,8 @@ is different from the submitter, a second pair of eyes can take a look at the
 code and spot potential problems. In the end, the project team or the team leaders
 have to decide which policy to follow.</p>
 <figure class="align-center" id="id20">
-<span id="gitlab-developer-3"></span><a class="reference internal image-reference" href="_images/gitlab-developer-3.png"><img alt="_images/gitlab-developer-3.png" src="_images/gitlab-developer-3.png" style="width: 30em;" /></a>
+<span id="gitlab-developer-3"></span><a class="reference internal image-reference" href="_images/gitlab-developer-3.png"><img alt="_images/gitlab-developer-3.png" src="_images/gitlab-developer-3.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.13 </span><span class="caption-text">GitLab page for the preparation of a new merge request.</span><a class="headerlink" href="#id20" title="Link to this image">¶</a></p>
 </figcaption>
@@ -1342,7 +1355,8 @@ will automatically be part of the present merge request even though the new
 commit might not be logically related to the merge request. In such a situation,
 it is better to start a new branch, probably based on the local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch.</p>
 <figure class="align-center" id="id21">
-<span id="gitlab-developer-4"></span><a class="reference internal image-reference" href="_images/gitlab-developer-4.png"><img alt="_images/gitlab-developer-4.png" src="_images/gitlab-developer-4.png" style="width: 30em;" /></a>
+<span id="gitlab-developer-4"></span><a class="reference internal image-reference" href="_images/gitlab-developer-4.png"><img alt="_images/gitlab-developer-4.png" src="_images/gitlab-developer-4.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.14 </span><span class="caption-text">A merge request can be discussed. It can be merged and closed or even closed
 without merging if the code has been found to be unsuitable for the project.
@@ -1417,7 +1431,8 @@ Deleted branch hello (war 313a6a5).
 </pre></div>
 </div>
 <figure class="align-center" id="id22">
-<span id="gitlab-developer-5"></span><a class="reference internal image-reference" href="_images/gitlab-developer-5.png"><img alt="_images/gitlab-developer-5.png" src="_images/gitlab-developer-5.png" style="width: 30em;" /></a>
+<span id="gitlab-developer-5"></span><a class="reference internal image-reference" href="_images/gitlab-developer-5.png"><img alt="_images/gitlab-developer-5.png" src="_images/gitlab-developer-5.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.15 </span><span class="caption-text">At the tab “Settings - Branches” individual branches or all merged branches can
 be removed.</span><a class="headerlink" href="#id22" title="Link to this image">¶</a></p>
@@ -1598,7 +1613,8 @@ To ssh://localhost:30022/gert/myrepo.git
 </div>
 <p>The tag is now also visible on the project’s web page as shown in <a class="reference internal" href="#gitlab-tag"><span class="std std-numref">Figure 2.16</span></a>.</p>
 <figure class="align-center" id="id23">
-<span id="gitlab-tag"></span><a class="reference internal image-reference" href="_images/gitlab-tag.png"><img alt="_images/gitlab-tag.png" src="_images/gitlab-tag.png" style="width: 30em;" /></a>
+<span id="gitlab-tag"></span><a class="reference internal image-reference" href="_images/gitlab-tag.png"><img alt="_images/gitlab-tag.png" src="_images/gitlab-tag.png" style="width: 30em;" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 2.16 </span><span class="caption-text">After a tag has been pushed to the remote repository, it can be used on the
 project’s web page to navigate to the commit associated with the tag.</span><a class="headerlink" href="#id23" title="Link to this image">¶</a></p>
@@ -1913,7 +1929,7 @@ in the GitLab documentation.</p>
 
     <div class="footer" role="contentinfo">
     &#169; Copyright 2018—2022, Gert-Ludwig Ingold, license: CC BY 4.0 International.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.5.
     </div>
   </body>
 </html>
