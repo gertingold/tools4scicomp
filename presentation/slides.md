@@ -532,6 +532,10 @@ $ cd <myrepo>
 
 <br>
 
+```text
+$ git init
+```
+
 #### a hidden subdirectory `.git` has been created
 
 ```text
