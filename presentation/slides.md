@@ -1897,14 +1897,144 @@ $ git log --oneline --decorate
 
 ---
 
-# A merge request
+# Creating a merge request
 
 <img src="images/gitlab-developer-5a.png" style="width: 80%; margin: auto">
 
 
 ---
 
-# A merge request (continued)
+# Creating a merge request (continued)
 
 <img src="images/gitlab-developer-5b.png" style="width: 80%; margin: auto">
 
+---
+
+# A merge request
+
+<div class="grid grid-cols-[60%_1fr] gap-8">
+<div><img src="images/gitlab-developer-6.png" style="width: 100%; margin: auto"></div>
+<div>
+
+* Adding more commits before the merging has happened will make them part of the
+  merge request.
+* This allows for an improvement of the content of the merge request, e.g. through
+  discussions with other developers.
+* It is possible to ask for explicit approval of the merge request.
+
+</div>
+</div>
+
+
+---
+
+# Ready to merge
+
+<div class="grid grid-cols-[60%_1fr] gap-8">
+<div><img src="images/gitlab-developer-7.png" style="width: 95%; margin: auto"></div>
+<div>
+
+* If during the discussion it turns out that the proposed code is not useful, the
+  merge request can be closed without merging.
+* In such a case, it makes sense to add a comment explaining why the code has not
+  been merged.
+
+</div>
+</div>
+
+---
+
+# A reminder of the overall picture
+
+<div><img src="images/gitlab.png" style="width: 80%; margin: auto"></div>
+
+---
+
+# Pull the merged code into the local repository
+
+```text
+$ git switch main
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+```
+
+* the new code is still in the `hello` branch, but not in `main`
+* we want to update `main` from `upstream`
+
+```text
+$ git fetch upstream
+remote: Enumerating objects: 1, done.
+remote: Counting objects: 100% (1/1), done.
+remote: Total 1 (delta 0), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (1/1), 248 bytes | 248.00 KiB/s, done.
+From ssh://gitlab.local:30022/boss/example 
+ * [new branch]      main       -> upstream/main
+$ git merge upstream/main       
+Updating af3f1b4..da6fdcc       
+Fast-forward
+ hello.py | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 hello.py
+```
+
+* our `main` branch is now consistent with `upstream/main`
+
+---
+
+# Update `origin/main`
+
+```text
+$ git log --oneline --graph --decorate --all
+*   da6fdcc (HEAD -> main, upstream/main) Merge branch 'hello' into 'main'
+|\  
+| * 51e0462 (origin/hello, hello) hello world script added
+|/  
+* af3f1b4 (origin/main, origin/HEAD) Initial commit
+```
+
+<br>
+
+* `origin/main` is not yet consistent with `upstream/main` and `main`
+
+<br>
+
+```text
+$ git push origin main
+Enter passphrase for key '/home/gli/.ssh/id_ed25519':
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (4/4), 565 bytes | 565.00 KiB/s, done.
+Total 4 (delta 0), reused 0 (delta 0), pack-reused 0
+To ssh://gitlab.local:30022/ingold/example.git
+   af3f1b4..da6fdcc  main -> main
+```
+
+---
+
+# Cleaning up
+
+```text
+$ git log --oneline --decorate --graph
+*   da6fdcc (HEAD -> main, upstream/main, origin/main, origin/HEAD) Merge branch 'hello' into 'main'
+|\  
+| * 51e0462 (hello, origin/hello) hello world script added
+|/  
+* af3f1b4 Initial commit
+```
+
+* Now, `main`, `upstream/main` and `origin/main` point to the same commit.
+* The material in `hello` and `origin/hello` is present in the three main branches.
+* We can therefore delete the local `hello` branch, but we could also keep it for further
+  development.
+* `origin/hello` had been removed during the commit, but we could have kept it as well.
+
+<br>
+
+```text
+$ git branch -d hello
+Deleted branch hello (was 51e0462).
+```
+
+* Git would warn us if we want to delete this branch before it has been merged into `main`.
