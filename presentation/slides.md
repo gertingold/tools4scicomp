@@ -1002,11 +1002,35 @@ Untracked files:
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
+<v-click>
+
 * the directory `__pycache__/` is no longer listed
 * wildcards can be used: `*.py[cod]` corresponds to all files with extensions `pyc`, `pyo`, or `pyd`
 * put `.gitignore` into version control
 * [github.com/github/gitignore](https://github.com/github/gitignore) contains a number of
-  `.gitignore` files for different languages
+  `.gitignore` files for different programming languages
+
+</v-click>
+
+---
+
+# What should or should not be committed?
+
+#### to be committed
+
+* all sources which are needed for the project
+* this includes information about the software environment, e.g. which library versions
+  have been used
+
+<br>
+
+#### not to be committed
+
+* results to not need to be committed, because they can usually be reconstructed
+* data of extensive calculations should be stored and backed up separately
+* Changes to non-text files like images or PDF files are usually non-local. Therefore
+  such files should not be put into version control in most cases as they will take
+  a lot of disk space.
 
 ---
 
