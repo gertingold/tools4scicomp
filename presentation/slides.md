@@ -519,7 +519,7 @@ layout: gli-two-cols-header
 
 ::left::
 
-#### create a new directory for the repository
+##### create a new directory for the repository
 
 ```text
 $ mkdir <myrepo>
@@ -532,11 +532,12 @@ $ cd <myrepo>
 
 <br>
 
+##### iniitalize the repository
 ```text
 $ git init
 ```
 
-#### a hidden subdirectory `.git` has been created
+* a hidden subdirectory `.git` has been created
 
 ```text
 $ ls -a
