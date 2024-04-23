@@ -2233,3 +2233,73 @@ $ cat hello.py
 for _ in range(3):
     print("Hello world!")
 ```
+
+---
+
+# Tagging
+
+```text
+$ git tag -a v1 -m 'first production release'
+```
+```text
+$ git show v1
+tag v1
+Tagger: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
+Date:   Tue Apr 23 16:35:10 2024 +0200
+
+first production release
+
+commit 1a55fb0747eebc1dcd01f547e1351bba1359ebec (HEAD -> main, tag: v1, origin/main, origin/HEAD, dev)
+Author: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
+Date:   Tue Apr 23 16:34:12 2024 +0200
+
+    doc string added
+```
+
+<br>
+
+* tagging can be useful in order to easily access specific versions
+* here we tagged the current `HEAD`
+
+---
+
+# Tagging a commit using its SHA1 value
+
+```text
+$ git tag -a v0.1 -m'prerelease version' 60234ed
+```
+```text
+$ git tag
+v0.1
+v1
+```
+```text
+$ git log --oneline -n2
+1a55fb0 (HEAD -> main, tag: v1, origin/main, origin/HEAD, dev) doc string added
+60234ed (tag: v0.1) function call added
+```
+
+<br>
+
+* the tags are listed together with the other references
+* so far, the tags are only known in the local repository but not on the GitLab server
+
+---
+
+# Pushing a tag to the server
+
+```text
+$ git push origin v1
+Enumerating objects: 1, done.
+Counting objects: 100% (1/1), done.
+Writing objects: 100% (1/1), 184 bytes | 184.00 KiB/s, done.
+Total 1 (delta 0), reused 0 (delta 0), pack-reused 0
+To http://gitlab.local:30080/ingold/myproject.git
+ * [new tag]         v1 -> v1
+```
+
+<div><img src="images/gitlab-tag.png" style="width: 70%; margin: auto"></div>
+
+---
+
+# Detached head state
