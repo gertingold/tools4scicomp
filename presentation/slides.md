@@ -2067,3 +2067,169 @@ Deleted branch hello (was 51e0462).
 ```
 
 * Git would warn us if we want to delete this branch before it has been merged into `main`.
+
+---
+
+# When and why is a clean working directory needed?
+
+* A clean working directory does not contain any changes with respect to `HEAD`.
+* When working on a project, a situation may arise where some work has been done but a
+  clean working directory is needed because
+  * some other work should be done first
+  * work in another branch should be done first, e.g. to fix a bug in the production branch  
+    problem: Git does not allow to switch to another branch if uncommitted changes are
+    present because they might get lost
+* There are two options:
+  * commit the changes first, but this might be unwanted if the work is not yet complete
+  * **stash the changes away**
+
+---
+layout: gli-two-cols-header
+---
+
+# Trying to leave a dirty working directory
+
+::left::
+
+```text
+$ git switch -c dev
+Switched to a new branch 'dev'
+```
+
+<br>
+
+##### modify `hello.py`
+````md magic-move
+```python
+# hello.py
+print("Hello world!")
+```
+```python
+# hello.py
+print("Hello world!")
+print("Hello world!")
+print("Hello world!")
+```
+````
+
+<v-click>
+```text
+$ git commit -a -m'repetitive output of message'
+[dev e6f467c] repetitive output of message
+ 1 file changed, 2 insertions(+)
+$ git switch main
+Switched to branch 'main'
+$ git switch dev
+Switched to branch 'dev'
+```
+
+* leaving a clean working directory is no problem
+
+</v-click>
+
+::right::
+
+<v-click>
+```text
+$ git branch
+* dev
+  main
+```
+
+<br>
+
+##### modify `hello.py`
+````md magic-move
+```python
+# hello.py
+print("Hello world!")
+print("Hello world!")
+print("Hello world!")
+```
+```python
+# hello.py
+for _ in range(3):
+    print("Hello world!")
+```
+````
+</v-click>
+
+<v-click>
+
+##### now we do not commit the changes
+```text
+$ git switch main
+error: Your local changes to the following files would be overwritten ↩
+by checkout:
+        hello.py
+Please commit your changes or stash them before you switch branches.
+Aborting
+```
+
+* a clean working directory is needed, either commit or stash the changes
+</v-click>
+
+---
+layout: gli-two-cols-header
+---
+
+# Stashing changes
+
+::left::
+
+```text
+$ git stash
+Saved working directory and index state WIP on dev: ↩
+e6f467c repetitive output of message
+$ git stash list
+stash@{0}: WIP on dev: e6f467c repetitive output of message
+$ git switch main
+Switched to branch 'main'
+```
+
+<br>
+
+##### in `main` we still have the first version of our script
+```text
+$ cat hello.py
+print("Hello world!")
+```
+
+<br>
+
+##### in `dev` we now get the last committed version
+```text
+$ git switch dev
+Switched to branch 'dev'
+$ cat hello.py
+print("Hello world!")
+print("Hello world!")
+print("Hello world!")
+```
+
+::right::
+
+```text
+$ git stash pop
+On branch dev
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in ↩
+working directory)
+        modified:   hello.py
+
+no changes added to commit (use "git add" and/or ↩
+"git commit -a")
+Dropped refs/stash@{0} (d1fc35f06e65ef6705cafb7f0313f34baf↩
+060459)
+```
+
+<br>
+
+##### the stash is empty again but we have our work in progress back
+```text
+$ git stash list
+$ cat hello.py
+for _ in range(3):
+    print("Hello world!")
+```
