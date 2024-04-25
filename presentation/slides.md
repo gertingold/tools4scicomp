@@ -2303,3 +2303,98 @@ To http://gitlab.local:30080/ingold/myproject.git
 ---
 
 # Detached head state
+
+```text
+$ git log --oneline
+1a55fb0 (HEAD -> main, tag: v1, origin/main, ↩
+         origin/HEAD) doc string added
+60234ed function call added
+f6a49f3 repeated print of text factored out
+4a49a85 loop implemented
+32e0993 simple hello world script added
+3960122 Initial commit
+```
+
+* `HEAD` is pointing to (the top of) a branch
+* we are interested in the code at a specific commit
+
+```text
+$ git checkout f6a49f3
+HEAD is now at f6a49f3 repeated print of text factored out
+```
+
+```text
+$ git log --oneline
+f6a49f3 (HEAD) repeated print of text factored out
+4a49a85 loop implemented
+32e0993 simple hello world script added
+3960122 Initial commit
+```
+
+* `HEAD` does no longer point to the top of a branch, it is detached
+
+---
+
+# The full Git message
+
+```text
+$ git checkout f6a49f3
+Note: switching to 'f6a49f3'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at f6a49f3 repeated print of text factored out
+```
+
+---
+
+# Saving work done in a detached head state
+
+````md magic-move
+```text
+for _ in range(3):
+    print("Hello world!")
+```
+```text
+for _ in range(3):
+    print("Hello world! How are you?")
+```
+````
+
+* a commit was added in the detached head state, let us switch back to the `main` branch
+
+```text
+$ git switch main
+Warning: you are leaving 1 commit behind, not connected to
+any of your branches:
+
+  4e8e665 'how are you' added
+
+If you want to keep it by creating a new branch, this may be a good time
+to do so with:
+
+ git branch <new-branch-name> 4e8e665
+
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+```
+
+* the commit is not connected to another branch 
+  * either create a new branch before leaving the branch in a detached head state
+  * or follow the advice after leaving the branch
+
+---
+
