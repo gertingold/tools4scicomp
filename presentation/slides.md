@@ -2364,11 +2364,11 @@ HEAD is now at f6a49f3 repeated print of text factored out
 # Saving work done in a detached head state
 
 ````md magic-move
-```text
+```python
 for _ in range(3):
     print("Hello world!")
 ```
-```text
+```python
 for _ in range(3):
     print("Hello world! How are you?")
 ```
