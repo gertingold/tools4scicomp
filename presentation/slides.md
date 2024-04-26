@@ -278,7 +278,7 @@ Webpage:  [git-scm.com](https://git-scm.com)
 
 # Getting help on Git
 
-```text {1|2-}{maxHeight:'450px'}
+```console {1|2-}{maxHeight:'450px'}
 $ git help
 usage: git [--version] [--help] [-C <path>] [-c <name>=<value>]
            [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
@@ -334,7 +334,7 @@ See 'git help git' for an overview of the system.
 
 <div></div>example:
 
-```text {1|2-}{maxHeight:'400px'}
+```console {1|2-}{maxHeight:'400px'}
 $ git --help init
 GIT-INIT(1)                                   Git Manual                                  GIT-INIT(1)
 
@@ -479,7 +479,7 @@ Git 2.34.1                                    07/07/2023                        
 
 # Some topical guides on Git
 
-```text {1|2-}{maxHeight:'450px'}
+```console {1|2-}{maxHeight:'450px'}
 $ git help -g
 
 The Git concept guides are:
@@ -521,7 +521,7 @@ layout: gli-two-cols-header
 
 ##### create a new directory for the repository
 
-```text
+```console
 $ mkdir <myrepo>
 $ cd <myrepo>
 ```
@@ -533,13 +533,13 @@ $ cd <myrepo>
 <br>
 
 ##### iniitalize the repository
-```text
+```console
 $ git init
 ```
 
 * a hidden subdirectory `.git` has been created
 
-```text
+```console
 $ ls -a
 .  ..  .git
 ```
@@ -552,7 +552,7 @@ $ ls -a
 
 #### content of the `.git` directory
 
-```text
+```console
 $ ls -l .git
 total 32
 -rw-rw-r-- 1 gli gli   23 Apr 12 10:47 HEAD
@@ -591,7 +591,7 @@ Git records the name of the user committing changes to the code. It therefore ne
 
 This information later can help to find out who introduced a mistake or who added an important piece of code.
 
-```text
+```console
 $ git config --global user.name <your name>
 $ git config --global user.email <your email>
 ```
@@ -601,11 +601,11 @@ $ git config --global user.email <your email>
   configuration per repository is also possible, e.g. if another email address should be used.
 * Many aspects of Git can be configured. For details see [chapter 8.1 of the Pro Git book](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration).  
   Example: configuration of a default editor
-  ```text
+  ```console
   $ git config --global core.editor vim
   ```
 * list configuration
-  ```text
+  ```console
   $ git config --list
   user.name=Gert-Ludwig Ingold
   user.email=gert.ingold@physik.uni-augsburg.de
@@ -645,7 +645,7 @@ $ git config --global user.email <your email>
 
 #### immediately after initialization the status is as follows
 
-```text {1|2|4|6}
+```console {1|2|4|6}
 $ git status
 On branch master
 
@@ -678,7 +678,7 @@ print("Hello world!")
 
 <br>
 
-```text {1|6-8}
+```console {1|6-8}
 $ git status
 On branch master
 
@@ -700,13 +700,13 @@ nothing added to commit but untracked files present (use "git add" to track)
 
 # Adding the file to the staging area
 
-```text
+```console
 git add hello.py
 ```
 
 <br>
 
-```text {1|6-8}
+```console {1|6-8}
 $ git status
 On branch master
 
@@ -743,7 +743,7 @@ for n in range(3):
 ````
 
 <v-click>
-```text {1|4|6-8|10-13}
+```console {1|4|6-8|10-13}
 $ git status
 On branch master
 
@@ -774,7 +774,7 @@ Changes not staged for commit:
 
 # Our first commit
 
-```text
+```console
 $ git commit -m 'simple hello world script added'
 [master (root-commit) 11e2d07] simple hello world script added
  1 file changed, 1 insertion(+)
@@ -786,7 +786,7 @@ $ git commit -m 'simple hello world script added'
   message which can consist of a single line or a single line and some additional text separated
   by an empty line.
 
-```text
+```console
 $ git status
 On branch master
 Changes not staged for commit:
@@ -803,7 +803,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 
 # Adding and committing
 
-```text
+```console
 $ git commit -a -m 'repetition of hello world implemented'
 [master 52b9aa8] repetition of hello world implemented
  1 file changed, 2 insertions(+), 1 deletion(-)
@@ -813,7 +813,7 @@ $ git commit -a -m 'repetition of hello world implemented'
 
 <br>
 
-```text
+```console
 $ git status
 On branch master
 nothing to commit, working tree clean
@@ -834,7 +834,7 @@ nothing to commit, working tree clean
 
 # Commit history
 
-```text {1|2-6|8-12}
+```console {1|2-6|8-12}
 $ git log
 commit 52b9aa80d2441b3d8a7363affbffb9694ee16750 (HEAD -> master)
 Author: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
@@ -860,7 +860,7 @@ Date:   Fri Apr 12 16:12:18 2024 +0200
 
 # Secure Hash Algorithm 1 (SHA1)
 
-```text
+```console
 $ echo Python | sha1sum
 79c4e0b5abbd2f67a369ba6ee0b95438c38eb0cb  -
 $ echo python | sha1sum
@@ -941,7 +941,7 @@ def repeated_print(text, repetitions):
 <v-click>
 Let us check whether the code still works:
 
-```text
+```console
 $ python hello.py
 Hello world!
 Hello world!
@@ -953,7 +953,7 @@ Hello world!
 
 # Irrelevant objects appear
 
-```text {all|8,10,11}
+```console {all|8,10,11}
 $ git status
 On branch master
 Changes not staged for commit:
@@ -969,7 +969,7 @@ Untracked files:
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
-```text {hide|1|5,8,10}
+```console {hide|1|5,8,10}
 $ ls -lR
 .:
 insgesamt 12
@@ -986,12 +986,12 @@ insgesamt 4
 
 # Let Git ignore objects
 
-```text
+```console
 # .gitignore
 __pycache__/
 ```
 
-```text {hide|all|8,10-11}
+```console {hide|all|8,10-11}
 $ git status
 On branch master
 Changes not staged for commit:
@@ -1049,7 +1049,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 
 <br>
 
-```text
+```console
 $ git log --oneline --graph --decorate --all
 * 4a97579 (HEAD -> master) .gitignore for Python added
 * 0c227f4 hello world script refactored
@@ -1064,7 +1064,7 @@ $ git log --oneline --graph --decorate --all
 
 # Creating a development branch
 
-```text
+```console
 $ git branch
 * master
 ```
@@ -1075,14 +1075,14 @@ $ git branch
 
 * Create a development branch called `dev`. Other names could be used as well to identify the branch.
 
-```text
+```console
 $ git switch -c dev
 Switched to a new branch 'dev'
 ```
 
 * `switch` switches the branch, `-c` implies creation of a new branch.
 
-```text {all|2}
+```console {all|2}
 $ git branch
 * dev
   master
@@ -1091,7 +1091,7 @@ $ git branch
 <br>
 Alternative:
 
-```text
+```console
 $ git branch dev
 $ git switch dev
 ```
@@ -1100,29 +1100,29 @@ $ git switch dev
 
 # Switching back and forth
 
-```text
+```console
 $ git branch
 * dev
   master
 ```
 
-```text
+```console
 $ git switch master
 Switched to branch »master«
 ```
 
-```text
+```console
 $ git branch
   dev
 * master
 ```
 
-```text
+```console
 $ git switch dev
 Switched to branch »dev«
 ```
 
-```text {all|2}
+```console {all|2}
 git log  --oneline --graph --decorate=short --all
 * 4a97579 (HEAD -> dev, master) .gitignore for Python added
 * 0c227f4 hello world script refactored
@@ -1156,7 +1156,7 @@ def hello(name="", repetitions=1):
 ```
 ````
 
-```text {hide|all|2,3}
+```console {hide|all|2,3}
 $ git log --oneline --graph --decorate --all
 * d5a8fb8 (HEAD -> dev) name as new argument implemented
 * 4a97579 (master) .gitignore for Python added
@@ -1180,13 +1180,13 @@ $ git log --oneline --graph --decorate --all
 
 #### `dev` branch
 
-```text {all|2}
+```console {all|2}
 $ git branch
 * dev
   master
 ```
 
-```text
+```console
 $ cat hello.py
 from repeat import repeated_print
 
@@ -1199,11 +1199,11 @@ def hello(name="", repetitions=1):
 
 #### `master` branch
 
-```text
+```console
 $ git switch master
 Switched to branch »master«
 ```
-```text
+```console
 $ cat hello.py
 from repeat import repeated_print
 
@@ -1224,7 +1224,7 @@ repeated_print("Hello world!", 3)
   </div>
 </div>
 
-```text
+```console
 $ git branch
   dev
 * master
@@ -1255,7 +1255,7 @@ def repeated_print(text, repetitions=1):
 
 #### commit and go back to the `dev` branch
 
-```text
+```console
 $ git commit -a -m 'default value for number of repetitions defined'
 $ git switch dev
 ```
@@ -1266,7 +1266,7 @@ $ git switch dev
 
 # Two branches
 
-```text
+```console
 $ git log --oneline --graph --decorate --all
 * 598bbf7 (master) default value for number of repetitions defined
 | * d5a8fb8 (HEAD -> dev) name as new argument implemented
@@ -1340,7 +1340,7 @@ if __name__ == "__main__":
 
 # What did we change?
 
-```text {1|all}
+```console {1|all}
 $ git diff
 diff --git a/hello.py b/hello.py
 index 539c294..1240711 100644
@@ -1366,7 +1366,7 @@ index 539c294..1240711 100644
 
 # `git add -p`
 
-```text
+```console
 $ git add -p hello.py
 diff --git a/hello.py b/hello.py
 index 539c294..1240711 100644
@@ -1386,7 +1386,7 @@ index 539c294..1240711 100644
 (1/1) Stage this hunk [y,n,q,a,d,s,e,?]?
 ```
 
-```text {all}{maxHeight:'100px'}
+```console {all}{maxHeight:'100px'}
 y - stage this hunk
 n - do not stage this hunk
 q - quit; do not stage this hunk or any of the remaining ones
@@ -1401,7 +1401,7 @@ e - manually edit the current hunk
 
 # Split the changes
 
-```text 
+```console 
 (1/1) Stage this hunk [y,n,q,a,d,s,e,?]? s
 Split into 2 hunks.
 @@ -2,6 +2,6 @@
@@ -1429,7 +1429,7 @@ Split into 2 hunks.
 
 # Merging two branches
 
-```text
+```console
 $ git log --oneline --graph --decorate --all
 * 3915166 (HEAD -> dev) function call added
 * 8b7465e exclamation mark added
@@ -1446,7 +1446,7 @@ $ git log --oneline --graph --decorate --all
 
 #### merge `dev` branch into `master` branch
 
-```text
+```console
 $ git switch master
 Switched to branch »master«
 ```
@@ -1458,14 +1458,14 @@ Switched to branch »master«
 
 # Merging two branches
 
-```text
+```console
 $ git merge dev
 Merge made by the 'ort' strategy.
  hello.py | 9 ++++++++-
  1 file changed, 8 insertions(+), 1 deletion(-)
 ```
 
-```text
+```console
 $ git log --oneline --graph --decorate --all
 *   9137444 (HEAD -> master) Merge branch 'dev'
 |\  
@@ -1540,7 +1540,7 @@ def repeated_print(text, repetitions=1):
 * The branch `dev` can be kept for further development.
 * It can also be deleted and a new branch `dev` can be created later.
 
-```text
+```console
 $ git branch -d dev
 Deleted branch dev (was 3915166).
 ```
@@ -1548,7 +1548,7 @@ Deleted branch dev (was 3915166).
 * If changes could be lost, the option `-d` is not sufficient to delete the branch.
   Use `-D` if the deletion of the branch is really wanted.
 
-```text
+```console
 $ git log --oneline --graph --decorate --all
 *   9137444 (HEAD -> master) Merge branch 'dev'
 |\  
@@ -1600,7 +1600,7 @@ def repeated_print(text, repetitions):
 
 <br>
 
-```text
+```console
 $ git log --oneline --graph --decorate --all
 * 6adb4bd (master) doc string added
 *   9137444 Merge branch 'dev'
@@ -1616,7 +1616,7 @@ $ git log --oneline --graph --decorate --all
 
 # Merge conflicts
 
-```text {all|6,7}
+```console {all|6,7}
 $ git branch
   dev
 * master
@@ -1633,7 +1633,7 @@ Automatic merge failed; fix conflicts and then commit the result.
 
 <v-after>
 
-```text {all|2-7|7-10}
+```console {all|2-7|7-10}
  # repeat.py
  <<<<<<< HEAD
  def repeated_print(text, repetitions=1):
@@ -1659,7 +1659,7 @@ Automatic merge failed; fix conflicts and then commit the result.
 
 # History after resolution of merge conflict
 
-```text
+```console
 $ git log --oneline --graph --decorate --all
 *   ee1bcde (HEAD -> master) Merge branch 'dev'
 |\  
@@ -1803,7 +1803,7 @@ $ git log --oneline --graph --decorate --all
 * After forking the `upstream` repository, the repositories `upstream` and `origin` have the
   same content, so that we can clone either one to a local repository.
 
-```text
+```console
 $ git clone ssh://git@gitlab.local:30022/ingold/example.git
 Cloning into 'example'...
 remote: Enumerating objects: 3, done.
@@ -1818,7 +1818,7 @@ Receiving objects: 100% (3/3), done
 * The repository has been cloned into a subdirectory with the name of the repository. A different
   name could be given as an extra argument.
 
-```text
+```console
 $ ls -a example
 .  ..  .git  README.md
 ```
@@ -1827,7 +1827,7 @@ $ ls -a example
 
 # Remote repositories
 
-```text
+```console
 $ cd example
 $ git remote -v
 origin  ssh://git@gitlab.local:30022/ingold/example.git (fetch)
@@ -1840,7 +1840,7 @@ origin  ssh://git@gitlab.local:30022/ingold/example.git (push)
 
 <br>
 
-```text
+```console
 $ git remote add upstream ssh://git@gitlab.local:30022/boss/example.git
 $ git remote -v
 origin  ssh://git@gitlab.local:30022/ingold/example.git (fetch)
@@ -1854,21 +1854,21 @@ upstream        ssh://git@gitlab.local:30022/boss/example.git (push)
 
 # Make a contribution to the project
 
-```text
+```console
 $ git switch -c hello
 Switched to a new branch 'hello'
 ```
 
 ... editing a script `hello.py` ...
 
-```text
+```console
 $ ls -a
 .  ..  .git  README.md  hello.py
 ```
 
 ... and commit it ...
 
-```text
+```console
 $ git log --oneline --decorate
 51e0462 (HEAD -> hello) hello world script added
 af3f1b4 (origin/main, origin/HEAD, main) Initial commit
@@ -1882,7 +1882,7 @@ af3f1b4 (origin/main, origin/HEAD, main) Initial commit
 
 # Pushing the commit to `origin`
 
-```text
+```console
 $ git push -u origin hello
 Enumerating objects: 4, done.
 Counting objects: 100% (4/4), done.
@@ -1909,7 +1909,7 @@ Branch 'hello' set up to track remote branch 'hello' from 'origin'.
 
 # The state on `origin`
 
-```text
+```console
 $ git log --oneline --decorate
 * 51e0462 (HEAD -> hello, origin/hello) hello world script added
 * af3f1b4 (origin/main, origin/HEAD, main) Initial commit
@@ -1981,7 +1981,7 @@ $ git log --oneline --decorate
 
 # Pull the merged code into the local repository
 
-```text
+```console
 $ git switch main
 Switched to branch 'main'
 Your branch is up to date with 'origin/main'.
@@ -1990,7 +1990,7 @@ Your branch is up to date with 'origin/main'.
 * the new code is still in the `hello` branch, but not in `main`
 * we want to update `main` from `upstream`
 
-```text
+```console
 $ git fetch upstream
 remote: Enumerating objects: 1, done.
 remote: Counting objects: 100% (1/1), done.
@@ -2012,7 +2012,7 @@ Fast-forward
 
 # Update `origin/main`
 
-```text
+```console
 $ git log --oneline --graph --decorate --all
 *   da6fdcc (HEAD -> main, upstream/main) Merge branch 'hello' into 'main'
 |\  
@@ -2027,7 +2027,7 @@ $ git log --oneline --graph --decorate --all
 
 <br>
 
-```text
+```console
 $ git push origin main
 Enter passphrase for key '/home/gli/.ssh/id_ed25519':
 Enumerating objects: 5, done.
@@ -2044,7 +2044,7 @@ To ssh://gitlab.local:30022/ingold/example.git
 
 # Cleaning up
 
-```text
+```console
 $ git log --oneline --decorate --graph
 *   da6fdcc (HEAD -> main, upstream/main, origin/main, origin/HEAD) Merge branch 'hello' into 'main'
 |\  
@@ -2061,7 +2061,7 @@ $ git log --oneline --decorate --graph
 
 <br>
 
-```text
+```console
 $ git branch -d hello
 Deleted branch hello (was 51e0462).
 ```
@@ -2091,7 +2091,7 @@ layout: gli-two-cols-header
 
 ::left::
 
-```text
+```console
 $ git switch -c dev
 Switched to a new branch 'dev'
 ```
@@ -2113,7 +2113,7 @@ print("Hello world!")
 ````
 
 <v-click>
-```text
+```console
 $ git commit -a -m'repetitive output of message'
 [dev e6f467c] repetitive output of message
  1 file changed, 2 insertions(+)
@@ -2130,7 +2130,7 @@ Switched to branch 'dev'
 ::right::
 
 <v-click>
-```text
+```console
 $ git branch
 * dev
   main
@@ -2157,7 +2157,7 @@ for _ in range(3):
 <v-click>
 
 ##### now we do not commit the changes
-```text
+```console
 $ git switch main
 error: Your local changes to the following files would be overwritten ↩
 by checkout:
@@ -2177,7 +2177,7 @@ layout: gli-two-cols-header
 
 ::left::
 
-```text
+```console
 $ git stash
 Saved working directory and index state WIP on dev: ↩
 e6f467c repetitive output of message
@@ -2190,7 +2190,7 @@ Switched to branch 'main'
 <br>
 
 ##### in `main` we still have the first version of our script
-```text
+```console
 $ cat hello.py
 print("Hello world!")
 ```
@@ -2198,7 +2198,7 @@ print("Hello world!")
 <br>
 
 ##### in `dev` we now get the last committed version
-```text
+```console
 $ git switch dev
 Switched to branch 'dev'
 $ cat hello.py
@@ -2209,7 +2209,7 @@ print("Hello world!")
 
 ::right::
 
-```text
+```console
 $ git stash pop
 On branch dev
 Changes not staged for commit:
@@ -2227,7 +2227,7 @@ Dropped refs/stash@{0} (d1fc35f06e65ef6705cafb7f0313f34baf↩
 <br>
 
 ##### the stash is empty again but we have our work in progress back
-```text
+```console
 $ git stash list
 $ cat hello.py
 for _ in range(3):
@@ -2238,10 +2238,10 @@ for _ in range(3):
 
 # Tagging
 
-```text
+```console
 $ git tag -a v1 -m 'first production release'
 ```
-```text
+```console
 $ git show v1
 tag v1
 Tagger: Gert-Ludwig Ingold <gert.ingold@physik.uni-augsburg.de>
@@ -2265,15 +2265,15 @@ Date:   Tue Apr 23 16:34:12 2024 +0200
 
 # Tagging a commit using its SHA1 value
 
-```text
+```console
 $ git tag -a v0.1 -m'prerelease version' 60234ed
 ```
-```text
+```console
 $ git tag
 v0.1
 v1
 ```
-```text
+```console
 $ git log --oneline -n2
 1a55fb0 (HEAD -> main, tag: v1, origin/main, origin/HEAD, dev) doc string added
 60234ed (tag: v0.1) function call added
@@ -2288,7 +2288,7 @@ $ git log --oneline -n2
 
 # Pushing a tag to the server
 
-```text
+```console
 $ git push origin v1
 Enumerating objects: 1, done.
 Counting objects: 100% (1/1), done.
@@ -2304,7 +2304,7 @@ To http://gitlab.local:30080/ingold/myproject.git
 
 # Detached head state
 
-```text
+```console
 $ git log --oneline
 1a55fb0 (HEAD -> main, tag: v1, origin/main, ↩
          origin/HEAD) doc string added
@@ -2318,12 +2318,12 @@ f6a49f3 repeated print of text factored out
 * `HEAD` is pointing to (the top of) a branch
 * we are interested in the code at a specific commit
 
-```text
+```console
 $ git checkout f6a49f3
 HEAD is now at f6a49f3 repeated print of text factored out
 ```
 
-```text
+```console
 $ git log --oneline
 f6a49f3 (HEAD) repeated print of text factored out
 4a49a85 loop implemented
@@ -2337,7 +2337,7 @@ f6a49f3 (HEAD) repeated print of text factored out
 
 # The full Git message
 
-```text
+```console
 $ git checkout f6a49f3
 Note: switching to 'f6a49f3'.
 
@@ -2376,7 +2376,7 @@ for _ in range(3):
 
 * a commit was added in the detached head state, let us switch back to the `main` branch
 
-```text
+```console
 $ git switch main
 Warning: you are leaving 1 commit behind, not connected to
 any of your branches:
