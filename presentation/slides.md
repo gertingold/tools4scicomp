@@ -2398,3 +2398,25 @@ Your branch is up to date with 'origin/main'.
 
 ---
 
+# Overall picture of the detached head state
+
+<div class="grid grid-cols-[1fr_1fr] gap-20">
+<div>
+
+![](images/detachedhead_1.png)
+
+<br>
+
+![](images/detachedhead_2.png)
+
+</div>
+<div>
+
+![](images/detachedhead_3.png)
+
+<br>
+
+![](images/detachedhead_4.png)
+
+</div>
+</div>
