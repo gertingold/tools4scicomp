@@ -1760,6 +1760,174 @@ $ git log --oneline --graph --decorate --all
 
 ---
 
+# Parenthesis on SSH keys: Two protocols
+
+<div><img src="images/code_urls.png" style="width: 32%; margin: auto;"></div>
+
+<br>
+
+#### Two different protocols
+* `http`: hypertext transfer protocol  
+  * needs username and password for authentification on the GitLab server 
+* `ssh`: secure shell
+  * generate an SSH key pair and put *public* key on GitLab server
+  * Use *private* key for authentification. A passphrase may be needed to use the private key.
+  * secure communication with GitLab server
+  * commits can be signed with a SSH key
+
+---
+
+# Parenthesis on SSH keys: Asymmetric key pair
+
+<br>
+
+<div><img src="images/asymmetric_encryption.png" style="width: 100%; margin: auto;"></div>
+<div style="font-size: small;padding-top: 10px;text-align: right;">(adapted from Wikipedia)</div>
+
+* *public* key allows to encrypt message
+* decryption requires *private* key
+
+<br>
+
+<div class="p-2 border-2 border-red-800 bg-red-50 text-red-800" style="width: 60%;margin: auto;">
+  <div class="grid grid-cols-[4%_1fr] gap-10">
+    <div><carbon-warning-alt class="text-red-800 text-3xl" /></div>
+    <div>
+      Distribute the public key, but keep the private key safe!
+    </div>
+  </div>
+</div>
+
+---
+
+# Parenthesis on SSH keys: Key pair generation
+
+* Check first whether you already have a key pair in your directory `$HOME/.ssh`
+* If not, generate a key pair. There are different algorithms available. Presently,
+  ED25519 is recommended:
+  ```console
+  $ ssh-keygen -t ed25519
+  Generating public/private ed25519 key pair.
+  Enter file in which to save the key (/home/gli/.ssh/id_ed25519): 
+  Enter passphrase (empty for no passphrase): 
+  Enter same passphrase again: 
+  Your identification has been saved in /home/gli/.ssh/id_ed25519
+  Your public key has been saved in /home/gli/.ssh/id_ed25519.pub
+  The key fingerprint is:
+  SHA256:9+VBe2dwBxkrPLyErXboCJYIy7SwqBh2HNCCDPX+NT0 gli@gli-tp14-1
+  The key's randomart image is:
+  +--[ED25519 256]--+
+  |=oo           oo |
+  |.o.o       =  .o |
+  |. +..     . B + o|
+  |.=.=.. . . + = +.|
+  |+.+oo + S E o + +|
+  |+..  o o * + o +.|
+  |o     . . . . .  |
+  |                 |
+  |                 |
+  +----[SHA256]-----+
+  ```
+
+---
+
+# Parenthesis on SSH keys: A key pair
+
+```console
+$ ls -l .ssh
+total 8
+-rw------- 1 gli gli 464 Apr 30 15:10 id_ed25519
+-rw-r--r-- 1 gli gli 102 Apr 30 15:10 id_ed25519.pub
+```
+
+* The longer key `id_ed25519` is the *private* key while the shorter key `id_ed25519.pub`
+  is the *public* key.
+* The public key has the form
+  ```console
+  $ cat .ssh/id_ed25519.pub
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJJ6q/C9VqYciIC45J5wTF2zdkuN4zEIwQGPiiGrSG7B gert.ingold@uni-a.de
+  ```
+
+* The private key starts and ends with
+  ```console
+  -----BEGIN OPENSSH PRIVATE KEY-----
+  …
+  -----END OPENSSH PRIVATE KEY-----
+
+  ```
+
+* Keep the private key secret.
+
+---
+
+# Parenthesis on SSH keys: Adding public key to GitLab
+
+<div class="grid grid-cols-[1fr_1fr] gap-8">
+ <div><img src="images/add_sshkey_1.png" style="width: 100%; margin: auto"></div>
+ <div><img src="images/add_sshkey_2.png" style="width: 100%; margin: auto"></div>
+</div>
+
+<div><img src="images/add_sshkey_3.png" style="width: 100%; margin: auto"></div>
+
+---
+
+# Parenthesis on SSH keys: Update remote repositories
+
+```console
+$ git remote -v
+origin  http://gitlab.local:30080/ingold/example.git (fetch)
+origin  http://gitlab.local:30080/ingold/example.git (push)
+upstream  http://gitlab.local:30080/boss/example.git (fetch)
+upstream  http://gitlab.local:30080/boss/example.git (push)
+```
+
+```console
+$ git remote remove origin
+$ git remote add upstream ssh://git@gitlab.local:30022/ingold/example.git
+$ git remote remove upstream
+$ git remote add origin ssh://git@gitlab.local:30022/boss/example.git
+```
+
+```console
+$ git remote -v
+origin  ssh://git@gitlab.local:30022/ingold/example.git (fetch)
+origin  ssh://git@gitlab.local:30022/ingold/example.git (push)
+upstream  ssh://git@gitlab.local:30022/boss/example.git (fetch)
+upstream  ssh://git@gitlab.local:30022/boss/example.git (push)
+```
+
+---
+
+# Parenthesis on SSH keys: `ssh-add`
+
+* Each time the private SSH key is accessed, the passphrase needs
+  to be entered. How can this be avoided?
+* Use `ssh-add` in order to add keys to the SSH authentication agent.
+
+```console
+$ ssh-add -L
+The agent has no identities.
+```
+
+* option `-L` lists the keys available to the agent
+
+<br>
+
+#### adding an SSH key
+```console
+$ ssh-add
+Enter passphrase for /home/ingold/.ssh/id_ed25519: 
+Identity added: /home/ingold/.ssh/id_ed25519 (gert.ingold@uni-a.de)
+$ ssh-add -L
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJJ6q/C9VqYciIC45J5wTF2zdkuN4zEIwQGPiiGrSG7B gert.ingold@uni-a.de
+```
+
+* After `ssh-add` there is no need anymore to enter the passphrase.
+* `ssh-add` needs to be executed again after the next login, if needed
+
+
+---
+
 # Inviting collaborators
 
 <div class="grid grid-cols-[60%_1fr] gap-8">
