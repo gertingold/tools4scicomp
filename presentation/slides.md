@@ -2588,3 +2588,279 @@ Your branch is up to date with 'origin/main'.
 
 </div>
 </div>
+
+---
+
+# Rewriting history
+
+<br>
+
+<div class="p-2 border-2 border-red-800 bg-red-50 text-red-800" style="width: 85%;margin: auto;">
+  <div class="grid grid-cols-[4%_1fr] gap-10">
+    <div><carbon-warning-alt class="text-red-800 text-3xl" /></div>
+    <div>
+      Do not rewrite history in a remote repository as it might result in big problems.
+    </div>
+  </div>
+</div>
+
+<br>
+
+* Rewriting the history in a local repository before pushing to a server is acceptable. 
+* Do not feel ashamed to explicitly revert a commit but adding another commit.
+* Rewriting the history on a server is highly problematic because other users might have
+  already pulled a previous version of the history thus leading to inconsistencies.
+
+<br>
+
+* In the following, we will cover only a few situations, but there exist solutions for
+  basically every situation.
+
+---
+
+# Amending the last commit message
+
+#### **Scenario:** One realizes a mistake in the commit message immediately after committing.
+
+````md magic-move
+```python
+for _ in range(3):
+    print("Hello world!")
+```
+```python
+for _ in range(3):
+    print("Hello world! How are you?")
+```
+````
+
+<v-click>
+
+```console
+$ git log --oneline
+a57c7f6 (HEAD -> main) 'who are you' added
+cd59c67 hello world script added
+```
+
+* There is a typo in the last commit message which is even misleading.
+
+</v-click>
+
+<br>
+
+<v-click>
+
+#### `--amend` option
+
+```console
+$ git commit --amend -m"'How are you?' added"
+[main 5bc4331] 'How are you?' added
+ Date: Thu May 2 07:41:29 2024 +0200
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+```console
+$ git log --oneline
+5bc4331 (HEAD -> main) 'How are you?' added
+cd59c67 hello world script added
+```
+
+</v-click>
+
+---
+
+# Removing the last commit
+
+#### **Scenario:** The last commit was not a good idea.
+
+<br>
+
+#### Solution 1: revert commit by adding another commit
+
+```console
+$ git log --oneline
+5bc4331 'How are you?' added
+cd59c67 hello world script added
+```
+
+```console
+$ git revert HEAD
+[main 29f3793] Revert "'How are you?' added"
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+```console
+$ git log --oneline
+29f3793 (HEAD -> main) Revert "'How are you?' added"
+5bc4331 'How are you?' added
+cd59c67 hello world script added
+```
+
+* A new commit has been added and history is not rewritten. Proceeding like this
+  is fine even if the previous commit had already been pushed to a remote repository.
+* It is also possible to revert other commits by using the corresponding hash value
+  as argument.
+
+---
+
+# Removing the last commit
+
+#### **Scenario:** The last commit was not a good idea.
+
+<br>
+
+#### Solution 2: reset to a previous commit
+
+```console
+$ git log --oneline
+5bc4331 (HEAD -> main) 'How are you?' added
+cd59c67 hello world script added
+```
+
+```console
+$ git reset --hard HEAD^
+HEAD is now at cd59c67 hello world script added
+```
+
+```console
+$ git log --oneline
+cd59c67 (HEAD -> main) hello world script added
+```
+
+* Now, everything is in the state of the parent of `HEAD`, i.e. `HEAD^`.
+* It is also possible to reset to other commits.
+
+<br>
+
+<div class="p-2 border-2 border-red-800 bg-red-50 text-red-800" style="width: 85%;margin: auto;">
+  <div class="grid grid-cols-[4%_1fr] gap-10">
+    <div><carbon-warning-alt class="text-red-800 text-3xl" /></div>
+    <div>
+      History will be rewritten and changes in the working directory will be lost.
+    </div>
+  </div>
+</div>
+
+---
+
+# Interactive rebase
+
+#### **Scenario:** apply only certain changes in `dev` branch using the `main` branch as base
+
+```console
+$ git log --oneline --graph --all
+* 014986c (main) headline modified
+| * 6147827 (HEAD -> dev) __name__ added to output
+| * 766d07e Test output amended
+|/  
+* 0d079bd Test script added
+```
+
+* We want to keep `014986c` and drop `766d07e` instead.
+* Then, we want to apply `6147827`.
+
+<br>
+
+* Use an interactive rebase of the `dev` branch on the `main` branch.
+
+```console
+$ git branch
+* dev
+  main
+```
+
+```console
+$ git branch -i main
+```
+
+---
+
+# Interactive rebase
+
+```console {all}{maxHeight:'320px'}
+pick 766d07e Test output amended
+pick 6147827 __name__ added to output
+
+# Rebase 014986c..6147827 onto 014986c (2 commands)
+#
+# Commands:
+# p, pick <commit> = use commit
+# r, reword <commit> = use commit, but edit the commit message
+# e, edit <commit> = use commit, but stop for amending
+# s, squash <commit> = use commit, but meld into previous commit
+# f, fixup [-C | -c] <commit> = like "squash" but keep only the previous
+#                    commit's log message, unless -C is used, in which case
+#                    keep only this commit's message; -c is same as -C but
+#                    opens the editor
+# x, exec <command> = run command (the rest of the line) using shell
+# b, break = stop here (continue rebase later with 'git rebase --continue')
+# d, drop <commit> = remove commit
+# l, label <label> = label current HEAD with a name
+# t, reset <label> = reset HEAD to a label
+# m, merge [-C <commit> | -c <commit>] <label> [# <oneline>]
+# .       create a merge commit using the original merge commit's
+# .       message (or the oneline, if no original merge commit was
+# .       specified); use -c <commit> to reword the commit message
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+```
+
+<br>
+
+* We replace `pick` by `drop` in the first line to ignore the commit `766d07e`.
+* By means of `reword`, we could modify a commit message.
+
+---
+
+# Interactive rebase
+
+```console
+$ git rebase -i main
+Auto-merging test.py
+CONFLICT (content): Merge conflict in test.py
+error: could not apply 6147827... __name__ added to output
+hint: Resolve all conflicts manually, mark them as resolved with
+hint: "git add/rm <conflicted_files>", then run "git rebase --continue".
+hint: You can instead skip this commit: run "git rebase --skip".
+hint: To abort and get back to the state before "git rebase", run "git rebase --abort".
+Could not apply 6147827... __name__ added to output
+```
+
+* There is a merge conflict which we need to resolve in the usual way.
+
+```console
+$ git add test.py
+```
+
+* Now, we can continue the rebase.
+
+```console
+$ git rebase --continue
+[detached HEAD 19b3f3e] __name__ added to output
+ 1 file changed, 2 insertions(+)
+Successfully rebased and updated refs/heads/dev.
+```
+
+---
+
+# Interactive rebase
+
+```console
+$ git log --oneline --graph --all
+* 19b3f3e (HEAD -> dev) __name__ added to output
+* 014986c (main) headline modified
+* 0d079bd Test script added
+```
+
+* Now, we have a linear history with `19b3f3e` applied on top of `014986c`.
+* The commit `__name__ added to output` has a new hash value because certain
+  aspects of the commit like its parent and the time of commit have changed.
+
+<br>
+
+* `git rebase` is very powerful and can be applied in many situations.
+* But remember: Be careful when rewriting history!
