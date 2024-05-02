@@ -556,7 +556,7 @@ The we obtain the following output from ``pytest``::
 
 Now, all tests pass just fine.
 
-One might object that the test so far only verify a few special cases and in particular
+One might object that the tests so far only verify a few special cases and in particular
 are limited to very small values of ``n``. How do we test line 10000 of Pascal's triangle
 without having to determine the expected result? We can test properties related to the
 fact that the elements of Pascal's triangle are binomial coefficients. The sum of the
