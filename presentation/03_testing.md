@@ -512,3 +512,525 @@ ValueError: ...
 * Here, the ellipsis (`...`) replaces arbitrary text
 * For a list of directives see the [`doctest` documentation](https://docs.python.org/3/library/doctest.html#doctest-options)
 * Of interest are in particular: `NORMALIZE_WHITESPACE`, `SKIP`, and `IGNORE_EXCEPTION_DETAIL`
+
+---
+layout: gli-two-cols-header
+---
+
+# Pascal's triangle as an example
+
+::left::
+
+```python
+def pascal(n):
+    """create the n-th line of Pascal's triangle
+
+    The line numbers start with n=0 for the line
+    containing only the entry 1. The elements of
+    a line are generated successively.
+
+    """
+    x = 1
+    yield x
+    for k in range(n):
+        x = x*(n-k)//(k+1)
+        yield x
+
+if __name__ == '__main__':
+    for n in range(7):
+        line = ' '.join(f'{x:2}' for x in pascal(n))
+        print(str(n)+line.center(25))
+```
+
+::right::
+
+```console
+$ python pascal.py
+0             1
+1           1  1
+2          1  2  1
+3        1  3  3  1
+4       1  4  6  4  1
+5     1  5 10 10  5  1
+6    1  6 15 20 15  6  1
+```
+
+---
+
+# Ideas for test cases
+
+1. explicit tests for certain lines
+1. sum of elements in line n should be 2<sup>n</sup>
+1. alternating sum of elements in a line should be 0
+1. line can be obtained from the previous line by appropriate summation
+
+<br>
+
+* These tests are independent of the logic of the program where
+  binomial coefficients are calculated sequentially.
+* First test is mostly convenient for small line numbers n and testing
+  of the corner case n=0
+* The other tests work well also for large line numbers.
+
+---
+
+# Testing elements in a line with small line number
+
+<div class="grid grid-cols-[35%_1fr] gap-4">
+<div>
+
+```python
+# test_pascal.py
+
+from pascal import pascal
+
+def test_n0():
+    assert list(pascal(0)) == [1]
+
+def test_n1():
+    assert list(pascal(1)) == [1, 1]
+
+def test_n5():
+    expected = [1, 4, 6, 4, 1]
+    assert list(pascal(5)) == expected
+```
+
+<br>
+
+* an error was inserted into the last test intentionally
+
+</div>
+<div>
+
+```console
+$ pytest
+============================= test session starts =============================
+platform linux -- Python 3.11.5, pytest-7.4.0, pluggy-1.0.0
+rootdir: /home/ingold/pascal
+plugins: anyio-3.5.0
+collected 3 items                                                             
+
+test_pascal.py ..F                                                      [100%]
+
+================================== FAILURES ===================================
+___________________________________ test_n5 ___________________________________
+
+    def test_n5():
+        expected = [1, 4, 6, 4, 1]
+>       assert list(pascal(5)) == expected
+E       assert [1, 5, 10, 10, 5, 1] == [1, 4, 6, 4, 1]
+E         At index 1 diff: 5 != 4
+E         Left contains one more item: 1
+E         Use -v to get more diff
+
+test_pascal.py:13: AssertionError
+=========================== short test summary info ===========================
+FAILED test_pascal.py::test_n5 - assert [1, 5, 10, 10, 5, 1] == [1, 4, 6, 4, 1]
+========================= 1 failed, 2 passed in 0.05s =========================
+```
+
+</div>
+</div>
+
+---
+
+# Tests which are expected to fail
+
+<div class="grid grid-cols-[35%_1fr] gap-4">
+<div>
+
+````md magic-move
+```python
+# test_pascal.py
+
+from pascal import pascal
+
+def test_n0():
+    assert list(pascal(0)) == [1]
+
+def test_n1():
+    assert list(pascal(1)) == [1, 1]
+
+def test_n5():
+    expected = [1, 4, 6, 4, 1]
+    assert list(pascal(5)) == expected
+```
+```python {all|12|3}
+# test_pascal.py
+
+import pytest
+from pascal import pascal
+
+def test_n0():
+    assert list(pascal(0)) == [1]
+
+def test_n1():
+    assert list(pascal(1)) == [1, 1]
+
+@pytest.mark.xfail
+def test_n5():
+    expected = [1, 4, 6, 4, 1]
+    assert list(pascal(5)) == expected
+```
+````
+
+</div>
+<div>
+<v-click>
+
+```console
+$ pytest
+============================= test session starts =============================
+platform linux -- Python 3.11.5, pytest-7.4.0, pluggy-1.0.0
+rootdir: /home/ingold/pascal
+plugins: anyio-3.5.0
+collected 3 items                                                             
+
+test_pascal.py ..x                                                      [100%]
+
+======================== 2 passed, 1 xfailed in 0.02s =========================
+```
+
+</v-click>
+</div>
+</div>
+
+<v-click>
+
+<br>
+
+* import `pytest` and decorate test function
+* tests expected to fail are marged with an `x`
+* if the test would have passed instead, it would be marked with an `X`
+
+</v-click>
+
+---
+
+# Skipping a test
+
+```python
+@pytest.mark.skip(reason="just for demonstration")
+def test_n5():
+    expected = [1, 4, 6, 4, 1]
+    assert list(pascal(5)) == expected
+```
+
+```console
+$ pytest -r s
+======================================= test session starts =======================================
+platform linux -- Python 3.11.5, pytest-7.4.0, pluggy-1.0.0
+rootdir: /home/gli/testing
+plugins: anyio-3.5.0
+collected 3 items                                                                                 
+
+test_pascal.py ..s                                                                          [100%]
+
+===================================== short test summary info =====================================
+SKIPPED [1] test_pascal.py:13: just for demonstration
+================================== 2 passed, 1 skipped in 0.01s ===================================
+```
+
+* `s` indicates a skipped test
+* option `-r s` is needed for the reason to be listed
+
+---
+
+# All tests pass
+
+<div class="grid grid-cols-[35%_1fr] gap-4">
+<div>
+
+````md magic-move
+```python
+# test_pascal.py
+
+from pascal import pascal
+
+def test_n0():
+    assert list(pascal(0)) == [1]
+
+def test_n1():
+    assert list(pascal(1)) == [1, 1]
+
+def test_n5():
+    expected = [1, 4, 6, 4, 1]
+    assert list(pascal(5)) == expected
+```
+```python
+# test_pascal.py
+
+from pascal import pascal
+
+def test_n0():
+    assert list(pascal(0)) == [1]
+
+def test_n1():
+    assert list(pascal(1)) == [1, 1]
+
+def test_n5():
+    expected = [1, 5, 10, 10, 5, 1]
+    assert list(pascal(5)) == expected
+```
+````
+
+</div>
+<div>
+<v-click>
+
+```console
+============================ test session starts ============================
+platform linux -- Python 3.11.5, pytest-7.4.0, pluggy-1.0.0
+rootdir: /home/ingold/pascal
+plugins: anyio-3.5.0
+collected 3 items                                                           
+
+test_pascal.py ...                                                    [100%]
+
+============================= 3 passed in 0.01s =============================
+```
+
+<br>
+
+* The three dots indicated three passing tests.
+
+</v-click>
+</div>
+</div>
+
+<br>
+
+<v-click>
+
+* Now we can add more tests according to the ideas listed earlier.
+
+</v-click>
+
+---
+
+# Sum and alternating sum
+
+<div class="grid grid-cols-[40%_1fr] gap-4">
+<div>
+
+```python
+def test_sum():
+    for n in (10, 100, 1000, 10000):
+        assert sum(pascal(n)) == 2**n
+
+def test_alternate_sum():
+    for n in (10, 100, 1000, 10000):
+        assert sum(alternate(pascal(n))) == 0
+
+def alternate(g):
+    sign = 1
+    for elem in g:
+        yield sign*elem
+        sign = -sign
+```
+
+</div>
+<div>
+
+```console
+======================= test session starts ========================
+platform linux -- Python 3.11.5, pytest-7.4.0, pluggy-1.0.0 -- ↩
+/home/ingold/anaconda3/bin/python
+cachedir: .pytest_cache
+rootdir: /home/ingold/pascal
+plugins: anyio-3.5.0
+collected 5 items                                                        
+
+test_pascal.py::test_n0 PASSED                               [ 20%]
+test_pascal.py::test_n1 PASSED                               [ 40%]
+test_pascal.py::test_n5 PASSED                               [ 60%]
+test_pascal.py::test_sum PASSED                              [ 80%]
+test_pascal.py::test_alternate_sum PASSED                    [100%]
+
+======================== 5 passed in 0.07s =========================
+```
+
+</div>
+</div>
+
+<br>
+
+* There is no problem in going to rather high line numbers.
+* The function name `alternate` does not start with `test` because it should not
+  be executed as a test.
+
+---
+
+# Completion of the tests
+
+<div class="grid grid-cols-[40%_1fr] gap-4">
+<div>
+
+```python
+# test_pascal.py
+
+from itertools import chain
+from pascal import pascal
+
+def test_n0():
+    assert list(pascal(0)) == [1]
+
+def test_n1():
+    assert list(pascal(1)) == [1, 1]
+
+def test_n5():
+    expected = [1, 5, 10, 10, 5, 1]
+    assert list(pascal(5)) == expected
+
+def test_sum():
+    for n in (10, 100, 1000, 10000):
+        assert sum(pascal(n)) == 2**n
+```
+
+</div>
+<div>
+
+```python
+def test_alternate_sum():
+    for n in (10, 100, 1000, 10000):
+        assert sum(alternate(pascal(n))) == 0
+
+def alternate(g):
+    sign = 1
+    for elem in g:
+        yield sign*elem
+        sign = -sign
+
+def test_generate_next_line():
+    for n in (10, 100, 1000, 10000):
+        for left, right, new in zip(chain([0], pascal(n)),
+                                    chain(pascal(n), [0]),
+                                    pascal(n+1)):
+            assert left+right == new
+```
+
+</div>
+</div>
+
+#### Problem:
+* The loops do not constitute individual tests.
+* Once a test fails within the loop, the test function exits.
+
+---
+
+# Parametrization of tests
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+<div>
+
+```python
+import pytest
+from itertools import chain
+from pascal import pascal
+
+@pytest.mark.parametrize("lineno, expected", [
+    (0, [1]),
+    (1, [1, 1]),
+    (5, [1, 5, 10, 10, 5, 1])
+])
+def test_line(lineno, expected):
+    assert list(pascal(lineno)) == expected
+
+powers_of_ten = pytest.mark.parametrize("lineno",
+                    [10, 100, 1000, 10000])
+
+@powers_of_ten
+def test_sum(lineno):
+    assert sum(pascal(lineno)) == 2**lineno
+```
+
+</div>
+<div>
+
+```python
+@powers_of_ten
+def test_alternate_sum(lineno):
+    assert sum(alternate(pascal(lineno))) == 0
+
+def alternate(g):
+    sign = 1
+    for elem in g:
+        yield sign*elem
+        sign = -sign
+
+@powers_of_ten
+def test_generate_next_line(lineno):
+    for left, right, new in zip(chain([0], pascal(lineno)),
+                                chain(pascal(lineno), [0]),
+                                pascal(lineno+1)):
+        assert left+right == new
+```
+</div>
+</div>
+
+<br>
+
+* This test suite now amounts to a total of 15 individual tests which are all
+  executed.
+
+---
+
+# Testing for exceptions
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+<div>
+
+```python
+def pascal(n):
+    """create the n-th line of Pascal's triangle
+
+    The line numbers start with n=0 for the line
+    containing only the entry 1. The elements of
+    a line are generated successively.
+
+    """
+    if n < 0:
+        raise ValueError(
+            f"n should not be negative, got {n}"
+                         )
+    x = 1
+    yield x
+    for k in range(n):
+        x = x*(n-k)//(k+1)
+        yield x
+```
+
+</div>
+<div>
+
+```python
+def test_negative_int():
+    with pytest.raises(ValueError):
+        next(pascal(-1))
+```
+
+```console
+$ pytest
+======================== test session starts ========================
+platform linux -- Python 3.11.5, pytest-7.4.0, pluggy-1.0.0
+rootdir: /home/ingold/pascal
+plugins: anyio-3.5.0
+collected 16 items                                                  
+
+test_pascal.py ................                               [100%]
+
+======================== 16 passed in 0.16s =========================
+```
+
+</div>
+</div>
+
+<br>
+
+* Execute the test under the `pytest.raises` context manager.
+* `pascal` returns a generator. We therefore need to explicitly asked for the 
+  next element.
+
+---
+
+# Testing with floats
