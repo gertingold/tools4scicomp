@@ -480,7 +480,7 @@ two successful tests and the ``F`` marks test which failed and for which detaile
 is given in the second part of the output. Clearly, the elements of line 5 in Pascal's
 triangle yielded by our function does not coincide with our expectation.
 
-It occasionally happens that a test is known to fail in the present of
+It occasionally happens that a test is known to fail in the present state of
 development.  One still may want to keep the test in the test suite, but it
 should not be flagged as failure. In such a case, the test can be decorated
 with ``pytest.mark.xfail``. Even though decorators can be used without knowing
