@@ -107,3 +107,11 @@ layout: gli-two-cols-header
 ---
 src: ./02_git.md
 ---
+
+---
+src: ./03_testing.md
+---
+
+---
+src: ./04_numpy_scipy.md
+---
