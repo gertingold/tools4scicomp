@@ -43,6 +43,7 @@ layout: section
   * Writing unit tests often help to improve the logical structure of the code because
     only a well-structured code can be tested easily.
 * *Integration tests* test the interplay of different parts of the project code.
+* No need to test external libraries. They should come with their own tests.
 
 ---
 
@@ -78,7 +79,7 @@ layout: section
 <div>
 
   * framework for writing comprehensive tests
-  * there exist other frameworks like `unittest` and `nose`
+  * in contrast to `unittest` not part of the Python standard libary
 </div>
 <div>
 
@@ -597,6 +598,10 @@ def test_n5():
 
 <br>
 
+* use `assert` for testing
+
+<br>
+
 * an error was inserted into the last test intentionally
 
 </div>
@@ -1033,4 +1038,120 @@ test_pascal.py ................                               [100%]
 
 ---
 
-# Testing with floats
+# Extension to floats
+
+* The entries in Pascal's triangle are binomial coefficients which appear in
+  $(1+x)^n$.  
+  Example:
+  $$(1+x)^4 = x^4+4x^3+6x^2+4x+1$$
+* Calculating a row of Pascals's triangle can be extended to float numbers
+  if we use float arithmetics instead of integer arithmetics. Then, the
+  generated numbers will not terminate.  
+  Example:
+  $$(1+x)^{1/3} = 1+\frac{1}{3}x-\frac{1}{9}x^2+\frac{5}{81}x^3+\ldots$$
+
+<br>
+
+* Let us rewrite our code for float arithmetics and test the coefficients.
+
+---
+
+# Adapted code for Pascal's triangle
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+<div>
+
+````md magic-move
+```python
+def pascal(n):
+    """create the n-th line of Pascal's triangle
+
+    The line numbers start with n=0 for the line
+    containing only the entry 1. The elements of
+    a line are generated successively.
+
+    """
+    x = 1
+    yield x
+    for k in range(n):
+        x = x*(n-k)//(k+1)
+        yield x
+```
+```python
+def taylor_power(power):
+    """generate the Taylor coefficients of (1+x)**power
+
+       This function is based on the function pascal().
+
+    """
+    coeff = 1
+    yield coeff
+    k = 0
+    while power-k != 0:
+        coeff = coeff*(power-k)/(k+1)
+        k = k+1
+        yield coeff
+```
+```python
+def taylor_power(power):
+    """generate the Taylor coefficients of (1+x)**power
+
+       This function is based on the function pascal().
+
+    """
+    coeff = 1
+    yield coeff
+    k = 0
+    while power-k != 0:
+        coeff = coeff*(power-k)/(k+1)
+        k = k+1
+        yield coeff
+
+if __name__ == "__main__":
+    for _, x in zip(range(10), taylor_power(1/3)):
+        print(x)
+```
+````
+
+</div>
+<div>
+<v-click>
+
+```console
+$ python taylor_power.py 
+1
+0.3333333333333333
+-0.11111111111111112
+0.0617283950617284
+-0.0411522633744856
+0.03017832647462277
+-0.023472031702484377
+0.019001168521058785
+-0.015834307100882322
+0.013488483826677534
+```
+
+<br>
+
+* These results correspond to 1, 1/3, -1/9, and 5/81,
+  and so on as expected.
+
+</v-click>
+</div>
+</div>
+
+---
+
+# There is more ...
+
+* More extensive collections of test functions can be grouped in classes.
+* Fixtures can provide data to several tests.
+* It is possible to provide setup and teardown functions for tests, e.g.
+  when working with databases.
+* Mocking allows to handle external dependencies, e.g. when connecting to
+  an external data source or when use the current time. `unittest.mock`
+  is part of the Python standard library.
+
+<br>
+
+* Documentation of pytest: [docs.pytest.org](https://docs.pytest.org/)
