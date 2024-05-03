@@ -1063,6 +1063,8 @@ test_pascal.py ................                               [100%]
 
 ````md magic-move
 ```python
+# pascal.py
+
 def pascal(n):
     """create the n-th line of Pascal's triangle
 
@@ -1078,6 +1080,8 @@ def pascal(n):
         yield x
 ```
 ```python
+# pascal_float.py
+
 def taylor_power(power):
     """generate the Taylor coefficients of (1+x)**power
 
@@ -1093,6 +1097,8 @@ def taylor_power(power):
         yield coeff
 ```
 ```python
+# pascal_float.py
+
 def taylor_power(power):
     """generate the Taylor coefficients of (1+x)**power
 
@@ -1142,7 +1148,96 @@ $ python taylor_power.py
 
 ---
 
-# There is more ...
+# The problem with `assert` and floats
+
+<div class="grid grid-cols-[35%_1fr] gap-4">
+<div>
+
+```python
+# test_taylor_power.py
+
+import pytest
+from pascal_float import taylor_power
+
+def test_one_third():
+    p = taylor_power(1/3)
+    result = [next(p) for _ in range(4)]
+    expected = [1, 1/3, -1/9, 5/81]
+    assert result == expected
+```
+
+<br>
+
+* rounding errors can make assertion fail
+* similarly it is usually not a good idea to
+  test floats for equality with zero
+
+</div>
+<div>
+
+```console
+$ pytest
+============================= test session starts =============================
+⋮
+
+test_taylor_power.py F                                                  [100%]
+
+================================== FAILURES ===================================
+_______________________________ test_one_third ________________________________
+
+    def test_one_third():
+        p = taylor_power(1/3)
+        result = [next(p) for _ in range(4)]
+        expected = [1, 1/3, -1/9, 5/81]
+>       assert result == expected
+E       assert [1, 0.3333333...7283950617284] == [1, 0.3333333...2839506172839]
+E         At index 2 diff: -0.11111111111111112 != -0.1111111111111111
+E         Use -v to get more diff
+
+test_taylor_power.py:7: AssertionError
+=========================== short test summary info ===========================
+FAILED test_taylor_power.py::test_one_third - assert [1, 0.3333333... ↩
+7283950617284] == [1, 0.3333333...2839506172839]
+============================== 1 failed in 0.05s ==============================
+```
+
+</div>
+</div>
+
+---
+
+# Testing floats with `pytest.approx`
+
+```python
+import pytest
+from pascal_float import taylor_power
+
+def test_one_third():
+    p = taylor_power(1/3)
+    result = [next(p) for _ in range(4)]
+    expected = [1, 1/3, -1/9, 5/81]
+    assert result == pytest.approx(expected, abs=0, rel=1e-15)
+```
+
+```console
+$ pytest
+============================= test session starts =============================
+platform linux -- Python 3.11.5, pytest-7.4.0, pluggy-1.0.0
+rootdir: /home/ingold/pascal
+plugins: anyio-3.5.0
+collected 1 item                                                              
+
+test_taylor_power.py .                                                  [100%]
+
+============================== 1 passed in 0.01s ==============================
+```
+
+* If the threshold `abs` for the absolute error is not given, its default
+  value 10<sup>-12</sup> might take precedence over the relative error.
+
+---
+
+# There is more in testing
 
 * More extensive collections of test functions can be grouped in classes.
 * Fixtures can provide data to several tests.
