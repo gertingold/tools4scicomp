@@ -224,3 +224,64 @@ array([[1, 2],
 matrix([[1, 2],
         [3, 4]])
 ```
+
+---
+
+# Converting a list of lists into an `ndarray`
+
+```python
+>>> import numpy as np
+>>> matrix = [[0, 1, 2],
+...           [3, 4, 5],
+...           [6, 7, 8]]
+>>> myarray = np.array(matrix)
+>>> myarray
+array([[0, 1, 2],
+       [3, 4, 5],
+       [6, 7, 8]])
+>>> type(myarray)
+<class 'numpy.ndarray'>
+```
+```python
+>>> myarray[0, :]
+array([0, 1, 2])
+>>> myarray[:, 0]
+array([0, 3, 6])
+```
+
+* In contrast to lists of lists, the `ndarray` allows to access rows and columns
+  in a consistent way.
+
+---
+
+# The structure of an `ndarray`
+
+<div>
+
+print attributes of an `ndarray`
+
+</div>
+
+```python
+def array_attributes(a):
+    for attr in ('ndim', 'size', 'itemsize', 'dtype', 'shape', 'strides'):
+        print(f'{attr:8s}: {getattr(a, attr)}')
+```
+
+```python
+>>> matrix = np.arange(10)
+>>> matrix
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+>>> array_attributes(matrix)
+ndim    : 1
+size    : 10
+itemsize: 8
+dtype   : int64
+shape   : (10,)
+strides : (8,)
+```
+
+* `int64` benötigt 64 Bits oder 8 Bytes
+* Die Schrittweite von einem Eintrag zum nächsten beträgt hier 8 Bytes.
+* Durch die Homogenität der Daten lässt sich die Position eines bestimmten
+  Eintrags direkt berechnen.
