@@ -449,14 +449,14 @@ $ ls -a
 ```console
 $ ls -l .git
 total 32
--rw-rw-r-- 1 gli gli   23 Apr 12 10:47 HEAD
-drwxrwxr-x 2 gli gli 4096 Apr 12 10:47 branches
--rw-rw-r-- 1 gli gli   92 Apr 12 10:47 config
--rw-rw-r-- 1 gli gli   73 Apr 12 10:47 description
-drwxrwxr-x 2 gli gli 4096 Apr 12 10:47 hooks
-drwxrwxr-x 2 gli gli 4096 Apr 12 10:47 info
-drwxrwxr-x 4 gli gli 4096 Apr 12 10:47 objects
-drwxrwxr-x 4 gli gli 4096 Apr 12 10:47 refs
+-rw-rw-r-- 1 ingold ingold   23 Apr 12 10:47 HEAD
+drwxrwxr-x 2 ingold ingold 4096 Apr 12 10:47 branches
+-rw-rw-r-- 1 ingold ingold   92 Apr 12 10:47 config
+-rw-rw-r-- 1 ingold ingold   73 Apr 12 10:47 description
+drwxrwxr-x 2 ingold ingold 4096 Apr 12 10:47 hooks
+drwxrwxr-x 2 ingold ingold 4096 Apr 12 10:47 info
+drwxrwxr-x 4 ingold ingold 4096 Apr 12 10:47 objects
+drwxrwxr-x 4 ingold ingold 4096 Apr 12 10:47 refs
 ```
 
 * option `-l`: long listing format
@@ -1702,13 +1702,13 @@ $ git log --oneline --graph --decorate --all
   ```console
   $ ssh-keygen -t ed25519
   Generating public/private ed25519 key pair.
-  Enter file in which to save the key (/home/gli/.ssh/id_ed25519): 
+  Enter file in which to save the key (/home/ingold/.ssh/id_ed25519): 
   Enter passphrase (empty for no passphrase): 
   Enter same passphrase again: 
-  Your identification has been saved in /home/gli/.ssh/id_ed25519
-  Your public key has been saved in /home/gli/.ssh/id_ed25519.pub
+  Your identification has been saved in /home/ingold/.ssh/id_ed25519
+  Your public key has been saved in /home/ingold/.ssh/id_ed25519.pub
   The key fingerprint is:
-  SHA256:9+VBe2dwBxkrPLyErXboCJYIy7SwqBh2HNCCDPX+NT0 gli@gli-tp14-1
+  SHA256:9+VBe2dwBxkrPLyErXboCJYIy7SwqBh2HNCCDPX+NT0 ingold@laptop-tp14-1
   The key's randomart image is:
   +--[ED25519 256]--+
   |=oo           oo |
@@ -1730,8 +1730,8 @@ $ git log --oneline --graph --decorate --all
 ```console
 $ ls -l .ssh
 total 8
--rw------- 1 gli gli 464 Apr 30 15:10 id_ed25519
--rw-r--r-- 1 gli gli 102 Apr 30 15:10 id_ed25519.pub
+-rw------- 1 ingold ingold 464 Apr 30 15:10 id_ed25519
+-rw-r--r-- 1 ingold ingold 102 Apr 30 15:10 id_ed25519.pub
 ```
 
 * The longer key `id_ed25519` is the *private* key while the shorter key `id_ed25519.pub`
@@ -1777,9 +1777,9 @@ upstream  http://gitlab.local:30080/boss/example.git (push)
 
 ```console
 $ git remote remove origin
-$ git remote add upstream git@gitlab.local:30022/ingold/example.git
-$ git remote remove upstream
 $ git remote add origin git@gitlab.local:30022/boss/example.git
+$ git remote remove upstream
+$ git remote add upstream git@gitlab.local:30022/ingold/example.git
 ```
 
 ```console
@@ -2091,7 +2091,7 @@ $ git log --oneline --graph --decorate --all
 
 ```console
 $ git push origin main
-Enter passphrase for key '/home/gli/.ssh/id_ed25519':
+Enter passphrase for key '/home/ingold/.ssh/id_ed25519':
 Enumerating objects: 5, done.
 Counting objects: 100% (5/5), done.
 Delta compression using up to 8 threads
