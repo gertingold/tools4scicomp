@@ -1777,17 +1777,17 @@ upstream  http://gitlab.local:30080/boss/example.git (push)
 
 ```console
 $ git remote remove origin
-$ git remote add upstream ssh://git@gitlab.local:30022/ingold/example.git
+$ git remote add upstream git@gitlab.local:30022/ingold/example.git
 $ git remote remove upstream
-$ git remote add origin ssh://git@gitlab.local:30022/boss/example.git
+$ git remote add origin git@gitlab.local:30022/boss/example.git
 ```
 
 ```console
 $ git remote -v
-origin  ssh://git@gitlab.local:30022/ingold/example.git (fetch)
-origin  ssh://git@gitlab.local:30022/ingold/example.git (push)
-upstream  ssh://git@gitlab.local:30022/boss/example.git (fetch)
-upstream  ssh://git@gitlab.local:30022/boss/example.git (push)
+origin  git@gitlab.local:30022/ingold/example.git (fetch)
+origin  git@gitlab.local:30022/ingold/example.git (push)
+upstream  git@gitlab.local:30022/boss/example.git (fetch)
+upstream  git@gitlab.local:30022/boss/example.git (push)
 ```
 
 ---
