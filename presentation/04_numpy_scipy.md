@@ -252,6 +252,16 @@ array([0, 3, 6])
 * In contrast to lists of lists, the `ndarray` allows to access rows and columns
   in a consistent way.
 
+<div class="mt-3 p-2 border-2 border-teal-800 bg-teal-50 text-teal-800">
+  <div class="grid grid-cols-[2%_1fr] gap-4">
+    <div><carbon-idea class="text-teal-800 text-xl" /></div>
+    <div>
+    <code>append</code> is frequently used to construct lists. Do not use it for arrays as this
+    leads to significant performance loss.
+    </div>
+  </div>
+</div>
+
 ---
 
 # The structure of an `ndarray`
@@ -269,19 +279,194 @@ def array_attributes(a):
 ```
 
 ```python
->>> matrix = np.arange(10)
+>>> matrix = np.arange(16)
 >>> matrix
-array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15])
 >>> array_attributes(matrix)
 ndim    : 1
-size    : 10
+size    : 16
 itemsize: 8
 dtype   : int64
-shape   : (10,)
+shape   : (16,)
 strides : (8,)
 ```
 
-* `int64` benötigt 64 Bits oder 8 Bytes
-* Die Schrittweite von einem Eintrag zum nächsten beträgt hier 8 Bytes.
-* Durch die Homogenität der Daten lässt sich die Position eines bestimmten
-  Eintrags direkt berechnen.
+* `int64` requires 64 bits or 8 bytes, in total this array requires 128 bytes
+* the stride from one entry to the next amounts to 8 bytes
+* due to the homogeneity of the data, the position of a given entry can easily
+  be determined
+
+---
+
+# The problem with finite precision
+
+```python
+>>> np.arange(1, 160, 10, dtype=np.int8)
+array([   1,   11,   21,   31,   41,   51,   61,   71,   81,   91,  101,
+        111,  121, -125, -115, -105], dtype=int8)
+```
+
+* `int8` refers to signed integers with 8 bits covering the range from -128 to 127
+* be aware of the danger of overflow
+
+<br>
+
+<div class="p-2 border-2 border-red-800 bg-red-50 text-red-800">
+  <div class="grid grid-cols-[4%_1fr] gap-10">
+    <div><carbon-warning-alt class="text-red-800 text-3xl" /></div>
+    <div>
+     While integers in Python in principle can become arbitrarily large, this is
+     not the case for integer <code>ndarray</code>s in NumPy!
+    </div>
+  </div>
+</div>
+
+<br>
+
+#### Data types
+
+<div class="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] gap-6">
+  <div>
+
+  * int8
+  * int16
+  * int32
+  * int64
+
+  </div>
+  <div>
+
+  * uint8
+  * uint16
+  * uint32
+  * uint64
+
+  </div>
+  <div>
+
+  * float16
+  * float32
+  * float64
+  * longdouble
+
+  </div>
+  <div>
+
+  * complex64
+  * complex128
+  * clongdouble
+
+  </div>
+  <div>
+
+  * bool
+  * object
+  * bytes
+  * str
+  * void
+
+  </div>
+</div>
+
+---
+
+# Shapes and strides
+
+<div class="grid grid-cols-[40%_1fr] gap-6">
+  <div>
+
+```python
+>>> matrix = np.arange(16).reshape(4, 4)
+>>> matrix
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11],
+       [12, 13, 14, 15]])
+>>> array_attributes(matrix)
+ndim    : 2
+size    : 16
+itemsize: 8
+dtype   : int64
+shape   : (4, 4)
+strides : (32, 8)
+```
+
+ * shapes and strides change the interpretation of data aligned in one dimension
+ * data can be reinterpreted without copying data in memory
+
+  </div>
+  <div>
+
+<img src="images/strides.png" style="width: 90%; margin: auto">
+
+  </div>
+</div>
+
+---
+
+# Avoid copying arrays
+
+<div class="mt-3 ml-30 mr-30 p-4 border-2 border-teal-800 bg-teal-50 text-teal-800">
+  <div class="grid grid-cols-[3%_1fr] gap-4">
+    <div><carbon-idea class="text-teal-800 text-xl" /></div>
+    <div>
+     Moving around large blocks of data in memory can take a lot of time.
+     Avoid making copies of arrays, if possible.
+    </div>
+  </div>
+</div>
+
+<br>
+
+#### example: transposition of a matrix
+
+```python
+>>> a = np.arange(9).reshape(3, 3)
+>>> a
+array([[0, 1, 2],
+       [3, 4, 5],
+       [6, 7, 8]])
+>>> a.strides
+(24, 8)
+>>> a.T
+array([[0, 3, 6],
+       [1, 4, 7],
+       [2, 5, 8]])
+>>> a.T.strides
+(8, 24)
+```
+
+* no data are copied
+
+---
+
+# Be careful when modifiying strides
+
+```python
+>>> a = np.arange(16)
+>>> a
+array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15])
+```
+```python
+>>> a.shape = (4, 4)
+>>> a.strides = (8, 8)
+>>> a
+array([[0, 1, 2, 3],
+       [1, 2, 3, 4],
+       [2, 3, 4, 5],
+       [3, 4, 5, 6]])
+```
+
+* caution: changing an element here can imply changes of other elements as well
+
+```python
+>>> a.strides = (8, 4)
+>>> a
+array([[          0,  4294967296,           1,  8589934592],
+       [          1,  8589934592,           2, 12884901888],
+       [          2, 12884901888,           3, 17179869184],
+       [          3, 17179869184,           4, 21474836480]])
+```
+
+* data are take as is
+* not respecting data boundaries can lead to unintended results
