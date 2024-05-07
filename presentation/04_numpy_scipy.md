@@ -470,3 +470,516 @@ array([[          0,  4294967296,           1,  8589934592],
 
 * data are take as is
 * not respecting data boundaries can lead to unintended results
+
+---
+
+# Initializing an array
+
+* If an array cannot be created directly, an array of the desired size should
+  be initialized. Do not use the `append` method.
+
+```python
+>>> a = np.zeros((2, 2))
+>>> a
+array([[0., 0.],
+       [0., 0.]])
+>>> a.dtype
+dtype('float64')
+```
+
+* All elements are set to zero in this case.
+* The default data type is `float64`.
+
+```python
+>>> a = np.zeros((2, 2), dtype=int)
+>>> a
+array([[0, 0],
+       [0, 0]])
+>>> a.dtype
+dtype('int64')
+```
+
+* If a different data is needed, it should be specified through the `dtype` argument.
+
+---
+
+# Initializing an array (cont'd)
+
+```python
+>>> np.empty((3, 3))
+array([[4.49105672e-320, 0.00000000e+000, 1.77459490e+248],
+       [4.29058029e+270, 1.33733641e+160, 8.59372554e-096],
+       [1.01021434e+141, 1.43180994e-065, 9.16526748e+242]])
+```
+
+* If all elements will be overwritten before usage anway, it is slightly more efficient
+  not to set the elements but to leave the memory as is.
+
+```python
+>>> np.ones((2, 2))
+array([[1., 1.],
+       [1., 1.]])
+```
+```python
+>>> 10*np.ones((2, 2))
+array([[10., 10.],
+       [10., 10.]])
+```
+
+* By multiplication, it is possible to feel an array homogeneously with the desired value.
+
+---
+
+# Structured matrices
+
+```python
+>>> np.identity(3)
+array([[1., 0., 0.],
+       [0., 1., 0.],
+       [0., 0., 1.]])
+```
+
+* In this way, only square matrices can be created.
+
+```python
+>>> np.eye(2, 4)
+array([[1., 0., 0., 0.],
+       [0., 1., 0., 0.]])
+>>> np.eye(4, k=1)
+array([[0., 1., 0., 0.],
+       [0., 0., 1., 0.],
+       [0., 0., 0., 1.],
+       [0., 0., 0., 0.]])
+```
+
+* With the `eye` method, also non-square unit matrices, possibly with a shifted diagonal, can be created 
+
+```python
+>>> 2*np.eye(4)-np.eye(4, k=1)-np.eye(4, k=-1)
+array([[ 2., -1.,  0.,  0.],
+       [-1.,  2., -1.,  0.],
+       [ 0., -1.,  2., -1.],
+       [ 0.,  0., -1.,  2.]])
+```
+
+---
+
+# Diagonal matrices and diagonals
+
+```python
+>>> np.diag([1, 2, 3, 4])
+array([[1, 0, 0, 0],
+       [0, 2, 0, 0],
+       [0, 0, 3, 0],
+       [0, 0, 0, 4]])
+```
+
+* A two-dimensional diagonal matrix is generated from a one-dimensional sequence.
+
+```python
+>>> matrix = np.arange(16).reshape(4, 4)
+>>> matrix
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11],
+       [12, 13, 14, 15]])
+>>> np.diag(matrix)
+array([ 0,  5, 10, 15])
+```
+
+* From a two-dimensional matrix which can even be non-square, the diagonal is extracted.
+
+---
+
+# Generating matrix elements by means of a function
+
+#### Example: multiplication table
+
+```python
+>>> np.fromfunction(lambda i, j: (i+1)*(j+1), shape=(6, 6), dtype=int)
+array([[ 1,  2,  3,  4,  5,  6],
+       [ 2,  4,  6,  8, 10, 12],
+       [ 3,  6,  9, 12, 15, 18],
+       [ 4,  8, 12, 16, 20, 24],
+       [ 5, 10, 15, 20, 25, 30],
+       [ 6, 12, 18, 24, 30, 36]])
+```
+
+* This works also in more than two dimensions.
+
+```python
+>>> np.fromfunction(lambda i, j, k: (i+1)*(j+1)/(k+1), shape=(2, 2, 2))
+array([[[1. , 0.5],
+        [2. , 1. ]],
+
+       [[2. , 1. ],
+        [4. , 2. ]]])
+````
+
+---
+
+# Equally-spaced values
+
+```python
+np.arange(1, 2, 0.1)
+array([1. , 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9])
+```
+
+* generalization of `range`
+* final value is not generated
+* step width is specified
+
+<br>
+
+```python
+>>> np.linspace(1, 2, 11)
+array([1. , 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2. ])
+```
+
+* number of elements is specified
+
+```python
+>>> np.linspace([1, 2], [2, -2], 11)
+array([[ 1. ,  2. ],
+       [ 1.1,  1.6],
+       ⋮
+       [ 1.9, -1.6],
+       [ 2. , -2. ]])
+```
+
+* works also for lists and arrays
+
+---
+
+# Equally-spaced values (cont'd)
+
+```python
+>>> np.linspace(1, 4, 7, retstep=True)
+(array([1. , 1.5, 2. , 2.5, 3. , 3.5, 4. ]), 0.5)
+```
+
+* It is possible to obtain the step width.
+* It is possible to omit the last value (`endpoint=False`).
+
+<br>
+
+```python
+>>> np.logspace(0, 3, 4)
+array([   1.,   10.,  100., 1000.])
+>>> np.logspace(0, 2, 5, base=2)
+array([1.        , 1.41421356, 2.        , 2.82842712, 4.        ])
+```
+
+* logarithmic scales are possible as well
+* default base is 10
+* the first two arguments are to be understood as exponents
+
+---
+
+# Application of linspace
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(0, 2*np.pi, 100)
+y = np.sin(x)
+plt.plot(x, y)
+plt.show()
+```
+
+<img src="images/application_linspace.png" style="width: 45%; margin: auto">
+
+---
+
+# Load data from a file
+
+```python
+# mydata.dat
+
+# time position
+   0.0   0.0
+   0.1   0.1
+   0.2   0.4
+   0.3   0.9
+```
+
+```python
+>>> np.loadtxt('mydata.dat')
+array([[0. , 0. ],
+       [0.1, 0.1],
+       [0.2, 0.4],
+       [0.3, 0.9]])
+```
+
+* `loadtxt` has a number of useful arguments, see [documentation](https://numpy.org/doc/stable/reference/generated/numpy.loadtxt.html#numpy-loadtxt)
+* for a even more flexible way of reading data files, see [genfromtxt](https://numpy.org/doc/stable/reference/generated/numpy.genfromtxt.html#numpy-genfromtxt)
+
+---
+
+# Random arrays
+
+```python
+>>> rng = np.random.default_rng()
+```
+
+```python
+>>> rng.random((2, 5))
+array([[0.83225433, 0.62066329, 0.8186137 , 0.81388624, 0.93601643],
+       [0.51750755, 0.00895467, 0.65958576, 0.59495482, 0.9500244 ]])
+>>> rng.random((2, 5))
+array([[0.62886203, 0.54529378, 0.73134872, 0.58461308, 0.34375939],
+       [0.5687676 , 0.89653199, 0.60219157, 0.84906627, 0.10558733]])
+```
+
+* In order to make the random numbers reproducible, a seed can be specified.
+
+```python
+>>> rng = np.random.default_rng(1234546)
+>>> rng.random((2, 5))
+array([[0.41581531, 0.19749742, 0.47628191, 0.07599962, 0.75069401],
+       [0.7087109 , 0.58950695, 0.97730533, 0.58801372, 0.81343677]])
+>>> rng = np.random.default_rng(1234546)
+>>> rng.random((2, 5))
+array([[0.41581531, 0.19749742, 0.47628191, 0.07599962, 0.75069401],
+       [0.7087109 , 0.58950695, 0.97730533, 0.58801372, 0.81343677]])
+```
+
+---
+
+# Displaying an array of random numbers
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+ <div>
+
+```python
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(42)
+data = rng.random((20, 20))
+plt.imshow(data, cmap=plt.cm.hot, interpolation='none')
+plt.colorbar()
+plt.show()
+```
+
+  </div>
+  <div>
+<img src="images/randomarray.png" style="width: 75%; margin: auto">
+  </div>
+</div>
+
+* There exist a variety of different random number generators, e.g.:
+  * `integers`: random integers between a lower and an upper value
+  * `choice`: random choice of elements from an array with or without replacement
+  * `shuffle`: shuffles an array in-place
+  * `normal`: normally distributed random numbers
+  * and many more, see [documentation](https://numpy.org/doc/stable/reference/random/generator.html)
+
+---
+
+# Indexing arrays
+
+```python
+>>> a = np.arange(10)
+>>> a
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+```
+```python
+>>> a[:]
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+```
+```python
+>>> a[1:4]
+array([1, 2, 3])
+```
+```python
+>>> a[5:-2]
+array([5, 6, 7])
+```
+```python
+>>> a[::2]
+array([0, 2, 4, 6, 8])
+```
+```python
+>>> a[1::2]
+array([1, 3, 5, 7, 9])
+```
+```python
+>>> a[::-1]
+array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+```
+
+* corresponds to the usual slicing syntax
+
+---
+
+# Array aliases and copies
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python
+>>> a = np.arange(10)
+>>> b = a
+>>> b
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+>>> id(a), id(b)
+(133258061830960, 133258061830960)
+>>> b[0] = 42
+>>> a
+array([42,  1,  2,  3,  4,  5,  6,  7,  8,  9])
+```
+
+ * `b` is just an alias for `a`, not a different array
+
+  </div>
+  <div>
+
+```python
+>>> a = np.arange(10)
+>>> b = a[:]
+>>> b
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+>>> id(a), id(b)
+(133258085410128, 133257805172912)
+>>> b[0] = 42
+>>> a
+array([42,  1,  2,  3,  4,  5,  6,  7,  8,  9])
+```
+
+ * while a new object is generated, it refers to the same part of the memory
+
+  </div>
+</div>
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python
+>>> a = np.arange(10)
+>>> b = np.copy(a)
+>>> b[0] = 42
+>>> a
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+>>> b
+array([42,  1,  2,  3,  4,  5,  6,  7,  8,  9])
+```
+
+  </div>
+  <div>
+
+ * a true copy is made by using the `copy`-method
+
+  </div>
+</div>
+
+---
+
+# Slicing in higher dimensions
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python
+>>> a = np.arange(36).reshape(6, 6)
+>>> a
+array([[ 0,  1,  2,  3,  4,  5],
+       [ 6,  7,  8,  9, 10, 11],
+       [12, 13, 14, 15, 16, 17],
+       [18, 19, 20, 21, 22, 23],
+       [24, 25, 26, 27, 28, 29],
+       [30, 31, 32, 33, 34, 35]])
+```
+
+```python
+>>> a[:, :]
+array([[ 0,  1,  2,  3,  4,  5],
+       [ 6,  7,  8,  9, 10, 11],
+       [12, 13, 14, 15, 16, 17],
+       [18, 19, 20, 21, 22, 23],
+       [24, 25, 26, 27, 28, 29],
+       [30, 31, 32, 33, 34, 35]])
+```
+```python
+>>> a[2:4, 3:6]
+array([[15, 16, 17],
+       [21, 22, 23]])
+```
+
+  </div>
+  <div>
+
+```python
+>>> a[::2, ::3]
+array([[ 0,  3],
+       [12, 15],
+       [24, 27]])
+```
+```python
+>>> a[2::2, ::3]
+array([[12, 15],
+       [24, 27]])
+```
+```python
+>>> a[2:4]
+array([[12, 13, 14, 15, 16, 17],
+       [18, 19, 20, 21, 22, 23]])
+```
+
+ * In the last example, the an implicit slice `::` is
+   assummed for the second dimension (axis 1).
+
+  </div>
+</div>
+
+---
+
+# Array axes
+
+#### Index notation for matrices
+
+<br>
+
+<div class="grid grid-cols-[3%_1fr_1fr] gap-4">
+  <div>
+
+  $a_{ij}$
+
+  </div>
+  <div>
+
+ * first index ($i$) refers to row (axes 0)
+ * second index ($j$) refers to column (axes 1)
+
+  <br>
+
+  <img src="images/axes.png" style="width: 75%; margin: auto">
+
+  </div>
+  <div>
+  Example: summation along different axes
+
+  <br>
+
+  ```python
+>>> a = np.arange(16).reshape(4, 4)
+>>> a
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11],
+       [12, 13, 14, 15]])
+```
+```python
+>>> a.sum(axis=0)
+array([24, 28, 32, 36])
+```
+```python
+>>> a.sum(axis=1)
+array([ 6, 22, 38, 54])
+```
+```python
+>>> a.sum()
+120
+```
+
+  </div>
+</div>
