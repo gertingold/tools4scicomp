@@ -2050,7 +2050,7 @@ Your branch is up to date with 'origin/main'.
 ```
 
 * the new code is still in the `hello` branch, but not in `main`
-* we want to update `main` from `upstream`
+  <carbon-arrow-right /> update `main` from `upstream`
 
 ```console
 $ git fetch upstream
@@ -2068,6 +2068,7 @@ Fast-forward
  create mode 100644 hello.py
 ```
 
+* this can also be done in a single step: `git pull upstream main`
 * our `main` branch is now consistent with `upstream/main`
 
 ---
