@@ -471,7 +471,7 @@ It is not unusual to start with an array filled with zeros. Let us create a :mat
 As we can see, the default type is ``float64``. If we prefer an array of integers, we could specify
 the ``dtype``::
 
-   >>> a = np.zeros((2, 2), dtype=np.int)
+   >>> a = np.zeros((2, 2), dtype=int)
    >>> a
    array([[0, 0],
           [0, 0]])
@@ -559,7 +559,7 @@ of the same function::
 If the elements of an array can be expressed as a function of the indices, ``fromfunction``
 can be used to generate the elements. As a simple example, we create a multiplication table::
 
-   >>> np.fromfunction(lambda i, j: (i+1)*(j+1), shape=(6, 6), dtype=np.int)
+   >>> np.fromfunction(lambda i, j: (i+1)*(j+1), shape=(6, 6), dtype=int)
    array([[ 1,  2,  3,  4,  5,  6],
           [ 2,  4,  6,  8, 10, 12],
           [ 3,  6,  9, 12, 15, 18],
