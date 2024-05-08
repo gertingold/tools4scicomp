@@ -960,7 +960,7 @@ array([[12, 13, 14, 15, 16, 17],
 
   <br>
 
-  ```python
+```python
 >>> a = np.arange(16).reshape(4, 4)
 >>> a
 array([[ 0,  1,  2,  3],
@@ -983,3 +983,235 @@ array([ 6, 22, 38, 54])
 
   </div>
 </div>
+
+---
+
+# Higher-dimensional arrays
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python
+>>> b = np.arange(24).reshape(2, 3, 4)
+>>> b
+array([[[ 0,  1,  2,  3],
+        [ 4,  5,  6,  7],
+        [ 8,  9, 10, 11]],
+
+       [[12, 13, 14, 15],
+        [16, 17, 18, 19],
+        [20, 21, 22, 23]]])
+```
+```python
+>>> b[0]
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11]])
+```
+```python
+>>> b[:, 0]
+array([[ 0,  1,  2,  3],
+       [12, 13, 14, 15]])
+```
+```python
+>>> b[:, :, 0]
+array([[ 0,  4,  8],
+       [12, 16, 20]])
+```
+
+  </div>
+  <div>
+    <img src="images/array3d.png" style="width: 75%; margin: auto">
+  </div>
+</div>
+
+---
+layout: gli-two-cols-header
+---
+
+# Ellipsis
+
+::left::
+
+```python
+>>> b[..., 0]
+array([[ 0,  4,  8],
+       [12, 16, 20]])
+```
+```python
+>>> c = np.arange(16).reshape(2, 2, 2, 2)
+>>> c
+array([[[[ 0,  1],
+         [ 2,  3]],
+
+        [[ 4,  5],
+         [ 6,  7]]],
+
+
+       [[[ 8,  9],
+         [10, 11]],
+
+        [[12, 13],
+         [14, 15]]]])
+```
+```python
+>>> c[0, ..., 0]
+array([[0, 2],
+       [4, 6]])
+```
+
+::right::
+
+* ellipsis replaces all missing indices by a colon
+* only one ellipsis allowed so that the slice is unambiguous
+
+---
+layout: gli-two-cols-header
+---
+
+# Columns with different shape
+
+::left::
+
+```python
+>>> a = np.arange(16).reshape(4, 4)
+>>> a
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11],
+       [12, 13, 14, 15]])
+```
+```python
+>>> a[:, 0:1]
+array([[ 0],
+       [ 4],
+       [ 8],
+       [12]])
+```
+```python
+>>> a[:, 0]
+array([ 0,  4,  8, 12])
+```
+
+::right::
+
+```python
+>>> b = np.arange(4)
+>>> b
+array([0, 1, 2, 3])
+```
+```python
+>>> b[:, np.newaxis]
+array([[0],
+       [1],
+       [2],
+       [3]])
+>>> b[:, np.newaxis].shape
+(4, 1)
+```
+```python
+>>> b[np.newaxis, :]
+array([[0, 1, 2, 3]])
+>>> b[np.newaxis, :].shape
+(1, 4)
+```
+
+<br>
+
+* `np.newaxis` adds a new axis with minimal extension
+
+---
+
+# Fancy indexing
+
+```python
+>>> a = np.arange(36).reshape(6, 6)
+>>> a
+array([[ 0,  1,  2,  3,  4,  5],
+       [ 6,  7,  8,  9, 10, 11],
+       [12, 13, 14, 15, 16, 17],
+       [18, 19, 20, 21, 22, 23],
+       [24, 25, 26, 27, 28, 29],
+       [30, 31, 32, 33, 34, 35]])
+```
+```python
+>>> a[[0, 2, 1], [1, 3, 5]]
+array([ 1, 15, 11])
+```
+```python
+>>> id_row = [[2, 0], [1, 3]]
+>>> id_col = [[0, 2], [4, 5]]
+>>> a[id_row, id_col]
+array([[12,  2],
+       [10, 23]])
+```
+
+* the arrays contain the indices of the corresponding axis
+* fancy indexing can be used for arrays of arbitrary dimension if a corresponding
+  number of index arrays is given
+* the dimension of the index arrays determines the dimension of the resulting array
+
+---
+
+# Fancy indexing with boolean arrays
+
+```python
+>>> rng = np.random.default_rng()
+>>> randomarray = rng.random(10)
+>>> randomarray
+array([0.09631035, 0.54061246, 0.7692907 , 0.42787232, 0.54760366,
+       0.64386641, 0.0696345 , 0.40970968, 0.24665492, 0.87821191])
+```
+```python
+>>> indexarray = randomarray < 0.5
+>>> indexarray
+array([ True, False, False,  True, False, False,  True,  True,  True,
+       False])
+```
+```python
+>>> randomarray[indexarray] = 0
+>>> randomarray
+array([0.        , 0.54061246, 0.7692907 , 0.        , 0.54760366,
+       0.64386641, 0.        , 0.        , 0.        , 0.87821191])
+```
+```python
+>>> randomarray[np.logical_not(indexarray)]
+array([0.54061246, 0.7692907 , 0.54760366, 0.64386641, 0.87821191])
+```
+
+* a boolean array selects those entries where the corresponding entry
+  of the boolean array is `True`
+
+---
+
+# Application: sieve of Eratosthenes
+
+<img src="images/eratosthenes.png" style="width: 75%; margin: auto">
+
+---
+
+# Application: sieve of Eratosthenes (cont'd)
+
+```python
+import math
+import numpy as np
+
+nmax = 49
+integers = np.arange(nmax+1)
+is_prime = np.ones(nmax+1, dtype=bool)
+is_prime[:2] = False
+for j in range(2, math.isqrt(nmax)+1):
+    if is_prime[j]:
+        is_prime[j*j::j] = False
+    print(integers[is_prime])
+```
+
+```
+[ 2  3  5  7  9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49]
+[ 2  3  5  7 11 13 17 19 23 25 29 31 35 37 41 43 47 49]
+[ 2  3  5  7 11 13 17 19 23 25 29 31 35 37 41 43 47 49]
+[ 2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 49]
+[ 2  3  5  7 11 13 17 19 23 29 31 37 41 43 47 49]
+[ 2  3  5  7 11 13 17 19 23 29 31 37 41 43 47]
+```
+
