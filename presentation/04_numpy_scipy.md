@@ -688,7 +688,9 @@ plt.plot(x, y)
 plt.show()
 ```
 
-<img src="images/application_linspace.png" style="width: 45%; margin: auto">
+<br>
+
+<img src="images/application_linspace.png" style="width: 40%; margin: auto">
 
 ---
 
@@ -764,7 +766,7 @@ plt.show()
 
   </div>
   <div>
-<img src="images/randomarray.png" style="width: 75%; margin: auto">
+<img src="images/randomarray.png" style="width: 70%; margin: auto">
   </div>
 </div>
 
@@ -1215,3 +1217,544 @@ for j in range(2, math.isqrt(nmax)+1):
 [ 2  3  5  7 11 13 17 19 23 29 31 37 41 43 47]
 ```
 
+---
+
+# Multiplication of arrays and scalars
+
+#### Multiplication of two arrays
+
+```python
+>>> a = np.array([[1, 2], [-3, 4]])
+>>> b = np.array([[-2, 1], [0, -1]])
+>>> a*b
+array([[-2,  2],
+       [ 0, -4]])
+```
+
+* the multiplication of two arrays happens elementwise
+* matrix multiplication is done by means of `np.dot` or `@`
+
+<br>
+
+#### Multiplication of an array and a scalar
+
+```python
+>>> 10 * np.ones(5)
+array([10., 10., 10., 10., 10.])
+```
+
+#### Comparison with a number
+```python
+>>> np.arange(6) > 3
+array([False, False, False, False,  True,  True])
+```
+
+* Why does this work?
+
+---
+
+# Broadcasting
+
+* In order to ensure that two arrays have the same dimensions, axes of length 1 are prepended.
+* This rule includes scalars which behave like arrays with shape `(1,)`.
+* Axes of length 1 are copied as often as necessary to reach the extent required by the other array.
+
+<br>
+
+<div class="grid grid-cols-[1fr_40%] gap-4">
+  <div>
+    <img src="images/broadcast.png" style="width: 90%; margin: auto">
+  </div>
+  <div>
+
+```python
+>>> a = np.arange(1, 13).reshape(3, 4)
+>>> v = np.arange(1, 5)
+```
+```python
+>>> a
+array([[ 1,  2,  3,  4],
+       [ 5,  6,  7,  8],
+       [ 9, 10, 11, 12]])
+>>> v
+array([1, 2, 3, 4])
+```
+```python
+>>> a*v
+array([[ 1,  4,  9, 16],
+       [ 5, 12, 21, 32],
+       [ 9, 20, 33, 48]])
+```
+
+  </div>
+</div>
+
+---
+layout: gli-two-cols-header
+---
+
+# Matrix multiplication
+
+::left::
+
+```python
+>>> a = np.arange(4)
+>>> b = np.arange(4, 8)
+>>> a
+array([0, 1, 2, 3])
+>>> b
+array([4, 5, 6, 7])
+```
+```python
+>>> np.dot(a, b)
+38
+```
+```python
+>>> a.dot(b)
+38
+```
+```python
+>>> a @ b
+38
+```
+
+::right::
+
+```python
+>>> a = np.array([[1, 2], [-3, 4]])
+>>> b = np.array([[-2, 1], [0, -1]])
+>>> a
+array([[ 1,  2],
+       [-3,  4]])
+>>> b
+array([[-2,  1],
+       [ 0, -1]])
+```
+```python
+>>> np.dot(a, b)
+array([[-2, -1],
+       [ 6, -7]])
+```
+```python
+>>> a.dot(b)
+array([[-2, -1],
+       [ 6, -7]])
+```
+```python
+>>> a @ b
+array([[-2, -1],
+       [ 6, -7]])
+```
+
+* `@` is preferred for product of two two-dimensional arrays
+
+---
+
+# Matrix-vector multiplication
+
+```python
+>>> v = np.array([2, -3])
+>>> m = np.array([[1, 3], [-2, 2]])
+```
+```python
+>>> np.dot(m, v)
+array([ -7, -10])
+```
+```python
+>>> np.dot(v, m)
+array([8, 0])
+```
+```python
+>>> np.dot(v.T, m)
+array([8, 0])
+```
+
+<br>
+
+#### Multiplication of an N-dimensional array and an M-dimensional array
+
+* sum over last axis of the first array and the second-to-last axis of the second array
+
+```python
+dot(a, b)[i,j,k,m] = sum(a[i,j,:] * b[k,:,m])
+```
+
+* one-dimensional arrays `v` and `v.T` have the same shape
+
+---
+
+# Universal functions
+
+* universal function cannot only handle scalar arguments but also arrays
+
+```python
+>>> import math
+>>> x = np.linspace(0, 2, 11)
+>>> x
+array([0. , 0.2, 0.4, 0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2. ])
+```
+```python
+>>> math.sin(x)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: only length-1 arrays can be converted to Python scalars
+```
+```python
+>>> np.sin(x)
+array([0.        , 0.19866933, 0.38941834, 0.56464247, 0.71735609,
+       0.84147098, 0.93203909, 0.98544973, 0.9995736 , 0.97384763,
+       0.90929743])
+```
+```python
+>>> x = np.array([[0, np.pi/2], [np.pi, 3/2*np.pi]])
+>>> np.sin(x)
+array([[ 0.0000000e+00,  1.0000000e+00],
+       [ 1.2246468e-16, -1.0000000e+00]])
+```
+
+* for universal functions available in NumPy see the [documentation](https://numpy.org/doc/stable/reference/routines.math.html)
+
+---
+
+# Universal functions in SciPy
+
+* much larger selection of unctions with many special functions, see the [documentatioon](https://docs.scipy.org/doc/scipy/reference/special.html)
+
+<br>
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python
+>>> from scipy.special import airy
+>>> import matplotlib.pyplot as plt
+>>> x = np.linspace(-20, 5, 300)
+>>> ai, aip, bi, bip = airy(x)
+>>> plt.plot(x, ai, label="Ai(x)")
+[<matplotlib.lines.Line2D object at 0x76a51921bc50>]
+>>> plt.plot(x, aip, label="Ai'(x)")
+[<matplotlib.lines.Line2D object at 0x76a5147b3710>]
+>>> plt.legend()
+<matplotlib.legend.Legend object at 0x76a514794710>
+>>> plt.show()
+```
+
+  </div>
+  <div>
+    <img src="images/airy.png" style="width: 90%; margin: auto">
+  </div>
+</div>
+
+---
+
+# Two-dimensional grids with `np.mgrid`
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python
+>>> np.mgrid[0:2:0.5, 0:1:0.5]
+array([[[0. , 0. ],
+        [0.5, 0.5],
+        [1. , 1. ],
+        [1.5, 1.5]],
+
+       [[0. , 0.5],
+        [0. , 0.5],
+        [0. , 0.5],
+        [0. , 0.5]]])
+```
+
+* corresponds to `np.arange`
+
+```python
+>>> np.mgrid[0:3:2j, 0:2:5j]
+array([[[0. , 0. , 0. , 0. , 0. ],
+        [3. , 3. , 3. , 3. , 3. ]],
+
+       [[0. , 0.5, 1. , 1.5, 2. ],
+        [0. , 0.5, 1. , 1.5, 2. ]]])
+```
+
+ * corresponds to `np.linspace`
+ * last argument is purely imaginary
+
+  </div>
+  <div>
+
+```python
+>>> x, y = np.mgrid[-5:5:100j, -5:5:100j]
+>>> plt.imshow(np.sin(x*y))
+<matplotlib.image.AxesImage object at 0x76a511a91d10>
+>>> plt.show()
+```
+
+  <img src="images/sinxy.png" style="width: 90%; margin: auto">
+
+  </div>
+</div>
+
+---
+
+# Two-dimensional grids with `np.ogrid`
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python
+>>> np.ogrid[0:2:3j, 0:1:5j]
+[array([[0.],
+       [1.],
+       [2.]]), array([[0.  , 0.25, 0.5 , 0.75, 1.  ]])]
+```
+
+ * open grid, uses broadcasting
+
+<br>
+
+ * example: Bessel function $J_\nu(x)$
+
+  </div>
+  <div>
+
+```python
+>>> from scipy.special import jv
+>>> nu, x = np.ogrid[0:10:41j, 0:20:100j]
+>>> plt.imshow(jv(nu, x), origin='lower')
+<matplotlib.image.AxesImage object at 0x76a511a7c050>
+>>> plt.xlabel('$x$')
+Text(0.5, 0, '$x$')
+>>> plt.ylabel(r'$\nu$')
+Text(0, 0.5, '$\\nu$')
+>>> plt.show()
+```
+
+  </div>
+</div>
+
+<br>
+
+<img src="images/besselj.png" style="width: 60%; margin: auto">
+
+---
+
+# Constructing a two-dimensional grid by hand
+
+```python
+>>> x = np.linspace(-40, 40, 500)
+>>> y = x[:, np.newaxis]
+>>> z = np.sin(np.hypot(x-10, y))+np.sin(np.hypot(x+10, y))
+>>> plt.imshow(z)
+<matplotlib.image.AxesImage object at 0x76a510afde90>
+>>> plt.show()
+```
+
+<br>
+
+<img src="images/interference.png" style="width: 30%; margin: auto">
+
+---
+
+# Runtime comparison
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python {all}{maxHeight:'440px'}
+import math
+import time
+import matplotlib.pyplot as plt
+import numpy as np
+
+def sin_math(nmax):
+    xvals = np.linspace(0, 2*np.pi, nmax)
+    start = time.time()
+    for x in xvals:
+        y = math.sin(x)
+    return time.time()-start
+
+def sin_math_list(nmax):
+    xvals = np.linspace(0, 2*np.pi, nmax)
+    start = time.time()
+    yvals = []
+    for x in xvals:
+        yvals.append(math.sin(x))
+    return time.time()-start
+
+def sin_numpy(nmax):
+    xvals = np.linspace(0, 2*np.pi, nmax)
+    start = time.time()
+    yvals = np.sin(xvals)
+    return time.time()-start
+
+maxpower = 27
+nvals = 2**np.arange(0, maxpower+1)
+tvals = np.empty((maxpower+1, 3))
+for nr, nmax in enumerate(nvals):
+    for idx, f in enumerate((sin_math, sin_math_list, sin_numpy)):
+        tvals[nr, idx] = f(nmax)
+plt.rc('text', usetex=True)
+plt.xscale('log')
+plt.xlabel('$n_\mathrm{max}$', fontsize=20)
+plt.ylabel('$t_\mathrm{math}/t_\mathrm{numpy}$', fontsize=20)
+plt.plot(nvals, tvals[:, 0]/tvals[:, 2], 'o', label='no list')
+plt.plot(nvals, tvals[:, 1]/tvals[:, 2], 'o', label='list')
+plt.legend()
+plt.show()
+```
+
+  </div>
+  <div>
+    <img src="images/math_numpy.png" style="width: 90%; margin: auto">
+  </div>
+</div>
+
+---
+layout: gli-two-cols-header
+---
+
+# Linear algebra with NumPy
+
+::left::
+
+#### common way to import the `linalg` module
+
+```python
+>>> import numpy.linalg as LA
+```
+
+#### norm of a vector
+
+```python
+>>> v = np.array([1, -2, 3])
+>>> n = LA.norm(v)
+>>> n**2
+14.0
+>>> v_normalized = v/n
+>>> LA.norm(v_normalized)
+1.0
+```
+
+#### cross product
+
+#### determinant
+```python
+>>> m = np.array([[2, 5], [1, 3]])
+>>> m
+array([[2, 5],
+       [1, 3]])
+>>> LA.det(m)
+1.0
+```
+
+::right::
+
+#### inverse matrix
+
+```python
+>>> LA.inv(m)
+array([[ 3., -5.],
+       [-1.,  2.]])
+
+```
+
+<br>
+
+#### solving a system of linear equations
+
+$$\mathsf{M}\mathbf{x} = \mathbf{v}\quad\longrightarrow\quad
+\mathbf{x} = \mathsf{M}^{-1}\mathbf{v}$$
+
+```python
+>>> v = np.array([4, 1])
+>>> np.dot(LA.inv(m), v)
+array([ 7., -2.])
+```
+```python
+>>> LA.solve(m, v)
+array([ 7., -2.])
+```
+
+---
+layout: gli-two-cols-header
+---
+
+# Solution of an eigenvalue problem
+
+::left::
+
+$$\begin{pmatrix} -2 & 2\\ 2 & 1\end{pmatrix}\mathbf{x} = \lambda\mathbf{x}$$
+
+```python
+m = np.array([[-2, 2], [2, 1]])
+```
+```python
+>>> LA.eigh(m)
+EighResult(eigenvalues=array([-3.,  2.]), 
+           eigenvectors=array([[-0.89442719, -0.4472136 ],
+                               [ 0.4472136 , -0.89442719]]))
+```
+
+#### only eigenvalues:
+
+```python
+>>> LA.eigvalsh(m)
+array([-3.,  2.])
+```
+
+<br>
+
+* `eigh`, `eigvalsh` for Hermitian matrices
+* `eig`, `eigvals` also for non-Hermitian matrices
+
+::right::
+
+```python
+>>> evals, evecs = LA.eigh(m)
+```
+```python
+>>> np.dot(m, evecs[:, 0])
+array([ 2.68328157, -1.34164079])
+>>> evals[0]*evecs[:, 0]
+array([ 2.68328157, -1.34164079])
+```
+```python
+>>> np.dot(m, evecs[:, 1])
+array([-0.89442719, -1.78885438])
+>>> evals[1]*evecs[:, 1]
+array([-0.89442719, -1.78885438])
+
+```
+
+* the eigenvectors are stored as columns of the array
+  `eigenvectors` (or here: `evecs`)
+
+<br>
+
+#### analytical eigenvectors
+
+```python
+>>> np.array([-2, 1])/np.sqrt(5)
+array([-0.89442719,  0.4472136 ])
+>>> np.array([-1, -2])/np.sqrt(5)
+array([-0.4472136 , -0.89442719])
+```
+
+---
+
+# Timing of `eig` vs. `eigh`
+
+```python
+>>> import timeit
+>>> a = np.random.random(250000).reshape(500, 500)
+>>> a = a+a.T
+>>> timeit.repeat('LA.eig(a)', number=100, globals=globals())
+[29.35714398899927, 28.644749746999878, 28.60115212599976, 28.615708055999676, 28.734661153999696]
+>>> timeit.repeat('LA.eigh(a)', number=100, globals=globals())
+[3.747801464999611, 4.294489919000625, 4.144420298999648, 4.138807968000037, 4.069388242000059]
+```
+
+<br>
+
+* In this example, `eigh` is about a factor of 7 faster than `eig`.
+* timing values can fluctuate  
