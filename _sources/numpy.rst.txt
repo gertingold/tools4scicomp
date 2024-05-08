@@ -1067,7 +1067,7 @@ print not only the final result but also the intermediate steps.
    integers = np.arange(nmax+1)
    is_prime = np.ones(nmax+1, dtype=bool)
    is_prime[:2] = False
-   for j in range(2, int(math.sqrt(nmax))+1):
+   for j in range(2, math.isqrt(nmax)+1):
        if is_prime[j]:
            is_prime[j*j::j] = False
        print(integers[is_prime])
