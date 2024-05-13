@@ -146,7 +146,7 @@ $ python -m doctest hello.py
 
 <br>
 
-* load the `doctext`-module for execution
+* load the `doctest`-module for execution
 * the docstring so far does not contain a test
 * output is produced in the case of failing tests or when using the option `-v`
 
