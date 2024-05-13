@@ -1758,3 +1758,46 @@ array([-0.4472136 , -0.89442719])
 
 * In this example, `eigh` is about a factor of 7 faster than `eig`.
 * timing values can fluctuate  
+
+---
+
+# SciPy-Module
+
+<div class="grid grid-cols-[12%_1fr_9%_1fr] gap-4">
+  <div><code>cluster</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/cluster.html">Clustering functionality</a></div>
+  <div><code>misc</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/misc.html">Utility routines (deprecated)</a></div>
+  <div><code>constants</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/constants.html">Physical and mathematical constants and units</a></div>
+  <div><code>ndimage</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/ndimage.html">N-dimensional image processing and interpolation</a></div>
+  <div><code>datasets</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/datasets.html">Load SciPy datasets</a></div>
+  <div><code>odr</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/odr.html">Orthogonal distance regression</a></div>
+  <div><code>fft</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/fft.html">Discrete Fourier and related transforms</a></div>
+  <div><code>optimize</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/optimize.html">Numerical optimization</a></div>
+  <div><code>fftpack</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/fftpack.html">Discrete Fourier transforms (legacy)</a></div>
+  <div><code>signal</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/signal.html">Signal processing</a></div>
+  <div><code>integrate</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/integrate.html">Numerical integration and ODEs</a></div>
+  <div><code>sparse</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/sparse.html">Sparse arrays, linear algebra and graph algorithms</a></div>
+  <div><code>interpolate</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/interpolate.html">Interpolation</a></div>
+  <div><code>spatial</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/spatial.html">Spatial data structures and algorithms</a></div>
+  <div><code>io</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/io.html">Scientific data format reading and writing</a></div>
+  <div><code>special</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/special.html">Special functions</a></div>
+  <div><code>linalg</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/linalg.html">Linear algebra functionality</a></div>
+  <div><code>stats</code></div>
+  <div><a href="https://docs.scipy.org/doc/scipy/reference/stats.html">Statistical functions</a></div>
+</div>
