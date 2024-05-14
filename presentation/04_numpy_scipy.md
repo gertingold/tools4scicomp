@@ -1801,3 +1801,381 @@ array([-0.4472136 , -0.89442719])
   <div><code>stats</code></div>
   <div><a href="https://docs.scipy.org/doc/scipy/reference/stats.html">Statistical functions</a></div>
 </div>
+
+---
+
+# Example: Linear regression of noisy data
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+
+x =  np.linspace(0, 10, 101)
+rng = np.random.default_rng()
+y = 2*x + 1 + rng.normal(0, 1, 101)
+
+result = stats.linregress(x, y)
+plt.plot(x, y, 'o')
+plt.plot(x, result.slope*x + result.intercept)
+plt.show()
+print(f"{result.slope = :6.4f}")
+print(f"{result.stderr = :6.4f}")
+print(f"{result.intercept = :6.4f}")
+print(f"{result.intercept_stderr = :6.4f}")
+```
+
+```console
+result.slope = 2.0293
+result.stderr = 0.0382
+result.intercept = 0.5772
+result.intercept_stderr = 0.2212
+```
+
+  </div>
+  <div>
+    <img src="images/linregress.png" style="width: 90%; margin: auto">
+  </div>
+</div>
+
+---
+
+# Example: Curve fitting
+
+<div class="grid grid-cols-[1fr_1fr] gap-4">
+  <div>
+
+```python
+import numpy as np
+from scipy import optimize
+import matplotlib.pyplot as plt
+
+def fitfunc(x, a, b):
+    return a*np.sin(x+b)
+
+x = np.linspace(0, 10, 101)
+rng = np.random.default_rng()
+y = 2*np.sin(x+0.5) + rng.normal(0, 1, 101)
+plt.plot(x, y, 'o')
+
+popt, pcov = optimize.curve_fit(fitfunc, x, y)
+print(f"a = {popt[0]:6.4f}, b = {popt[1]:6.4f}")
+plt.plot(x, popt[0]*np.sin(x+popt[1]))
+plt.show()
+```
+
+```console
+a = 2.2615, b = 0.6587
+```
+
+  </div>
+  <div>
+    <img src="images/curvefit.png" style="width: 90%; margin: auto">
+  </div>
+</div>
+
+---
+
+# Example: Finding eigenvalue for finite potential well
+
+<div class="grid grid-cols-[1fr_50%] gap-4">
+  <div>
+
+```python
+import numpy as np
+from scipy import optimize
+import matplotlib.pyplot as plt
+
+def f(energy, alpha):
+    sqrt_1me = np.sqrt(1-energy)
+    return (np.sqrt(energy)*np.cos(alpha*sqrt_1me)
+            -sqrt_1me*np.sin(alpha*sqrt_1me))
+
+alpha = 1
+e0, r = optimize.brentq(f, a=0, b=1, args=alpha,
+                        full_output=True)
+print(f"{e0 = :6.4f}\n")
+print(r)
+
+x = np.linspace(0, 1, 400)
+plt.plot(x, f(x, alpha))
+plt.plot(e0, 0, 'o')
+plt.show()
+```
+
+```console {all}{maxHeight:'100px'}
+e0 = 0.4538
+
+      converged: True
+           flag: converged
+ function_calls: 7
+     iterations: 6
+           root: 0.45375316586032827
+```
+
+  </div>
+  <div>
+
+$$\sqrt{\epsilon}\cos(\alpha\sqrt{1-\epsilon}) - 
+  \sqrt{1-\epsilon}\sin(\alpha\sqrt{1-\epsilon}) = 0$$
+$$\epsilon = -\frac{E}{V_0}
+\qquad\alpha = \sqrt{\frac{2mV_0}{\hbar^2}}\frac{L}{2}$$
+
+<img src="images/brentq.png" style="width: 90%; margin: auto">
+
+  </div>
+</div>
+
+---
+
+# Example: Hanging chain
+
+<div class="grid grid-cols-[30%_1fr] gap-4">
+  <div>
+  <img src="images/chainlink.png" style="width: 90%; margin: auto">
+
+  <br>
+
+ * minimiere potentielle Energie (`f_energy`)
+ * Endpunkte auf gleicher Höhe (`y_constraint`)
+ * Endpunkte mit vorgegebenem horizontalem Abstand
+   (`x_constraint`)
+
+  </div>
+  <div>
+
+```python {all|13-27}{maxHeight:'450px'}
+import numpy as np
+from scipy import optimize
+import matplotlib.pyplot as plt
+
+class Chain:
+    def __init__(self, nlinks, length):
+        if nlinks < length:
+            raise ValueError('length requirement cannot be fulfilled with '
+                             'the given number of links')
+        self.nlinks = nlinks
+        self.length = length
+
+    def x_constraint(self, phi):
+        return np.sum(np.cos(phi))-self.length
+
+    def y_constraint(self, phi):
+        return np.sum(np.sin(phi))
+
+    def f_energy(self, phi):
+        return np.sum(np.arange(self.nlinks, 0, -1)*np.sin(phi))
+
+    def equilibrium(self):
+        result = optimize.minimize(
+                     self.f_energy, np.linspace(-0.1, 0.1, self.nlinks),
+                     method='SLSQP',
+                     constraints=[{'type': 'eq', 'fun': self.x_constraint},
+                                  {'type': 'eq', 'fun': self.y_constraint}])
+        return result.x
+
+    def plot_equilibrium(self):
+        phis = chain.equilibrium()
+        x = np.zeros(chain.nlinks+1)
+        x[1:] = np.cumsum(np.cos(phis))
+        y = np.zeros(chain.nlinks+1)
+        y[1:] = np.cumsum(np.sin(phis))
+        plt.axes().set_aspect('equal')
+        plt.plot(x, y)
+        plt.plot(x, y, 'o')
+        plt.show()
+
+chain = Chain(6, 5)
+chain.plot_equilibrium()
+```
+
+  </div>
+</div>
+
+---
+
+# Example: Hanging chain (cont'd)
+
+<div class="grid grid-cols-[1fr_25%] gap-4">
+  <div>
+<img src="images/hanging_chain_6.png" style="width: 82%; margin-right: 0; margin-left: auto">
+<br>
+<img src="images/hanging_chain_30.png" style="width: 80%; margin-right: 0; margin-left: auto">
+
+<br>
+
+  * im Kontinuumslimes: hyperbolischer Kosinus
+
+  </div>
+  <div>
+
+   $n = 6$
+
+   <br> <br> <br> <br> <br> <br>
+
+   $n = 30$
+
+  </div>
+</div>
+
+---
+
+# Example: Falling chain – Equation of motion
+
+<div></div>
+
+[W. Tomaszewski, P. Pieranski, J.-C. Geminard, Am. J. Phys. **74**, 776 (2006)](https://doi.org/10.1119/1.2204074)
+
+$$\sum_{j=1}^n m_{i,j}c_{i,j}\ddot{\varphi}_j = -\sum_{j=1}^n m_{i,j}s_{i,j}\dot\varphi^2_j
+  + \frac{r}{m\ell^2}\left(\dot\varphi_{i-1}-2\dot\varphi_i+\dot\varphi_{i+1}\right)
+  - \frac{g}{\ell}a_ic_i$$
+
+$$c_i = \cos(\varphi_i)\qquad c_{i,j} = \cos(\varphi_i-\varphi_j)\qquad s_{i,j} = \sin(\varphi_i-\varphi_j)$$
+
+$$a_i = n-i+\frac{1}{2}\qquad
+  M_{i,j} = \begin{cases}
+             n-i+\frac{1}{3} & i=j\\
+             n-\max(i,j)+\frac{1}{2} & i\neq j
+            \end{cases}$$
+
+* Das Modell berücksichtigt Dämpfung an den Gelenken zwischen den Kettengliedern → Parameter $r$
+
+---
+
+# Example: Falling chain – Code
+
+```python {all|32-37|39-42|44-45|47-53|55-61|63-78|94-101|117-122}{maxHeight:'450px'}
+import numpy as np
+import numpy.linalg as LA
+from scipy import integrate, optimize
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+class Chain:
+    def __init__(self, nlinks, length):
+        if nlinks < length:
+            raise ValueError('length requirement cannot be fulfilled with '
+                             'the given number of links')
+        self.nlinks = nlinks
+        self.length = length
+
+    def x_constraint(self, phi):
+        return np.sum(np.cos(phi))-self.length
+
+    def y_constraint(self, phi):
+        return np.sum(np.sin(phi))
+
+    def f_energy(self, phi):
+        return np.sum(np.arange(self.nlinks, 0, -1)*np.sin(phi))
+
+    def equilibrium(self):
+        result = optimize.minimize(
+                     self.f_energy, np.linspace(-0.1, 0.1, self.nlinks),
+                     method='SLSQP',
+                     constraints=[{'type': 'eq', 'fun': self.x_constraint},
+                                  {'type': 'eq', 'fun': self.y_constraint}])
+        return result.x
+
+class FallingChain(Chain):
+    def __init__(self, nlinks, length, damping):
+        super(FallingChain, self).__init__(nlinks, length)
+        self.set_matrix_m()
+        self.set_vector_a()
+        self.set_matrix_damping(damping)
+        
+    def set_matrix_m(self):
+        m = np.fromfunction(lambda i, j: self.nlinks-np.maximum(i, j)-0.5,
+                            (self.nlinks, self.nlinks))
+        self.m = m-np.identity(self.nlinks)/6
+
+    def set_vector_a(self):
+        self.a = np.arange(self.nlinks, 0, -1)-0.5
+    
+    def set_matrix_damping(self, damping):
+        self.damping = (-2*np.identity(self.nlinks, dtype=np.float64)
+                        + np.eye(self.nlinks, k=1)
+                        + np.eye(self.nlinks, k=-1))
+        self.damping[0, 0] = -1
+        self.damping[self.nlinks-1, self.nlinks-1] = -1
+        self.damping = damping*self.damping
+
+    def solve_eq_of_motion(self, time_i, time_f, nt):
+        y0 = np.zeros(2*self.nlinks, dtype=np.float64)
+        y0[self.nlinks:] = self.equilibrium()
+        self.solution = integrate.solve_ivp(
+                            self.diff, (time_i, time_f), y0,
+                            method='RK45',
+                            t_eval=np.linspace(time_i, time_f, nt))
+
+    def diff(self, t, y):
+        momenta = y[:self.nlinks]
+        angles = y[self.nlinks:]
+        d_angles = momenta
+        ci = np.cos(angles)
+        cij = np.cos(angles[:, np.newaxis]-angles)
+        sij = np.sin(angles[:, np.newaxis]-angles)
+        mcinv = LA.inv(self.m*cij)
+        d_momenta = -np.dot(self.m*sij, momenta*momenta)
+        d_momenta = d_momenta + np.dot(self.damping, momenta)
+        d_momenta = d_momenta - self.a*ci
+        d_momenta = np.dot(mcinv, d_momenta)
+        d = np.empty_like(y)
+        d[:self.nlinks] = d_momenta
+        d[self.nlinks:] = d_angles
+        return d
+
+def angles_to_coords(phi):
+    """convert angles to coordinates of link endpoints
+        
+       phi: angles of links with respect to the horizontal
+       x, y: coordinates of link endpoints
+           
+    """
+    dim = phi.shape[0]+1
+    x = np.zeros(dim)
+    x[1:] = np.cumsum(np.cos(phi))
+    y = np.zeros(dim)
+    y[1:] = np.cumsum(np.sin(phi))
+    return x, y
+
+def animate(i):
+    x, y = angles_to_coords(c.solution.y[:, i][c.nlinks:])
+    line.set_data(x, y)
+    return line,
+
+def init():
+    line.set_data([], [])
+    return line,
+
+nlinks = 50
+length = 40
+damping = 1
+ti = 0
+tf = 200
+tsteps = 1000
+
+c = FallingChain(nlinks, length, damping)
+c.solve_eq_of_motion(ti, tf, tsteps)
+fig = plt.figure()
+ax = fig.add_subplot(111, autoscale_on=False,
+                     xlim=(-nlinks, nlinks), ylim=(-nlinks, 0.3*nlinks))
+ax.set_aspect('equal')
+line, = ax.plot([], [])
+anim = animation.FuncAnimation(fig, animate, tsteps,
+                               interval=20, blit=True,
+                               init_func=init)
+
+FFwriter = animation.FFMpegWriter(fps=30)
+anim.save('falling_chain.mp4', writer = FFwriter)
+```
+
+---
+
+# Example: Falling chain – Results
+
+<video width="560" height="420" controls style="margin: auto;">
+  <source src="movies/falling_chain.mp4" type="video/mp4">
+</video>
