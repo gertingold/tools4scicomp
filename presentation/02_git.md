@@ -104,7 +104,7 @@ The use of a version control system is no substitute for project management and 
 
 <br>
 
-<img src="images/cvcs.png" style="width: 60%; margin: auto">
+<img src="/images/cvcs.png" style="width: 60%; margin: auto">
 
 <br>
 
@@ -117,7 +117,7 @@ The use of a version control system is no substitute for project management and 
 
 <br>
 
-<img src="images/dvcs.png" style="width: 70%; margin: auto">
+<img src="/images/dvcs.png" style="width: 70%; margin: auto">
 
 <br>
 
@@ -140,7 +140,7 @@ server through which users exchange their versions.</div>
 
 <br>
 
-<img src="images/dvcs-github.png" style="width: 40%; margin: auto">
+<img src="/images/dvcs-github.png" style="width: 40%; margin: auto">
 
 <br>
 
@@ -512,7 +512,7 @@ $ git config --global user.email <your email>
 
 <br>
 
-<img src="images/addcommit.png" style="width: 50%; margin: auto">
+<img src="/images/addcommit.png" style="width: 50%; margin: auto">
 
 <br>
 
@@ -1597,7 +1597,7 @@ $ git log --oneline --graph --decorate --all
 <br>
 
 <div class="grid grid-cols-[60%_1fr] gap-8">
- <div><img src="images/gitlab.png" style="width: 100%; margin: auto"></div>
+ <div><img src="/images/gitlab.png" style="width: 100%; margin: auto"></div>
  <div>
 
   #### project maintainer
@@ -1617,8 +1617,8 @@ $ git log --oneline --graph --decorate --all
 # Creating a new project on GitLab
 
 <div class="grid grid-cols-[30%_1fr] gap-8">
- <div><img src="images/gitlab-create-project-1.png" style="width: 100%; margin: auto"></div>
- <div><img src="images/gitlab-create-project-2.png" style="width: 100%; margin: auto"></div>
+ <div><img src="/images/gitlab-create-project-1.png" style="width: 100%; margin: auto"></div>
+ <div><img src="/images/gitlab-create-project-2.png" style="width: 100%; margin: auto"></div>
 </div>
 
 * Create blank project  
@@ -1633,7 +1633,7 @@ $ git log --oneline --graph --decorate --all
 
 # Setting up the project
 
-<div><img src="images/gitlab-create-project-3.png" style="width: 90%; margin: auto"></div>
+<div><img src="/images/gitlab-create-project-3.png" style="width: 90%; margin: auto"></div>
 
 <br>
 
@@ -1644,7 +1644,7 @@ $ git log --oneline --graph --decorate --all
 
 # The initial commit
 
-<div><img src="images/gitlab-create-project-4.png" style="width: 60%; margin: auto"></div>
+<div><img src="/images/gitlab-create-project-4.png" style="width: 60%; margin: auto"></div>
 
 <br>
 
@@ -1656,7 +1656,7 @@ $ git log --oneline --graph --decorate --all
 
 # Parenthesis on SSH keys: Two protocols
 
-<div><img src="images/code_urls.png" style="width: 32%; margin: auto;"></div>
+<div><img src="/images/code_urls.png" style="width: 32%; margin: auto;"></div>
 
 <br>
 
@@ -1675,7 +1675,7 @@ $ git log --oneline --graph --decorate --all
 
 <br>
 
-<div><img src="images/asymmetric_encryption.png" style="width: 100%; margin: auto;"></div>
+<div><img src="/images/asymmetric_encryption.png" style="width: 100%; margin: auto;"></div>
 <div style="font-size: small;padding-top: 10px;text-align: right;">(adapted from Wikipedia)</div>
 
 * *public* key allows to encrypt message
@@ -1757,11 +1757,11 @@ total 8
 # Parenthesis on SSH keys: Adding public key to GitLab
 
 <div class="grid grid-cols-[1fr_1fr] gap-8">
- <div><img src="images/add_sshkey_1.png" style="width: 100%; margin: auto"></div>
- <div><img src="images/add_sshkey_2.png" style="width: 100%; margin: auto"></div>
+ <div><img src="/images/add_sshkey_1.png" style="width: 100%; margin: auto"></div>
+ <div><img src="/images/add_sshkey_2.png" style="width: 100%; margin: auto"></div>
 </div>
 
-<div><img src="images/add_sshkey_3.png" style="width: 100%; margin: auto"></div>
+<div><img src="/images/add_sshkey_3.png" style="width: 100%; margin: auto"></div>
 
 ---
 
@@ -1825,16 +1825,16 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJJ6q/C9VqYciIC45J5wTF2zdkuN4zEIwQGPiiGrSG7B
 # Inviting collaborators
 
 <div class="grid grid-cols-[60%_1fr] gap-8">
-<div><img src="images/gitlab-create-project-5.png" style="width: 100%; margin: auto"></div>
-<div><img src="images/gitlab-create-project-6.png" style="width: 100%; margin: auto"></div>
+<div><img src="/images/gitlab-create-project-5.png" style="width: 100%; margin: auto"></div>
+<div><img src="/images/gitlab-create-project-6.png" style="width: 100%; margin: auto"></div>
 </div><br>
-<div><img src="images/gitlab-create-project-7.png" style="width: 100%; margin: auto"></div>
+<div><img src="/images/gitlab-create-project-7.png" style="width: 100%; margin: auto"></div>
 
 ---
 
 # The `upstream` repository
 
-<div><img src="images/gitlab-developer-1.png" style="width: 100%; margin: auto"></div>
+<div><img src="/images/gitlab-developer-1.png" style="width: 100%; margin: auto"></div>
 
 <br>
 
@@ -1846,17 +1846,17 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJJ6q/C9VqYciIC45J5wTF2zdkuN4zEIwQGPiiGrSG7B
 
 # A reminder of the overall picture
 
-<div><img src="images/gitlab.png" style="width: 80%; margin: auto"></div>
+<div><img src="/images/gitlab.png" style="width: 80%; margin: auto"></div>
 
 ---
 
 # Forking the repository
 
-<img src="images/gitlab-developer-2.png" style="width: 80%; margin: auto">
+<img src="/images/gitlab-developer-2.png" style="width: 80%; margin: auto">
 
 <br>
 
-<img src="images/gitlab-developer-3.png" style="width: 60%; margin: auto">
+<img src="/images/gitlab-developer-3.png" style="width: 60%; margin: auto">
 
 ---
 
@@ -1984,27 +1984,27 @@ $ git log --oneline --decorate
 
 <br>
 
-<img src="images/gitlab-developer-4.png" style="width: 60%; margin: auto">
+<img src="/images/gitlab-developer-4.png" style="width: 60%; margin: auto">
 
 ---
 
 # Creating a merge request
 
-<img src="images/gitlab-developer-5a.png" style="width: 80%; margin: auto">
+<img src="/images/gitlab-developer-5a.png" style="width: 80%; margin: auto">
 
 
 ---
 
 # Creating a merge request (continued)
 
-<img src="images/gitlab-developer-5b.png" style="width: 80%; margin: auto">
+<img src="/images/gitlab-developer-5b.png" style="width: 80%; margin: auto">
 
 ---
 
 # A merge request
 
 <div class="grid grid-cols-[60%_1fr] gap-8">
-<div><img src="images/gitlab-developer-6.png" style="width: 100%; margin: auto"></div>
+<div><img src="/images/gitlab-developer-6.png" style="width: 100%; margin: auto"></div>
 <div>
 
 * Adding more commits before the merging has happened will make them part of the
@@ -2022,7 +2022,7 @@ $ git log --oneline --decorate
 # Ready to merge
 
 <div class="grid grid-cols-[60%_1fr] gap-8">
-<div><img src="images/gitlab-developer-7.png" style="width: 95%; margin: auto"></div>
+<div><img src="/images/gitlab-developer-7.png" style="width: 95%; margin: auto"></div>
 <div>
 
 * If during the discussion it turns out that the proposed code is not useful, the
@@ -2037,7 +2037,7 @@ $ git log --oneline --decorate
 
 # A reminder of the overall picture
 
-<div><img src="images/gitlab.png" style="width: 80%; margin: auto"></div>
+<div><img src="/images/gitlab.png" style="width: 80%; margin: auto"></div>
 
 ---
 
@@ -2361,7 +2361,7 @@ To http://gitlab.local:30080/ingold/myproject.git
  * [new tag]         v1 -> v1
 ```
 
-<div><img src="images/gitlab-tag.png" style="width: 70%; margin: auto"></div>
+<div><img src="/images/gitlab-tag.png" style="width: 70%; margin: auto"></div>
 
 ---
 
@@ -2466,20 +2466,20 @@ Your branch is up to date with 'origin/main'.
 <div class="grid grid-cols-[1fr_1fr] gap-20">
 <div>
 
-![](images/detachedhead_1.png)
+![](/images/detachedhead_1.png)
 
 <br>
 
-![](images/detachedhead_2.png)
+![](/images/detachedhead_2.png)
 
 </div>
 <div>
 
-![](images/detachedhead_3.png)
+![](/images/detachedhead_3.png)
 
 <br>
 
-![](images/detachedhead_4.png)
+![](/images/detachedhead_4.png)
 
 </div>
 </div>

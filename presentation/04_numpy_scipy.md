@@ -14,7 +14,7 @@ Basis: [NumPy](https://numpy.org)
 
 </div>
 
-<img src="images/ecosystem.png" style="width: 90%; margin: auto">
+<img src="/images/ecosystem.png" style="width: 90%; margin: auto">
 
 ---
 
@@ -24,7 +24,7 @@ Basis: [NumPy](https://numpy.org)
 
 <br>
 
-<img src="images/rgbarray.png" style="width: 40%; margin: auto">
+<img src="/images/rgbarray.png" style="width: 40%; margin: auto">
 
 ---
 
@@ -397,7 +397,7 @@ strides : (32, 8)
   </div>
   <div>
 
-<img src="images/strides.png" style="width: 90%; margin: auto">
+<img src="/images/strides.png" style="width: 90%; margin: auto">
 
   </div>
 </div>
@@ -690,7 +690,7 @@ plt.show()
 
 <br>
 
-<img src="images/application_linspace.png" style="width: 40%; margin: auto">
+<img src="/images/application_linspace.png" style="width: 40%; margin: auto">
 
 ---
 
@@ -766,7 +766,7 @@ plt.show()
 
   </div>
   <div>
-<img src="images/randomarray.png" style="width: 70%; margin: auto">
+<img src="/images/randomarray.png" style="width: 70%; margin: auto">
   </div>
 </div>
 
@@ -954,7 +954,7 @@ array([[12, 13, 14, 15, 16, 17],
 
   <br>
 
-  <img src="images/axes.png" style="width: 75%; margin: auto">
+  <img src="/images/axes.png" style="width: 75%; margin: auto">
 
   </div>
   <div>
@@ -1023,7 +1023,7 @@ array([[ 0,  4,  8],
 
   </div>
   <div>
-    <img src="images/array3d.png" style="width: 75%; margin: auto">
+    <img src="/images/array3d.png" style="width: 75%; margin: auto">
   </div>
 </div>
 
@@ -1188,7 +1188,7 @@ array([0.54061246, 0.7692907 , 0.54760366, 0.64386641, 0.87821191])
 
 # Application: sieve of Eratosthenes
 
-<img src="images/eratosthenes.png" style="width: 75%; margin: auto">
+<img src="/images/eratosthenes.png" style="width: 75%; margin: auto">
 
 ---
 
@@ -1263,7 +1263,7 @@ array([False, False, False, False,  True,  True])
 
 <div class="grid grid-cols-[1fr_40%] gap-4">
   <div>
-    <img src="images/broadcast.png" style="width: 90%; margin: auto">
+    <img src="/images/broadcast.png" style="width: 90%; margin: auto">
   </div>
   <div>
 
@@ -1441,7 +1441,7 @@ array([[ 0.0000000e+00,  1.0000000e+00],
 
   </div>
   <div>
-    <img src="images/airy.png" style="width: 90%; margin: auto">
+    <img src="/images/airy.png" style="width: 90%; margin: auto">
   </div>
 </div>
 
@@ -1489,7 +1489,7 @@ array([[[0. , 0. , 0. , 0. , 0. ],
 >>> plt.show()
 ```
 
-  <img src="images/sinxy.png" style="width: 90%; margin: auto">
+  <img src="/images/sinxy.png" style="width: 90%; margin: auto">
 
   </div>
 </div>
@@ -1534,7 +1534,7 @@ Text(0, 0.5, '$\\nu$')
 
 <br>
 
-<img src="images/besselj.png" style="width: 60%; margin: auto">
+<img src="/images/besselj.png" style="width: 60%; margin: auto">
 
 ---
 
@@ -1551,7 +1551,7 @@ Text(0, 0.5, '$\\nu$')
 
 <br>
 
-<img src="images/interference.png" style="width: 30%; margin: auto">
+<img src="/images/interference.png" style="width: 30%; margin: auto">
 
 ---
 
@@ -1605,7 +1605,7 @@ plt.show()
 
   </div>
   <div>
-    <img src="images/math_numpy.png" style="width: 90%; margin: auto">
+    <img src="/images/math_numpy.png" style="width: 90%; margin: auto">
   </div>
 </div>
 
@@ -1837,7 +1837,7 @@ result.intercept_stderr = 0.2212
 
   </div>
   <div>
-    <img src="images/linregress.png" style="width: 90%; margin: auto">
+    <img src="/images/linregress.png" style="width: 90%; margin: auto">
   </div>
 </div>
 
@@ -1873,7 +1873,7 @@ a = 2.2615, b = 0.6587
 
   </div>
   <div>
-    <img src="images/curvefit.png" style="width: 90%; margin: auto">
+    <img src="/images/curvefit.png" style="width: 90%; margin: auto">
   </div>
 </div>
 
@@ -1924,7 +1924,7 @@ $$\sqrt{\epsilon}\cos(\alpha\sqrt{1-\epsilon}) -
 $$\epsilon = -\frac{E}{V_0}
 \qquad\alpha = \sqrt{\frac{2mV_0}{\hbar^2}}\frac{L}{2}$$
 
-<img src="images/brentq.png" style="width: 90%; margin: auto">
+<img src="/images/brentq.png" style="width: 90%; margin: auto">
 
   </div>
 </div>
@@ -1935,7 +1935,7 @@ $$\epsilon = -\frac{E}{V_0}
 
 <div class="grid grid-cols-[30%_1fr] gap-4">
   <div>
-  <img src="images/chainlink.png" style="width: 90%; margin: auto">
+  <img src="/images/chainlink.png" style="width: 90%; margin: auto">
 
   <br>
 
@@ -2001,9 +2001,9 @@ chain.plot_equilibrium()
 
 <div class="grid grid-cols-[1fr_25%] gap-4">
   <div>
-<img src="images/hanging_chain_6.png" style="width: 82%; margin-right: 0; margin-left: auto">
+<img src="/images/hanging_chain_6.png" style="width: 82%; margin-right: 0; margin-left: auto">
 <br>
-<img src="images/hanging_chain_30.png" style="width: 80%; margin-right: 0; margin-left: auto">
+<img src="/images/hanging_chain_30.png" style="width: 80%; margin-right: 0; margin-left: auto">
 
 <br>
 
@@ -2177,5 +2177,5 @@ anim.save('falling_chain.mp4', writer = FFwriter)
 # Example: Falling chain – Results
 
 <video width="560" height="420" controls style="margin: auto;">
-  <source src="movies/falling_chain.mp4" type="video/mp4">
+  <source src="/movies/falling_chain.mp4" type="video/mp4">
 </video>
