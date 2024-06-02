@@ -115,3 +115,7 @@ src: ./03_testing.md
 ---
 src: ./04_numpy_scipy.md
 ---
+
+---
+src: ./05_runtime.md
+---
