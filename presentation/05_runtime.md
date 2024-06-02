@@ -167,4 +167,5 @@ plt.show()
 * A better solution starts at the last line and works its way upwards.
 * For this solution, the run-time increases only *quadratically* with the
   problem size. <carbon-face-satisfied class="text-green-800 text-3xl" />
-
+* Polynomial is better than exponential, but for a given problem size, the prefactor may
+  also be relevant.
