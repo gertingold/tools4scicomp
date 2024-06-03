@@ -108,7 +108,7 @@ plt.show()
 
 ---
 
-# A naive solution
+# A better solution
 
 ```python {all|24-33}{maxHeight:'450px'}
 import math
