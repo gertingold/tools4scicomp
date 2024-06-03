@@ -1418,7 +1418,7 @@ array([[ 0.0000000e+00,  1.0000000e+00],
 
 # Universal functions in SciPy
 
-* much larger selection of unctions with many special functions, see the [documentatioon](https://docs.scipy.org/doc/scipy/reference/special.html)
+* much larger selection of unctions with many special functions, see the [documentation](https://docs.scipy.org/doc/scipy/reference/special.html)
 
 <br>
 
