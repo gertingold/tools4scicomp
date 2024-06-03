@@ -83,7 +83,7 @@ standard library offers the possibility to determine the current time::
 
 While this result is nicely readable, it is not well suited to calculate time differences.
 For this purpose, the seconds passed since the beginning of the epoch are better suited.
-On Unix systems, the epoch starts on January, 1970 at 00:00:00 UTC::
+On Unix systems, the epoch starts on January 1, 1970 at 00:00:00 UTC::
 
    >>> time.time()
    1545905769.0189064
