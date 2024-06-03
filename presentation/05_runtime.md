@@ -362,7 +362,61 @@ print(f'process time: {end_proc-start_proc:5.3f}s')
 
 # `timeit` module
 
+```python
+>>> import timeit
+>>> timeit.timeit('0.5**2')
+0.007943803999978627
+```
 
+* The command has been executed one million times. Therefore, the result given in seconds
+  should actually be interpreted as microseconds. The evaluation of the square thus requires
+  8 nanoseconds.
 
-<br>
+```python
+>>> x = 0.5
+>>> timeit.timeit('x**2')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/opt/anaconda3/lib/python3.11/timeit.py", line 237, in timeit
+    return Timer(stmt, setup, timer, globals).timeit(number)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.11/timeit.py", line 180, in timeit
+    timing = self.inner(it, self.timer)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<timeit-src>", line 6, in inner
+NameError: name 'x' is not defined
+```
 
+* By default, `timeit` does not have access to the outside scope.
+
+---
+
+# `timeit` module (cont'd)
+
+```python
+>>> x = 0.5
+>>> timeit.timeit('x**2', globals=globals())
+0.04229282000005696
+```
+
+* One possibility is to give `timeit` access to the variables known globally.
+
+<br />
+
+```python
+>>> timeit.timeit('x**2', 'x = 0.5')
+0.039870551000149135
+```
+
+* A second possibility is to define the value of `x` in the setup command given in the
+  second argument.
+
+<br />
+
+```python
+>>> timeit.timeit('math.pow(x, 2)', 'import math; x=0.5')
+0.04683635499986849
+```
+
+* Comparison with the power function from the `math`-module. The execution time of the
+  setup code is not taken into account.
