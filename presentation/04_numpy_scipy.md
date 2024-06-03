@@ -928,7 +928,7 @@ array([[12, 13, 14, 15, 16, 17],
 ```
 
  * In the last example, an implicit slice `::` is
-   assummed for the second dimension (axis 1).
+   assumed for the second dimension (axis 1).
 
   </div>
 </div>
