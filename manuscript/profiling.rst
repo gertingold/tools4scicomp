@@ -780,7 +780,7 @@ profiling result from it later by means of::
 .. [#cython] For more information, see `Cython – C-Extensions for Python
              <https://cython.org/>`_. 
 .. [#pypy] For more information, see the `PyPy homepage <https://pypy.org>`_.
-.. [#numba] For more information, see the `Numba homepage <https://numpy.pydta.org>`_.
+.. [#numba] For more information, see the `Numba homepage <https://numba.pydata.org>`_.
 .. [#dek_tex] Donald E. Knuth is well known far beyond the computer science
               community as the author of the typesetting system TeX.
 .. [#knuth_quote] D.\ E. Knuth, Computing Surveys **6**, 261 (1974). The quote
