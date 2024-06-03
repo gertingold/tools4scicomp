@@ -169,3 +169,200 @@ plt.show()
   problem size. <carbon-face-satisfied class="text-green-800 text-3xl" />
 * Polynomial is better than exponential, but for a given problem size, the prefactor may
   also be relevant.
+
+---
+
+# Reduction of run-time with more hardware
+
+* distribute tasks over a number of compute nodes of a compute cluster
+* even a single CPU contains several cores allowing for parallel computation
+* GPUs may be useful if the communication overhead does not become too high
+  * architecture supports very well the manipulation of matrices
+  * for machine learning tasks high numerical precession is not necessarily needed
+  * [CuPy](https://cupy.dev) as a drop-in replacement for most of the NumPy and SciPy libraries,
+    runs on NVIDIA GPUs
+* human ressources often more costly than hardware ressources
+
+<br />
+
+* BUT: computers need energy to run and thus contribute to the climate change
+
+example: [meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)
+
+<img src="/images/meta-llama-3-8b.png" style="width: 70%; margin: auto">
+
+---
+
+# Energy efficiency
+
+<img src="/images/green500.png" style="width: 80%; margin: auto">
+
+---
+
+# Reduction of run-time with the right software
+
+* use of appropriate libraries like NumPy and SciPy for numerical tasks
+* write time-critical parts e.g. in C
+  * autogeneration of C code from Python-like code with [Cython](https://cython.org)
+* just in time compilation (JIT)
+  * [PyPy](https://www.pypy.org)
+  * [Numba](https://numba.pydata.org/): often adding a simple decorator to the most
+    critical function is sufficient, but sometimes rewriting the code more in C-style
+    may be appropriate
+
+<br />
+
+### Main question:
+
+* Which parts of the program are most time critical and need to be accelerated?<br />  
+  <carbon-arrow-right /> profiling of code
+
+---
+
+# Simple time measurements
+
+<div class="grid grid-cols-[35%_1fr] gap-4"><div>
+
+```python
+>>> import time
+>>> time.ctime()
+'Mon Jun  3 12:22:17 2024'
+```
+
+</div><div>
+
+* Even though we can obtain the current time, the format is not does not allow to 
+  simply calculate time differences.
+
+</div></div>
+<div class="grid grid-cols-[35%_1fr] gap-4"><div>
+
+```python
+>>> time.time()
+1717410254.1613576
+```
+
+</div><div>
+
+* Here, the currect time is given in seconds since the begin of the epoch. On Unix systems,
+  the epoch starts on January 1, 1970 at 00:00:00 UTC.
+
+</div></div>
+<div class="grid grid-cols-[35%_1fr] gap-4"><div>
+
+```python
+import time
+
+for _ in range(10):
+    sum_of_ints = 0
+    start = time.time()
+    for n in range(1000000):
+        sum_of_ints = sum_of_ints + 1
+    end = time.time()
+    print(f'{end-start:5.3f}s', end='  ')
+```
+
+</div><div>
+
+* timing results fluctuate
+
+  first run:
+  ```
+  0.072s  0.075s  0.078s  0.080s  0.082s  0.085s  0.087s  0.089s 0.090s  0.093s
+  ```
+
+  second run:
+  ```
+  0.069s  0.094s  0.075s  0.076s  0.078s  0.080s  0.081s  0.083s  0.085s  0.086s
+  ```
+
+* it makes sense to average over several runs
+
+</div></div>
+
+---
+
+# Time vs. process time
+
+* CPUs are multitasking. Compute time is shared between different processes running
+  in parallel and/or sequentially for short time intervals. Other processes may
+  influence the time required to run the script
+
+```python
+import time
+
+sum_of_ints = 0
+start = time.time()
+start_proc = time.process_time()
+for n in range(10):
+    for m in range(100000):
+        sum_of_ints = sum_of_ints + 1
+    time.sleep(1)
+end = time.time()
+end_proc = time.process_time()
+print(f'total time:   {end-start:5.3f}s')
+print(f'process time: {end_proc-start_proc:5.3f}s')
+```
+
+```bash
+total time:   10.065s
+process time: 0.064s
+```
+
+* time measures the total elapsed time (wall time)
+* process time measures the time spent in the specific process running the script
+
+---
+layout: gli-two-cols-header
+---
+
+# Overhead when calling a function
+
+::left::
+
+```python
+import time
+
+sum_of_ints = 0
+start_proc = time.process_time()
+for n in range(10000000):
+    sum_of_ints = sum_of_ints + 1
+end_proc = time.process_time()
+print(f'process time: {end_proc-start_proc:5.3f}s')
+```
+
+* average over 10 runs: 0.9071 s
+
+::right::
+
+```python
+import time
+
+def increment_by_one(x):
+    return x+1
+
+sum_of_ints = 0
+start_proc = time.process_time()
+for n in range(10000000):
+    increment_by_one(sum_of_ints)
+end_proc = time.process_time()
+print(f'process time: {end_proc-start_proc:5.3f}s')
+```
+
+* average over 10 runs: 0.9843 s
+
+::bottom::
+
+* details matter
+* timing can influence the run time
+* The approach used so far requires a modification of the code.
+  There should be a better way.
+
+---
+
+# `timeit` module
+
+
+
+<br>
+
