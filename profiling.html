@@ -422,7 +422,7 @@ code spend most of its time?</p>
 <p>To address this question, we make use of the <code class="docutils literal notranslate"><span class="pre">cProfile</span></code> module contained in the
 Python standard library. Among the various ways of using this module, we choose
 one which avoids having to change our script:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">cProfile</span> <span class="o">-</span><span class="n">o</span> <span class="n">carpet</span><span class="o">.</span><span class="n">prof</span> <span class="n">carpet</span><span class="o">.</span><span class="n">py</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m cProfile -o carpet.prof carpet.py
 </pre></div>
 </div>
 <p>This command runs the script <code class="docutils literal notranslate"><span class="pre">carpet.py</span></code> under the control of the <code class="docutils literal notranslate"><span class="pre">cProfile</span></code> module.

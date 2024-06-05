@@ -428,7 +428,7 @@ To address this question, we make use of the ``cProfile`` module contained in th
 Python standard library. Among the various ways of using this module, we choose
 one which avoids having to change our script::
 
-   % python -m cProfile -o carpet.prof carpet.py
+   $ python -m cProfile -o carpet.prof carpet.py
 
 This command runs the script ``carpet.py`` under the control of the ``cProfile`` module.
 The option ``-o carpet.prof`` indicates that the results of this profiling run are
