@@ -268,7 +268,7 @@ with the use of the corresponding function of the ``math`` module::
    for n in np.logspace(0.31, 6, 300):
        nint = int(n)
        t_numpy = timeit.timeit('f_numpy(nint)', number=10, globals=globals())
-       t_math = timeit.timeit("f_math(nint)", number=10, globals=globals())
+       t_math = timeit.timeit('f_math(nint)', number=10, globals=globals())
        x.append(nint)
        y.append(t_math/t_numpy)
    
