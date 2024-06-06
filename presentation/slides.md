@@ -119,3 +119,7 @@ src: ./04_numpy_scipy.md
 ---
 src: ./05_runtime.md
 ---
+
+---
+src: ./06_documentation.md
+---
