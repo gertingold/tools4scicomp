@@ -2034,7 +2034,7 @@ $$\sum_{j=1}^n m_{i,j}c_{i,j}\ddot{\varphi}_j = -\sum_{j=1}^n m_{i,j}s_{i,j}\dot
 $$c_i = \cos(\varphi_i)\qquad c_{i,j} = \cos(\varphi_i-\varphi_j)\qquad s_{i,j} = \sin(\varphi_i-\varphi_j)$$
 
 $$a_i = n-i+\frac{1}{2}\qquad
-  M_{i,j} = \begin{cases}
+  m_{i,j} = \begin{cases}
              n-i+\frac{1}{3} & i=j\\
              n-\max(i,j)+\frac{1}{2} & i\neq j
             \end{cases}$$
