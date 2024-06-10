@@ -1635,8 +1635,6 @@ layout: gli-two-cols-header
 1.0
 ```
 
-#### cross product
-
 #### determinant
 ```python
 >>> m = np.array([[2, 5], [1, 3]])
