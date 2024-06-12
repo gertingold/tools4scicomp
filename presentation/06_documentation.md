@@ -247,9 +247,9 @@ Scientific computing with NumPy and SciPy
 
 # Setting up a Sphinx project
 
-```bash {all}{maxHeight:'480px'}
-`$ sphinx-quickstart
-Welcome to the Sphinx 5.0.2 quickstart utility.
+```bash {all|4-5|12|15-17|25|27-30|34-37}{maxHeight:'480px'}
+$ sphinx-quickstart
+Welcome to the Sphinx 7.3.7 quickstart utility.
 
 Please enter values for the following settings (just press Enter to
 accept a default value, if one is given in brackets).
@@ -295,7 +295,7 @@ where "builder" is one of the supported builders, e.g. html, latex or linkcheck.
 $ ls
 Makefile  _build  _static  _templates  conf.py  index.rst  make.bat
 $ make help
-Sphinx v5.0.2
+Sphinx v7.3.7
 Please use `make target' where target is one of
   html        to make standalone HTML files
   dirhtml     to make HTML files named index.html in directories
@@ -329,9 +329,10 @@ Please use `make target' where target is one of
 
 ```bash {all|6,16}{maxHeight:'480px'}
 $ make html
-Running Sphinx v5.0.2
+Running Sphinx v7.3.7
 making output directory... done
 building [mo]: targets for 0 po files that are out of date
+writing output... 
 building [html]: targets for 1 source files that are out of date
 […]
 build succeeded.
