@@ -344,3 +344,214 @@ The HTML pages are in _build/html.
 
 <img src="/images/sphinx_example.png" style="width: 80%; margin: auto">
 
+---
+
+# Configuration file `conf.py`
+
+```python {all}{maxHeight:'250px'}
+# Configuration file for the Sphinx documentation builder.
+#
+# For the full list of built-in configuration values, see the documentation:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+# -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+
+project = 'Example project'
+copyright = '2024, Gert-Ludwig Ingold'
+author = 'Gert-Ludwig Ingold'
+
+# -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
+extensions = []
+
+templates_path = ['_templates']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+
+html_theme = 'alabaster'
+html_static_path = ['_static']
+```
+
+<br />
+
+* the configuration file is a Python file
+* many more aspects can be configured, e.g. also for the LaTeX builder
+* there exists a number of [interesting extensions](https://www.sphinx-doc.org/en/master/usage/extensions/index.html)
+  which can be added to the list `extensions`
+
+---
+
+# Extensions
+
+<br />
+
+some important examples
+
+* sphinx.ext.autodoc – Include documentation from docstrings
+* sphinx.ext.intersphinx – Link to other projects’ documentation
+* sphinx.ext.linkcode – Add external links to source code
+* sphinx.ext.mathjax – Render math via JavaScript
+* sphinx.ext.napoleon – Support for NumPy and Google style docstrings
+* sphinx.ext.todo – Support for todo items
+* sphinx.ext.viewcode – Add links to highlighted source code
+
+---
+
+# Documentation from docstrings
+
+```bash {6-8|20}{maxHeight:'150px'}
+# Configuration file for the Sphinx documentation builder.
+#
+# For the full list of built-in configuration values, see the documentation:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+import os
+import sys
+sys.path.insert(0, os.path.abspath('.'))
+
+# -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+
+project = 'Example project'
+copyright = '2024, Gert-Ludwig Ingold'
+author = 'Gert-Ludwig Ingold'
+
+# -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+
+templates_path = ['_templates']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+
+html_theme = 'alabaster'
+html_static_path = ['_static']
+```
+
+* set path correctly so that the script `carpet.py` can be found an imported
+* use extensions for creating the documentation from docstrings and for linking to
+  the corresponding code
+
+```rst {all|9-11|13-15}{maxHeight:'150px'}
+.. Example project documentation master file, created by
+   sphinx-quickstart on Wed Jun 12 08:28:41 2024.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to Example project's documentation!
+===========================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+.. automodule:: carpet
+   :members:
+   :undoc-members:
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+```
+
+* `toctree` directive creates table of content
+* `automodule` directive creates documentation from docstrings (needs `sphinx.ext.autodoc`)
+
+---
+
+# Sphinx docstring format
+
+```python
+def eigenfunction(self, x):
+    """Determine set of eigenfunction values at position ``x``.
+
+    The basis set is limited by the number of eigenstates given by
+    ``self.nbase``.
+
+    :param x: position at which the eigenfunctions are to be determined
+    :type x: float or numpy.ndarray
+    :return: array of eigenfunction values
+    :rtype: numpy.ndarray
+    :raises AssertionError: if the dimension of ``x`` does not equal 1
+    """
+    assert x.ndim == 1
+    normalization = sqrt(2/self.width)
+    args = (np.arange(self.nbase)[:, np.newaxis]+1)*np.pi*x/self.width
+    result = np.empty((self.nbase, x.size))
+    result[0::2, :] = normalization*np.cos(args[0::2])
+    result[1::2, :] = normalization*np.sin(args[1::2])
+    return result
+```
+
+---
+
+# HTML output
+
+<img src="/images/sphinx_carpet.png" style="width: 45%; margin: auto">
+
+---
+
+# Alternative docstring formats – NumPy
+
+```python
+def eigenfunction(self, x):
+    """Determine set of eigenfunction values at position `x`.
+
+    The basis set is limited by the number of eigenstates given by
+    ``self.nbase``.
+
+    Parameters
+    ----------
+    x : float or numpy.ndarray
+        position at which the eigenfunctions are to be determined
+
+    Returns
+    -------
+    numpy.ndarray
+        array of eigenfunction values
+
+    Raises
+    ------
+    AssertionError
+        if the dimension of `x` does not equal 1
+
+    """
+```
+
+* requires `sphinx.ext.napoleon`
+
+---
+
+# Alternative docstring formats – Google
+
+```python
+def eigenfunction(self, x):
+    """Determine set of eigenfunction values at position `x`.
+
+    The basis set is limited by the number of eigenstates given by
+    ``self.nbase``.
+
+    Args:
+        x (float or numpy.ndarray): Position at which the eigenfunctions
+            are to be determined.
+
+    Returns:
+        numpy.ndarray: Array of eigenfunction values.
+
+    Raises:
+        AssertionError: The dimension of `x` does not equal 1.
+
+    """
+```
+
+* requires `sphinx.ext.napoleon`
