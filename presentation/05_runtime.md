@@ -802,7 +802,7 @@ Wed Jun  5 13:32:07 2024    carpet.prof
 <br />
 
 * The number of calls to `eigenfunction` now fits our expectation.
-* By making the cache also available outside of the function `psi, the number
+* By making the cache also available outside of the function `psi`, the number
   of calls could be reduced even further.
 * The time required by `eigenfunction` is now negligible compared to total
   run-time.
