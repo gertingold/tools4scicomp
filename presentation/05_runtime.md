@@ -731,7 +731,6 @@ Wed Jun  5 09:16:31 2024    carpet.prof
         self.coeffs = self.get_coeffs(psi0)
         self.eigenfunction_cache = {}
 
-
     def psi(self, x, t):
         if not x in self.eigenfunction_cache:
             self.eigenfunction_cache[x] = [self.eigenfunction(n, x)
