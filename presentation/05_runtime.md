@@ -244,7 +244,7 @@ example: [meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Lla
 
 </div><div>
 
-* Here, the currect time is given in seconds since the begin of the epoch. On Unix systems,
+* Here, the current time is given in seconds since the begin of the epoch. On Unix systems,
   the epoch starts on January 1, 1970 at 00:00:00 UTC.
 
 </div></div>
