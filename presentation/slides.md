@@ -123,3 +123,7 @@ src: ./05_runtime.md
 ---
 src: ./06_documentation.md
 ---
+
+---
+src: ./07_parallel.md
+---
