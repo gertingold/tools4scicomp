@@ -1,0 +1,50 @@
+from pyx import canvas, color, deco, path, text, trafo
+
+text.set(text.LatexEngine)
+text.preamble(r'''\usepackage[sfdefault,lining,scaled=.85]{FiraSans}
+\usepackage[scaled=0.85]{FiraMono}
+\usepackage{newtxsf}''')
+
+c = canvas.canvas()
+
+c.fill(path.rect(0, 0, 1, 1), [color.hsb(0.1, 0.2, 1)])
+c.fill(path.rect(0, 1, 1, 1), [color.hsb(0.3, 0.2, 1)])
+c.fill(path.rect(0, 2, 1, 1), [color.hsb(0.5, 0.2, 1)])
+c.stroke(path.rect(0, 0, 1, 3))
+c.stroke(path.line(0, 1, 1, 1))
+c.stroke(path.line(0, 2, 1, 2))
+c.stroke(path.line(-0.1, 2.2, -0.6, 2.2), [deco.earrow])
+c.text(-0.7, 2.1, 'read 0', [text.halign.right])
+c.stroke(path.line(-0.6, 1.5, -0.1, 1.5), [deco.earrow])
+c.text(-0.7, 1.85, 'increment', [text.halign.right, text.valign.middle])
+c.text(-0.7, 1.6, 'write 1', [text.halign.right, text.valign.top])
+c.stroke(path.line(1.1, 1.2, 1.6, 1.2), [deco.earrow])
+c.text(1.7, 1.1, 'read 1')
+c.text(1.7, 0.85, 'increment', [text.valign.middle])
+c.stroke(path.line(1.6, 0.5, 1.1, 0.5), [deco.earrow])
+c.text(1.7, 0.6, 'write 2', [text.valign.top])
+
+c.text(0.5, 2.5, '0', [text.halign.center, text.valign.top])
+c.text(0.5, 1.5, '1', [text.halign.center, text.valign.top])
+c.text(0.5, 0.5, '2', [text.halign.center, text.valign.top])
+
+c1 = canvas.canvas()
+c1.fill(path.rect(0, 0, 1, 1.5), [color.hsb(0.3, 0.2, 1)])
+c1.fill(path.rect(0, 1.5, 1, 1.5), [color.hsb(0.5, 0.2, 1)])
+c1.stroke(path.rect(0, 0, 1, 3))
+c1.stroke(path.line(0, 1.5, 1, 1.5))
+c1.text(0.5, 2.25, '0', [text.halign.center, text.valign.top])
+c1.text(0.5, 0.75, '1', [text.halign.center, text.valign.top])
+c1.stroke(path.line(-0.1, 2.2, -0.6, 2.2), [deco.earrow])
+c1.text(-0.7, 2.1, 'read 0', [text.halign.right])
+c1.stroke(path.line(-0.6, 1.0, -0.1, 1.0), [deco.earrow])
+c1.text(-0.7, 1.6, 'increment', [text.halign.right, text.valign.middle])
+c1.text(-0.7, 1.1, 'write 1', [text.halign.right, text.valign.top])
+c1.stroke(path.line(1.1, 1.7, 1.6, 1.7), [deco.earrow])
+c1.text(1.7, 1.6, 'read 0')
+c1.text(1.7, 1.1, 'increment', [text.valign.middle])
+c1.stroke(path.line(1.6, 0.5, 1.1, 0.5), [deco.earrow])
+c1.text(1.7, 0.6, 'write 1', [text.valign.top])
+
+c.insert(c1, [trafo.translate(6, 0)])
+c.writeGSfile(device='png16m', resolution=600)
