@@ -156,7 +156,7 @@ the Mandelbrot set.
        return nitermax
    
    def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax):
-       data = np.empty(shape=(npts, npts), dtype=np.int)
+       data = np.empty(shape=(npts, npts), dtype=int)
        dx = (xmax-xmin)/(npts-1)
        dy = (ymax-ymin)/(npts-1)
        for nx in range(npts):
@@ -211,7 +211,7 @@ in our first version.
        cy, cx = np.mgrid[ymin:ymax:npts*1j, xmin:xmax:npts*1j]
        x = np.zeros_like(cx)
        y = np.zeros_like(cx)
-       data = np.zeros(cx.shape, dtype=np.int)
+       data = np.zeros(cx.shape, dtype=int)
        for n in range(nitermax):
            x2 = x*x
            y2 = y*y
@@ -277,7 +277,7 @@ a parallel treatment. Again we concentrate on the Mandelbrot specific parts.
    def mandelbrot_tile(nitermax, nx, ny, cx, cy):
        x = np.zeros_like(cx)
        y = np.zeros_like(cx)
-       data = np.zeros(cx.shape, dtype=np.int)
+       data = np.zeros(cx.shape, dtype=int)
        for n in range(nitermax):
            x2 = x*x
            y2 = y*y
@@ -299,7 +299,7 @@ a parallel treatment. Again we concentrate on the Mandelbrot specific parts.
                                                 nx, ny, cx, cy)
                        for (nx, ny, cx, cy) in paramlist]
            results = [f.result() for f in futures.as_completed(wait_for)]
-       data = np.zeros(cx.shape, dtype=np.int)
+       data = np.zeros(cx.shape, dtype=int)
        for nx, ny, result in results:
            data[nx*nlen:(nx+1)*nlen, ny*nlen:(ny+1)*nlen] = result
        return data
