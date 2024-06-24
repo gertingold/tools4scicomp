@@ -168,7 +168,7 @@ the Mandelbrot set.
    
    def plot(data):
        plt.imshow(data, extent=(xmin, xmax, ymin, ymax),
-                  cmap='jet', origin='bottom', interpolation='none')
+                  cmap='jet', origin='lower', interpolation='none')
        plt.show()
    
    nitermax = 2000
@@ -598,7 +598,7 @@ our Mandelbrot example.
    
    def plot(data, xmin, xmax, ymin, ymax):
        plt.imshow(data, extent=(xmin, xmax, ymin, ymax),
-                  cmap='jet', origin='bottom', interpolation='none')
+                  cmap='jet', origin='lower', interpolation='none')
        plt.show()
    
    nitermax = 2000
