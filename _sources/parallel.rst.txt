@@ -196,7 +196,7 @@ a grid of complex values :math:`c` and to collect the results in the
 array ``data``. For simple testing purposes, it is useful to graphically
 represent the results by means of the function ``plot``. We also have
 added code to determine the time spent in the functions ``mandelbrot``
-and ``mandelbrot_iteration``. On an i7-6700HQ CPU, we measured and
+and ``mandelbrot_iteration``. On an i7-6700HQ CPU, we measured an
 execution time of 81.1 seconds.
 
 Before parallelizing code, it often makes sense to consider other
