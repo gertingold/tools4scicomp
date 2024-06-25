@@ -96,18 +96,108 @@ layout: section
 
 ---
 
-# Global interpreter lock
+# Threads
 
+* Threads share a common range of memory.
+* Therefore, they can access the same data and easily exchange data with other threads.
+* Threads result in little overhead.
+* However, if data are not accessed and modified in the right order, mistakes may occur.
+* Such mistakes can be very difficult to identify, because there occurrence may depend 
+  on the details of the timing.
 
+<br />
+
+* For CPython, the global interpreter lock (GIL) presently does not allow to execute 
+  several threads in parallel.
+* Multithreading in Python therefore is only useful for *I/O-bound* problems.
+* For *runtime-bound* problems, multiple threads will lead to a performance reduction
+  because of the overhead involved in switching between threads.
 
 ---
 
-# Embarassingly parallel
+# Global interpreter lock (GIL)
 
-or perfectly parallel or trivially parallelizable
+* Memory management in CPython is done by reference counting.
+
+``` python
+>>> import sys
+>>> a = [1, 2]
+>>> sys.getrefcount(a)
+2
+>>> b = a
+>>> sys.getrefcount(a)
+3
+>>> b = []
+>>> sys.getrefcount(a)
+2
+```
+
+* When the number of references to an object becomes zero, the memory occupied by
+  that object will be released.
+* Threads running in parallel can lead to an incorrect reference count causing
+  either memory leakage or freeing memory which is still needed. This is prevented
+  by the GIL.
+* Side note: Because of the possibility of reference cycles, additional garbage
+  collection is done.
+
+---
+
+# Processes
+
+* The `multiprocessing` module allows to start several Python interpreters which
+  can run independently, each with its own GIL.
+* The interpreter processes can run on different cores and thus lead to a speed-up
+  of runtime-bound tasks.
+* However, starting new processes implies more overhead than starting new threads.
+* Furthermore, data are not shared so that communication between processes is more
+  complicated.
+
+<br />
+
+### Embarrassingly parallel problems
 
 * A task can sometimes be decomposed into subtasks which do not need to communicate with each other.
 * Example: Monte Carlo simulations with different seeds or runs for different parameters like temperature.
+* For embarrassingly parallel problems, the `multiprocessing` module helps to easily organize
+  the distribution of the problem over several processes and to collect the results.
+
+---
+
+# [PEP 703](https://peps.python.org/pep-0703/)
+
+* PEP = Python Enhancement Proposal
+* PEP 703: Making the Global Interpreter Lock Optional in CPython
+* proposal for implementation of a thread-safe memory management
+
+<br />
+
+* plans to abandon the GIL in steps over the next five years
+* The process will be monitored and adjusted when necessary.
+* For the moment, the CPython with GIL will remain the standard,
+  but the possibility for a no-GIL build might appear in Python 3.13
+  or Python 3.14.
+
+---
+
+# Example: Mandelbrot set
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+<img src="/images/mandelbrot_detail.png" style="width: 100%; margin: auto">
+</div><div>
+
+* For a complex number $c$, the recursion
+
+  $$z_{n+1} = z_n+c$$
+
+  is carried out with initial value $z_0=0$
+* If the threshold $|z|=2$ is reached, it is known that the series will not be bounded.
+* For a graphical representation, the number of iterations needed to reach this threshold
+  is determined and colour-coded.
+* The problem is embarrassingly parallel because the iteration can be done for each
+  value of $c$ separately.
+
+</div></div>
 
 ---
 
