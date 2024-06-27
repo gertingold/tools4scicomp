@@ -188,7 +188,7 @@ layout: section
 
 * For a complex number $c$, the recursion
 
-  $$z_{n+1} = z_n+c$$
+  $$z_{n+1} = z_n^2+c$$
 
   is carried out with initial value $z_0=0$
 * If the threshold $|z|=2$ is reached, it is known that the series will not be bounded.
@@ -198,6 +198,188 @@ layout: section
   value of $c$ separately.
 
 </div></div>
+
+---
+
+# A first implementation
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+```python
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+
+def mandelbrot_iteration(cx, cy, nitermax):
+    x = 0
+    y = 0
+    for n in range(nitermax):
+        x2 = x*x
+        y2 = y*y
+        if x2+y2 > 4: return n
+        x, y = x2-y2+cx, 2*x*y+cy
+    return nitermax
+
+def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax):
+    data = np.empty(shape=(npts, npts), dtype=int)
+    dx = (xmax-xmin)/(npts-1)
+    dy = (ymax-ymin)/(npts-1)
+    for nx in range(npts):
+        x = xmin+nx*dx
+        for ny in range(npts):
+            y = ymin+ny*dy
+            data[ny, nx] = mandelbrot_iteration(
+                                x, y, nitermax)
+    return data
+```
+
+</div><div>
+
+```python
+def plot(data):
+    plt.imshow(data, extent=(xmin, xmax, ymin, ymax),
+               cmap='jet', origin='lower', interpolation='none')
+    plt.show()
+
+nitermax = 2000
+npts = 1024
+xmin = -2
+xmax = 1
+ymin = -1.5
+ymax = 1.5
+start = time.time()
+data = mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax)
+ende = time.time()
+print(ende-start)
+plot(data)
+```
+
+* run-time measured on an i5-1135G7 processor: 44.9s
+
+</div></div>
+
+---
+
+# Implementation with NumPy
+
+````md magic-move
+```python
+def mandelbrot_iteration(cx, cy, nitermax):
+    x = 0
+    y = 0
+    for n in range(nitermax):
+        x2 = x*x
+        y2 = y*y
+        if x2+y2 > 4: return n
+        x, y = x2-y2+cx, 2*x*y+cy
+    return nitermax
+
+def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax):
+    data = np.empty(shape=(npts, npts), dtype=int)
+    dx = (xmax-xmin)/(npts-1)
+    dy = (ymax-ymin)/(npts-1)
+    for nx in range(npts):
+        x = xmin+nx*dx
+        for ny in range(npts):
+            y = ymin+ny*dy
+            data[ny, nx] = mandelbrot_iteration(
+                                x, y, nitermax)
+    return data
+```
+```python
+def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax):
+    cy, cx = np.mgrid[ymin:ymax:npts*1j, xmin:xmax:npts*1j]
+    x = np.zeros_like(cx)
+    y = np.zeros_like(cx)
+    data = np.zeros(cx.shape, dtype=int)
+    for n in range(nitermax):
+        x2 = x*x
+        y2 = y*y
+        notdone = x2+y2 < 4
+        data[notdone] = n
+        x[notdone], y[notdone] = (x2[notdone]-y2[notdone]+cx[notdone],
+                                  2*x[notdone]*y[notdone]+cy[notdone])
+    return data
+```
+````
+
+<v-after>
+
+* The calculation is restricted by means of fancy indexing to matrix elements
+  for which the threshold of 2 is not yet exceeded.
+* run-time measured on an i5-1135G7 processor: 17.0s
++ speed up by a factor of about 2.6
+
+</v-after>
+
+---
+
+# The `concurrent` module
+
+* With the help of the `concurrent.futures` module, parallel execution of code
+  in threads or processes can be organized.
+* We will consider the evaluation of a Mandelbrot set as example of an embarrassingly
+  parallel problem which will be handled in parallel processes.
+
+<br />
+
+* import the module
+
+```python
+from concurrent import futures
+```
+
+* create a parameter list from which parameter sets will be taken and distributed
+  to the different processes or workers
+* use a `with` context to distribute the tasks and collect the results
+
+```python
+with futures.ProcessPoolExecutor(max_workers=max_workers) as executors:
+    ...
+```
+
+* create a list scheduling function calls and collect the results in a list
+
+---
+
+```python
+from concurrent import futures
+from itertools import product
+from functools import partial
+
+import numpy as np
+
+def mandelbrot_tile(nitermax, nx, ny, cx, cy):
+    x = np.zeros_like(cx)
+    y = np.zeros_like(cx)
+    data = np.zeros(cx.shape, dtype=int)
+    for n in range(nitermax):
+        x2 = x*x
+        y2 = y*y
+        notdone = x2+y2 < 4
+        data[notdone] = n
+        x[notdone], y[notdone] = (x2[notdone]-y2[notdone]+cx[notdone],
+                                  2*x[notdone]*y[notdone]+cy[notdone])
+    return (nx, ny, data)
+
+def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax, ndiv, max_workers=4):
+    cy, cx = np.mgrid[ymin:ymax:npts*1j, xmin:xmax:npts*1j]
+    nlen = npts//ndiv
+    paramlist = [(nx, ny,
+                  cx[nx*nlen:(nx+1)*nlen, ny*nlen:(ny+1)*nlen],
+                  cy[nx*nlen:(nx+1)*nlen, ny*nlen:(ny+1)*nlen])
+                 for nx, ny in product(range(ndiv), repeat=2)]
+    with futures.ProcessPoolExecutor(max_workers=max_workers) as executors:
+        wait_for = [executors.submit(partial(mandelbrot_tile, nitermax),
+                                             nx, ny, cx, cy)
+                    for (nx, ny, cx, cy) in paramlist]
+        results = [f.result() for f in futures.as_completed(wait_for)]
+    data = np.zeros(cx.shape, dtype=int)
+    for nx, ny, result in results:
+        data[nx*nlen:(nx+1)*nlen, ny*nlen:(ny+1)*nlen] = result
+    return data
+```
 
 ---
 
