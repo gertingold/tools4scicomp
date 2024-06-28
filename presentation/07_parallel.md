@@ -343,13 +343,21 @@ with futures.ProcessPoolExecutor(max_workers=max_workers) as executors:
 
 ---
 
+# Parallel evaluation of Mandelbrot set
+
+* Split region in the complex plane into subregions which will be handled
+  by processes running in parallel.
+* `import` statements
+
 ```python
 from concurrent import futures
 from itertools import product
 from functools import partial
-
 import numpy as np
+```
 
+* evaluation of the Mandelbrot set in a subregion
+```python
 def mandelbrot_tile(nitermax, nx, ny, cx, cy):
     x = np.zeros_like(cx)
     y = np.zeros_like(cx)
@@ -362,7 +370,13 @@ def mandelbrot_tile(nitermax, nx, ny, cx, cy):
         x[notdone], y[notdone] = (x2[notdone]-y2[notdone]+cx[notdone],
                                   2*x[notdone]*y[notdone]+cy[notdone])
     return (nx, ny, data)
+```
 
+---
+
+# Parallel evaluation of Mandelbrot set (cont'd)
+
+```python {all|4-7|8-12|14-15}
 def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax, ndiv, max_workers=4):
     cy, cx = np.mgrid[ymin:ymax:npts*1j, xmin:xmax:npts*1j]
     nlen = npts//ndiv
@@ -371,8 +385,7 @@ def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax, ndiv, max_workers=4):
                   cy[nx*nlen:(nx+1)*nlen, ny*nlen:(ny+1)*nlen])
                  for nx, ny in product(range(ndiv), repeat=2)]
     with futures.ProcessPoolExecutor(max_workers=max_workers) as executors:
-        wait_for = [executors.submit(partial(mandelbrot_tile, nitermax),
-                                             nx, ny, cx, cy)
+        wait_for = [executors.submit(partial(mandelbrot_tile, nitermax), nx, ny, cx, cy)
                     for (nx, ny, cx, cy) in paramlist]
         results = [f.result() for f in futures.as_completed(wait_for)]
     data = np.zeros(cx.shape, dtype=int)
@@ -380,6 +393,56 @@ def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax, ndiv, max_workers=4):
         data[nx*nlen:(nx+1)*nlen, ny*nlen:(ny+1)*nlen] = result
     return data
 ```
+
+<v-click at="1">
+
+* create a list of parameters for the different tasks
+
+</v-click>
+<v-click at="2">
+
+* submit the tasks to a number of workers (parallel processes)
+* we use `partial` to specify a fixed parameter not specified in the parameter list
+* wait for results and collect them in a list
+
+</v-click>
+<v-click at="3">
+
+* gather the results in an array for later plotting
+
+</v-click>
+
+---
+
+# Distribution of subregions over four processes
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+<img src="/images/mandelbrot_tiles.png" style="width: 100%; margin: auto">
+</div><div>
+
+* not all subregions need the same compute time
+* the number of subregions handled by one process ranges from 15 to 17
+
+</div></div>
+
+---
+
+# Run-time as a function of the number of tasks
+
+<br />
+
+<img src="/images/mandelbrot_parallel.png" style="width: 100%; margin: auto">
+
+<br />
+
+* 4 parallel processes
+* If only four tasks are distributed to four processes, the longest-running process
+  determines the run-time.
+* If a large number of tasks is defined, the overhead in starting the tasks and collecting
+  the results becomes relevant.
+* In the present example, 64 tasks are optimal.
 
 ---
 
