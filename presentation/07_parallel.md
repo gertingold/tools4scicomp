@@ -437,12 +437,41 @@ def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax, ndiv, max_workers=4):
 
 <br />
 
-* 4 parallel processes
+* 4 parallel processes, NumPy version of the program
 * If only four tasks are distributed to four processes, the longest-running process
   determines the run-time.
 * If a large number of tasks is defined, the overhead in starting the tasks and collecting
   the results becomes relevant.
 * In the present example, 64 tasks are optimal.
+
+---
+
+# Speed-up
+
+<img src="/images/parallel_time.png" style="width: 100%; margin: auto">
+
+<br />
+
+* 4 processes, treatment of individual points in the complex plane
+* A maximum speed-up by a factor of 3.3 corresponding a fraction of 93% of 
+  parallel execution according to Amdahl's law
+
+---
+
+# Compilation
+
+* Python is an interpreted language
+* compilation can yield significant speed-up by providing optimized machine code
+  * [Cython](https://cython.org): script is converted to C as much as possible in order to be compiled
+  * [Numba](https://numba.pydata.org): just-in-time compilation, the code of a function is compiled
+    when needed. Therefore, there is an overhead during the first function call, but the machine code
+    can be used in ensuing calls of that function.
+
+<br />
+
+* We will discuss Numba as it can be used more easily.
+
+
 
 ---
 
