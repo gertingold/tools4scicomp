@@ -773,4 +773,348 @@ def mandelbrot_set(xmin, xmax, ymin, ymax, npts, nitermax):
 
 # MPI
 
+* MPI = message passing interface
+* allows for communication between different processes
+* first version of the standard published in 1994
+
+<br />
+
+* in Python: `mpi4py` module (not part of Anaconda distribution)
+
+<br />
+
+#### installation in a [conda](https://docs.conda.io/en/latest/) environment
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+* configuration file
+
+```yaml
+# environment.yml
+
+name: mpi
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - mpi4py
+```
+
+</div><div>
+
+* name can be appropriately chosen
+* additional required packages should be listed in dependencies
+* installation
+  ```bash
+  $ conda env create -f environment.yml
+  ```
+* activation of the environment
+  ```bash
+  $ conda activate mpi
+  ```
+
+</div></div>
+
+---
+
+# Hello world from several workers
+
+```python
+# helloworld.py
+
+from mpi4py import MPI
+ 
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+ 
+print(f"Hello world from worker {rank} of {size}")
+```
+
+* `COMM_WORLD` is the default communicator
+* `GetRank()` returns the ID or rank of the current process
+* `GetSize()` number of the processes
+
+#### running the script
+
+```bash
+$ mpirun -n 4 python helloworld.py
+Hello world from worker 2 of 4
+Hello world from worker 3 of 4
+Hello world from worker 1 of 4
+Hello world from worker 0 of 4
+```
+
+* if the script is not run with `mpirun`, only one process will be used
+
+---
+
+# Point-to-point communication
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+```python
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+
+data = 2
+if rank == 0:
+    dest = rank+1
+    comm.send(data, dest=dest) 
+    print(f'{rank} sends to {dest}: {data}')
+elif rank == size-1:
+    source = rank-1
+    data = comm.recv(source=source)
+    print(f'{rank} receives from {source}: {data}')
+else:
+    source = rank-1
+    data = comm.recv(source=source) 
+    print(f'{rank} receives from {source}: {data}')
+    data = data*2
+    dest = rank+1
+    comm.send(data, dest=dest)
+    print(f'{rank} sends to {dest}: {data}')
+```
+
+</div><div>
+
+* data are handed over from one process to the next where data are multiplied
+  by two
+
+<br />
+
+* output:
+  ```
+  0 sends to 1: 2
+  1 receives from 0: 2
+  1 sends to 2: 4
+  2 receives from 1: 4
+  2 sends to 3: 8
+  3 receives from 2: 8
+  ```
+
+<br />
+
+* The script is given to each worker which as a function of its rank executes
+  the prescribed code.
+* The `recv` function waits until it has received data. The calculation proceeds
+  in the intended order.
+
+</div></div>
+
+---
+
+# Blocked communication
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+* tags can be used to mark messages
+
+```python
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+
+data = 'msg'
+if rank == 0:
+    comm.send(data, dest=1, tag=1)
+    print(f'{rank}: data sent')
+else:
+    data = comm.recv(source=0, tag=1)
+    print(f'{rank}: data received')
+```
+
+```
+0: data sent
+1: data received
+```
+
+</div><div>
+
+```python
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+
+data = 'msg'
+if rank == 0:
+    comm.send(data, dest=1, tag=1)
+    print(f'{rank}: data sent')
+else:
+    data = comm.recv(source=0, tag=2)
+    print(f'{rank}: data received')
+```
+
+```
+0: data sent
+```
+
+<br />
+
+* Here, the communication is blocked, because worker 1 is
+  waiting for a message with tag `2` which is never sent.
+
+</div></div>
+
+---
+
+# Broadcast
+
+* one process sends data to all other processes
+
+<br />
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+```python
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+
+if rank == 0:
+    data = [1, 2, 3]
+else:
+    data = None
+
+print(f'{rank}| data before broadcast: {data}')
+data = comm.bcast(data, root=0)
+print(f'{rank}| data after broadcast: {data}')
+```
+
+</div><div>
+
+```
+0| data before broadcast: [1, 2, 3]
+0| data after broadcast: [1, 2, 3]
+1| data before broadcast: None
+1| data after broadcast: [1, 2, 3]
+2| data before broadcast: None
+2| data after broadcast: [1, 2, 3]
+3| data before broadcast: None
+3| data after broadcast: [1, 2, 3]
+```
+
+</div></div>
+
+---
+
+# Reduce
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+```python
+from math import factorial
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+size = comm.Get_size()
+rank = comm.Get_rank()
+
+result = comm.reduce(rank+1, op=MPI.PROD, root=0)
+
+if rank == 0:
+    print(f'result: {result}')
+    print(f'{size}! = {factorial(size)}')
+```
+
+
+```bash
+$ mpirun -n 20 python test.py
+result: 2432902008176640000
+20! = 2432902008176640000
+```
+
+* other common functions include `MPI.SUM`,
+  `MPI.MAX`, `MPI.MIN`
+* It is also possible to define custom functions.
+
+</div><div>
+
+* compare `reduce` function from the `functools` module
+  of the Python standard library
+
+```python
+from functools import reduce
+
+N = 20
+data = range(1, N+1)
+result = reduce(lambda x, y: x*y, data)
+print(result)
+```
+
+* Since Python 3.8, there exists a function `prod` in the
+  `math` module
+
+</div></div>
+
+---
+
+# Scatter and gather
+
+<div class="grid grid-cols-[48%_1fr] gap-4">
+<div>
+
+```python
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+size = comm.Get_size()
+rank = comm.Get_rank()
+
+if rank == 0:
+   data = [x+1 for x in range(size)]
+   print(f'to be scattered: {data}', flush=True)
+else:
+   data = None
+   
+data = comm.scatter(data, root=0)
+print(f'{rank}| obtained: {data}', flush=True)
+data = data**2
+
+result = comm.gather(data, root=0)
+
+if rank == 0:
+    print(f'gathered result by worker {rank}: {result}',
+          flush=True)
+```
+
+</div><div>
+
+```
+to be scattered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+0| obtained: 1
+1| obtained: 2
+2| obtained: 3
+3| obtained: 4
+4| obtained: 5
+5| obtained: 6
+6| obtained: 7
+7| obtained: 8
+8| obtained: 9
+9| obtained: 10
+gathered result by worker 0: [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+```
+
+<br />
+
+* `flush=True` is used here to obtain the correct sequence of output
+</div></div>
+
+---
+
 https://doc.sagemath.org/html/en/thematic_tutorials/numerical_sage/parallel_laplace_solver.html
+
