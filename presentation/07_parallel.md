@@ -460,18 +460,314 @@ def mandelbrot(xmin, xmax, ymin, ymax, npts, nitermax, ndiv, max_workers=4):
 
 # Compilation
 
+* Before using more hardware ressources, other ways to speed-up execution should
+  be explored.
+
+<br />
+
 * Python is an interpreted language
 * compilation can yield significant speed-up by providing optimized machine code
   * [Cython](https://cython.org): script is converted to C as much as possible in order to be compiled
-  * [Numba](https://numba.pydata.org): just-in-time compilation, the code of a function is compiled
-    when needed. Therefore, there is an overhead during the first function call, but the machine code
-    can be used in ensuing calls of that function.
+  * [Numba](https://numba.pydata.org): just-in-time (JIT) compilation, the code of a function is compiled
+    when needed
+    * There is an overhead during the first function call, but the machine code
+      can be used in ensuing calls of that function.
+    * Numba can also deal with NumPy arrays and can create universal functions
+    * code can be vectorized for distribution on several cores
 
 <br />
 
 * We will discuss Numba as it can be used more easily.
 
+---
 
+# Example: evaluation of the Riemann zeta function
+
+* Riemann zeta function will be evaluated in a very naive way by cutting the summation
+  $$\zeta(s) = \sum_{n=1}^\infty \frac{1}{n^s}$$
+* There are ways to approximate the contribution of the neglected terms.
+* There exist also other ways to the determine the Riemann zeta function, see 
+  [here in section *Miscellaneous*](http://numbers.computation.free.fr/Constants/constants.html)
+
+```python
+def zeta(x, nmax):
+    zetasum = 0
+    for n in range(1, nmax+1):
+        zetasum = zetasum+1/(n**x)
+    return zetasum
+
+print(zeta(2, 100000000))
+```
+
+* The relative error is 5.5·10⁻⁹ with respect to the exact result $\pi^2/6$.
+* The run-time on an i7-6700HQ processor is 8.7s.
+
+---
+
+# Numba version
+
+````md magic-move
+```python
+def zeta(x, nmax):
+    zetasum = 0
+    for n in range(1, nmax+1):
+        zetasum = zetasum+1/(n**x)
+    return zetasum
+
+print(zeta(2, 100000000))
+```
+```python {all|1-3}
+import numba
+
+@numba.njit
+def zeta(x, nmax):
+    zetasum = 0
+    for n in range(1, nmax+1):
+        zetasum = zetasum+1/(n**x)
+    return zetasum
+
+print(zeta(2, 100000000))
+```
+````
+
+<v-click at="1">
+
+* The run-time is now 0.78 seconds amounting to a 10× speed-up
+
+</v-click>
+<v-click at="2">
+
+* It was sufficient to add a decorator `numba.njit` to the function.
+* In `njit` the part `jit` refers to the just-in-time compiler and
+  `n` refers to the `nopython` mode.
+* It can happen that Numba is not able to compile the entire function.
+  Then, the decorator `numba.jit` with option `nopython=False` can be
+  used and Numba will try to find loops which it can compile. The rest
+  will be implying the Python interpreter and thus reduce performance. 
+
+</v-click>
+
+---
+
+# Compilation time
+
+```python
+import time
+import numba
+
+@numba.njit
+def zeta(x, nmax):
+    zetasum = 0
+    for n in range(1, nmax+1):
+        zetasum = zetasum+1/(n**x)
+    return zetasum
+
+start = time.time()
+result = zeta(2, 100000000)
+print(f'time with compilation:    {time.time()-start:4.2f}s')
+
+start = time.time()
+result = zeta(2, 100000000)
+print(f'time without compilation: {time.time()-start:4.2f}s')
+```
+
+```
+time with compilation:    0.78s
+time without compilation: 0.40s
+```
+
+* After the result of the compilation is available, the run-time is
+  smaller by another factor of 2.
+
+---
+
+# Signatures
+
+```python
+import numba
+
+@numba.njit
+def zeta(x, nmax):
+    zetasum = 0
+    for n in range(1, nmax+1):
+        zetasum = zetasum+1/(n**x)
+    return zetasum
+
+print(zeta.signatures)
+zeta(2, 100000000)
+print(zeta.signatures)
+```
+
+```
+[]
+[(int64, int64)]
+```
+
+* As long as the function `zeta` was not called, no compilation happens.
+* We have called the function `zeta` with two integer arguments. The
+  function has been compiled for the corresponding signature.
+* The data type is `int64` and therefore potentially subject to overflow
+  in contrast to Python integers.
+
+---
+
+# Different signatures
+
+```python
+import time
+from numba import njit
+
+def zeta(x, nmax):
+    zetasum = 0
+    for n in range(1, nmax+1):
+        zetasum = zetasum+1/(n**x)
+    return zetasum
+
+zeta_numba = njit(zeta)
+
+nmax = 100000000
+for x in (2, 2.5, 2+1j):
+    start = time.time()
+    print(f'ζ({x}) = {zeta_numba(x, nmax)}')
+    print(f'execution time with compilation:    {time.time()-start:5.2f}s')
+    start = time.time()
+    zeta_numba(x, nmax)
+    print(f'execution time without compilation: {time.time()-start:5.2f}s')
+    start = time.time()
+    zeta(x, nmax)
+    print(f'execution time without Numba:       {time.time()-start:5.2f}s\n')
+
+print(zeta_numba.signatures)
+```
+
+---
+
+# Different signatures (cont'd)
+
+```
+ζ(2) = 1.644934057834575
+execution time with compilation:     0.79s
+execution time without compilation:  0.42s
+execution time without Numba:        9.67s
+
+ζ(2.5) = 1.341487257103954
+execution time with compilation:     2.56s
+execution time without compilation:  2.47s
+execution time without Numba:       11.83s
+
+ζ((2+1j)) = (1.1503556987382961-0.43753086346605924j)
+execution time with compilation:    10.20s
+execution time without compilation: 10.65s
+execution time without Numba:       24.74s
+
+[(int64, int64), (float64, int64), (complex128, int64)]
+```
+
+* compilation for three different signatures
+* timing details and speed-up depend on the signatures 
+
+---
+
+# Parallel execution with Numba
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+```python
+# zeta.py
+
+import os
+import time
+import numpy as np
+from numba import vectorize, float64, int64
+
+@vectorize([float64(float64, int64)], target='parallel')
+def zeta(x, nmax):
+    zetasum = 0.
+    for n in range(nmax):
+        zetasum = zetasum+1./((n+1)**x)
+    return zetasum
+
+x = np.linspace(2, 10, 200, dtype=np.float64)
+start = time.time()
+y = zeta(x, 10000000)
+print(time.time()-start)
+```
+
+</div><div>
+
+* The number of threads can be defined by setting the environment
+  variable `NUMBA_NUM_THREADS`:
+  ```bash
+  $ export NUMBA_NUM_THREADS=4; python zeta.py
+  ```
+* The required data types for input (`float64, int64`) and output (`float64`)
+  need to be specified in order to obtain a universal function. 
+* It is possible to specify more than one signature.
+* By setting `target` to `cuda`, compilation for NVIDIA GPUs can be requested.
+  
+
+</div></div>
+
+---
+
+# Mandelbrot set with Numba
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+```python
+from numba import complex128, guvectorize, int64, njit
+import numpy as np
+
+@njit
+def mandelbrot_iteration(c, maxiter):
+    z = 0
+    for n in range(maxiter):
+        z = z**2+c
+        if z.real*z.real+z.imag*z.imag > 4:
+            return n
+    return maxiter
+
+@guvectorize([(complex128[:], int64[:], int64[:])],
+             '(n), () -> (n)', target='parallel')
+def mandelbrot(c, itermax, output):
+    nitermax = itermax[0]
+    for i in range(c.shape[0]):
+        output[i] = mandelbrot_iteration(c[i], nitermax)
+
+def mandelbrot_set(xmin, xmax, ymin, ymax, npts, nitermax):
+    cy, cx = np.ogrid[ymin:ymax:npts*1j, xmin:xmax:npts*1j]
+    c = cx+cy*1j
+    return mandelbrot(c, nitermax)
+```
+
+</div><div>
+
+* `guvectorize` allows for a universal function with arrays in the inner loop
+* arrays in the signature are indicated by `[:]`
+* The second argument of `guvectorize` indicates the layout where the returned
+  array `output` has the same shape as the input array `c`.
+* The `mandelbrot` function is called with two arguments, but possesses three
+  arguments. The function is missing a return statement. Instead, the third
+  argument refers to the result. 
+
+</div></div>
+
+---
+
+# Timing of the different Mandelbrot set codes
+
+| Type of code          | size        | run-time |
+| --------------------- | ----------- | --------:|
+| naive implementation  | 1024×1024   | 40.556s  |
+| with NumPy            | 1024×1024   | 28.060s  |
+| with Numba, 1 thread  | 1024×1024   |  0.940s  |
+| with Numba, 8 threads | 1024×1024   |  0.223s  |
+| with Numba, 8 threads | 8192×8192   | 13.680s  |
+| with Numba, 8 threads | 16384×16384 | 56.756s  |
+
+* measured for an i7-6700HQ processor with 4 cores and hyperthreading
 
 ---
 
