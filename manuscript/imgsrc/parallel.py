@@ -11,7 +11,7 @@ def mandelbrot_tile(nitermax, nx, ny, cx, cy):
     start = time.time()
     x = np.zeros_like(cx)
     y = np.zeros_like(cx)
-    data = np.zeros(cx.shape, dtype=np.int)
+    data = np.zeros(cx.shape, dtype=int)
     for n in range(nitermax):
         x2 = x*x
         y2 = y*y
