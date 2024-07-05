@@ -909,7 +909,7 @@ else:
 
 ---
 
-# Blocked communication
+# Blocking communication
 
 <div class="grid grid-cols-[50%_1fr] gap-4">
 <div>
@@ -965,6 +965,49 @@ else:
   waiting for a message with tag `2` which is never sent.
 
 </div></div>
+
+---
+
+# Non-blocking communication
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+```python
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+
+if rank == 0:
+    data = list(range(1, size))
+    for i in range(size-1):
+        req = comm.isend(data[i], dest=i+1, tag=i+1)
+        print(f"expected: {data[i]**2}")
+        req.wait()
+else:
+    req = comm.irecv(source=0, tag=rank)
+    mydata = req.wait()
+    print(rank, mydata**2)
+```
+
+</div><div>
+
+```bash
+$ mpirun -n 4 python test.py
+expected: 1
+expected: 4
+expected: 9
+1 1
+2 4
+3 9
+```
+
+</div></div>
+
+* some work can be done before communication is completed
+* here, process 0 prints the expected results while waiting
 
 ---
 
@@ -1116,5 +1159,281 @@ gathered result by worker 0: [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
 
 ---
 
-https://doc.sagemath.org/html/en/thematic_tutorials/numerical_sage/parallel_laplace_solver.html
+# Discretization of the Laplace operator
 
+* As an example for commmunication between processes, we consider the
+  2d Laplace equation with boundary conditions.
+
+<br />
+
+<div class="grid grid-cols-[50%_1fr] gap-4">
+<div>
+
+<img src="/images/gitter-finite-differenzen.png" style="width: 70%; margin: auto">
+
+</div><div>
+
+* Laplace equation
+
+$$\frac{\partial^2\Phi}{\partial x^2}+\frac{\partial^2\Phi}{\partial y^2} = 0$$
+
+* partial derivative on the lattice
+
+$$\frac{\partial\Phi}{\partial x} \approx \frac{\Phi_{n+1,m}-\Phi_{n-1,m}}{2\Delta}$$
+$$\frac{\partial^2\Phi}{\partial x^2} \approx \frac{\Phi_{n+1,m}-2\Phi_{n,m}+\Phi_{n-1,m}}{\Delta^2}$$
+
+* correspondingly for $y$
+
+</div></div>
+
+---
+
+# Solution of discretized Laplace equation
+
+<div class="grid grid-cols-[10%_1fr_25%] gap-4">
+<div>
+
+<img src="/images/gitter_finite_differenzen_simple.png" style="width: 100%; margin: auto">
+
+</div><div>
+
+$$\Phi_{n,m} = \frac{1}{4}\left(\Phi_{n+1,m}+\Phi_{n-1,m}+\Phi_{n,m+1}+\Phi_{n,m-1}\right)$$
+
+</div></div>
+<br />
+
+1. *Solution of an inhomogeneous system of linear equations*  
+   inhomogeneity results from boundary conditions
+1. *Jacobi method*   
+   iterative approach: new function values result from averaging over old nearest neighbor
+   values
+1. *Gauß-Seidel method*   
+   iterative approach: lattice is traversed, thereby mixing old and new values
+   $$\Phi_{n,m} = \frac{1}{4}\left(\Phi^\text{(old)}_{n+1,m}+\Phi^\text{(new)}_{n-1,m}
+                                   +\Phi^\text{(old)}_{n,m+1}+\Phi^\text{(new)}_{n,m-1}\right)$$
+   here: iteration from top left to bottom right   
+   typically faster convergence, less memory required, but breaks a potentially present symmetry
+
+---
+
+# Dividing the grid and need for commuication 
+
+<img src="/images/laplace_communication_1.png" style="width: 45%" class="absolute top-100px">
+<div v-click>
+<img src="/images/laplace_communication_2.png" style="width: 45%" class="absolute top-100px">
+</div>
+<div v-click>
+<img src="/images/laplace_communication_3.png" style="width: 45%" class="absolute top-100px">
+</div>
+<div v-click>
+<img src="/images/laplace_communication_4.png" style="width: 45%" class="absolute top-100px">
+</div>
+
+<div class="absolute left-520px top-100px ">
+
+<v-clicks at="0">
+
+* array with boundary conditions
+* subdivisions of the grid for 4 processes
+* data from other processes are needed for iteration
+* for N processes, 2(N-1) send/receive operations are needed
+
+</v-clicks>
+
+</div>
+
+---
+
+# Implementation (part 1)
+
+<div class="grid grid-cols-[50%_1fr] gap-4"><div>
+
+```python
+from mpi4py import MPI
+import numpy as np
+from numpy import r_
+import matplotlib.pyplot as plt
+
+def jacobi_step(u):
+    u_old = u.copy()
+    u[1:-1, 1:-1] = 0.25*(u[0:-2, 1:-1] + u[2:, 1:-1]
+                          + u[1:-1,0:-2] + u[1:-1, 2:])
+    v = (u-u_old).flat
+    return u, np.dot(v,v)
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+root = 0
+
+num_points = 500
+rows_per_process = num_points//size
+max_iter = 5000
+num_iter = 0
+total_err = 1
+```
+
+</div><div>
+
+* The function `jacobi_step` averages over the nearest neighbors to update a lattice site.
+* The comparison of the old and new values yields an error estimate. Alternatively, one
+  could check how well the Laplace equation is satisfied.
+* `num_points` defines the grid size.
+* `rows_per_process` defines the number of matrix rows attributed to each process.
+
+</div></div>
+
+---
+
+# Implementation (part 2)
+
+<div class="grid grid-cols-[55%_1fr] gap-4"><div>
+
+```python
+m = None
+
+if rank == root:
+    m = np.zeros((num_points, num_points), dtype=float)
+    m[0, :] = 1
+    m[:, 0] = 1
+    m[-1, :] = -1
+    m[:, -1] = -1
+
+my_grid = np.empty((rows_per_process, num_points), dtype=float)
+comm.Scatterv(m, my_grid, root)
+```
+
+* The initial matrix `m` is defined for process 0, where an arrow containing zeros
+  is filled with the boundary values.
+* The top and the left boundary values are set to 1 while the bottom and the right
+  boundary values are set to -1.
+
+</div><div>
+
+* In order to avoid an undefined variable for all other processes, `m` needs to be
+  initialized. It is sufficent to set it to `None`.
+* `Scatterv` distributes the section of the matrix `M` to the arrays `my_grid` of 
+  the different processes.
+* `my_grid` needs to exist and be sufficiently large. Therefore, we create an empty
+  matrix of the required size.
+* MPI methods starting with uppercase letters do not act on Python objects but on
+  buffers instead.
+
+</div></div>
+
+---
+
+# Implementation (part 3) – communication
+
+<div class="grid grid-cols-[55%_1fr] gap-4"><div>
+
+```python
+while num_iter < max_iter and total_err > 1e-7:
+    if rank == 0:
+        comm.Send(my_grid[-1, :], 1)
+
+    if rank > 0 and rank < size-1:
+        row_above = np.empty((1, num_points), dtype=float)
+        comm.Recv(row_above, rank-1)
+        comm.Send(my_grid[-1, :], rank+1)
+
+    if rank == size-1:
+        row_above = np.empty((1, num_points), dtype=float)
+        comm.Recv(row_above, rank-1)
+        comm.Send(my_grid[0, :], rank-1)
+
+    if rank > 0 and rank < size-1:
+        row_below = np.empty((1, num_points), dtype=float)
+        comm.Recv(row_below, rank+1)
+        comm.Send(my_grid[0, :], rank-1)
+
+    if rank == 0:
+        row_below = np.empty((1, num_points), dtype=float)
+        comm.Recv(row_below, 1)
+```
+
+</div><div>
+
+<br />
+<img src="/images/laplace_communication_4.png" style="width: 100%">
+
+</div></div>
+
+---
+
+# Implementation (part 4) – Jacobi iteration
+
+<div class="grid grid-cols-[54%_1fr] gap-4"><div>
+
+```python
+    if rank > 0 and rank < size-1:
+        u, err = jacobi_step(r_[row_above, my_grid, row_below])
+        my_grid = u[1:-1, :]
+
+    if rank == 0:
+        u, err = jacobi_step(r_[my_grid, row_below])
+        my_grid = u[0:-1, :]
+
+    if rank == size-1:
+        u, err = jacobi_step(r_[row_above, my_grid])
+        my_grid = u[1:, :]
+
+    if num_iter % 500 == 0:
+        err_list = np.empty(size, dtype=float)
+        comm.Gather(err, err_list, root)
+        if rank == 0:
+            total_err = 0
+            for err in err_list:
+                total_err = total_err + err
+            total_err = np.sqrt(total_err)/num_points**2
+            print(f"{total_err = :8.3g}")
+        total_err = comm.bcast(total_err, root)
+
+    num_iter=num_iter+1
+```
+
+</div><div>
+
+* We are still within the `while` loop.
+* `numpy.r_` stacks arrays. Data received from other processes are
+  added  to `my_grid`.
+* Every 500 iterations, an error estimate is evaluated. It is important
+  to broadcast this information to all processes. Otherwise process 0
+  might terminate due to the `while` condition while the other processes
+  remain in the loop waiting for data from process 0. The program will
+  then hang.
+* Even though the broadcasting is done by process 0, the corresponding
+  line needs to be executed for all processes. Otherwise `total_err`
+  would not get a value assigned.
+
+</div></div>
+
+---
+
+# Implementation (part 5)
+
+<div class="grid grid-cols-[54%_1fr] gap-4"><div>
+
+```python
+recvbuf = np.empty_like(m)
+
+comm.Gather(my_grid, recvbuf, root)
+if rank == 0:
+    sol = np.array(recvbuf)
+    sol.shape = (num_points,num_points)
+    print(f"{num_iter = }")
+    plt.imshow(sol)
+    plt.show()
+               
+```
+
+</div><div>
+
+* Gather the results.
+* A buffer `recvbuf` is needed to store the results.
+* Finally, the data can be further analyzed or represented
+  graphically.
+
+</div></div>
+
+<img src="/images/laplace.png" style="width: 40%; margin: auto">
