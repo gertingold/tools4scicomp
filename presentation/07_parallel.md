@@ -713,7 +713,7 @@ print(time.time()-start)
 
 # Mandelbrot set with Numba
 
-<div class="grid grid-cols-[50%_1fr] gap-4">
+<div class="grid grid-cols-[52%_1fr] gap-4">
 <div>
 
 ```python
