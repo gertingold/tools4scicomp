@@ -10,16 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: checkout merge commit
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
-        python-version: '3.11'
+        python-version: '3.13'
 
     - name: install dependencies
       run: |
-        conda install -y python=3.11
+        conda install -y python=3.13
         conda env update --file environment.yml --name base
         echo $CONDA/bin >> $GITHUB_PATH
 
@@ -32,3 +32,13 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: manuscript/_build/html
+
+    - name: build the book pdf
+      run: |
+        cd manuscript;make latexpdf
+
+    - name: deploy book's PDF to gh-pages branch
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: manuscript/_build/latex/tools4scicomp.pdf
