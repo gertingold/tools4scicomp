@@ -35,7 +35,7 @@ jobs:
 
     - name: build the book pdf
       run: |
-        cd manuscript;make latexpdf
+        sudo apt install -y latexmk;cd manuscript;make latexpdf
 
     - name: deploy book's PDF to gh-pages branch
       uses: peaceiris/actions-gh-pages@v4
