@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>2. Version Control with Git &#8212; Tools for Scientific Computing 0.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=dfa0e015" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/haiku.css?v=fce32b03" />
     <script src="_static/documentation_options.js?v=b489f392"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -21,7 +21,7 @@
           <span>Tools for Scientific Computing 0.3 documentation</span></a></h1>
         <h2 class="heading"><span>2. Version Control with Git</span></h2>
       </div>
-      <div class="topnav" role="navigation" aria-label="top navigation">
+      <div class="topnav" role="navigation" aria-label="Top">
       
         <p>
         «&#160;&#160;<a href="introduction.html"><span class="section-number">1. </span>Introduction</a>
@@ -529,14 +529,14 @@ but which we can motivate only now. Having our previous versions safely stored i
 the repository, we might be brave enough to refactor our script by defining a
 function to repeatedly printing a given text. Doing so, we end up with two files</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
-<span class="kn">from</span> <span class="nn">repeat</span> <span class="kn">import</span> <span class="n">repeated_print</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">repeat</span><span class="w"> </span><span class="kn">import</span> <span class="n">repeated_print</span>
 
 <span class="n">repeated_print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>and</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
@@ -709,9 +709,9 @@ Switched to a new branch &#39;dev&#39;
 <p>Everything is set up now to work on the new idea. Let us suppose that at some point
 you arrive at the following script:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
-<span class="kn">from</span> <span class="nn">repeat</span> <span class="kn">import</span> <span class="n">repeated_print</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">repeat</span><span class="w"> </span><span class="kn">import</span> <span class="n">repeated_print</span>
 
-<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
         <span class="n">repeated_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -748,7 +748,7 @@ continuing to work in the development branch, we perform the following steps:</p
 </li>
 <li><p>make modifications to <code class="docutils literal notranslate"><span class="pre">repeat.py</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
@@ -780,9 +780,9 @@ continuing to work in the development branch, we perform the following steps:</p
 <p>Now it is time to complete the script <code class="docutils literal notranslate"><span class="pre">hello.py</span></code> by adding an exclamation mark
 after the name and calling the new function <code class="docutils literal notranslate"><span class="pre">hello</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
-<span class="kn">from</span> <span class="nn">repeat</span> <span class="kn">import</span> <span class="n">repeated_print</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">repeat</span><span class="w"> </span><span class="kn">import</span> <span class="n">repeated_print</span>
 
-<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;Hello, &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;!&quot;</span>
         <span class="n">repeated_print</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
@@ -861,21 +861,21 @@ of the two branches (<code class="docutils literal notranslate"><span class="pre
 (<code class="docutils literal notranslate"><span class="pre">1d9a25f</span></code>) and (<code class="docutils literal notranslate"><span class="pre">a807c98</span></code>). It is interesting to compare the script <code class="docutils literal notranslate"><span class="pre">repeat.py</span></code>
 in these three versions. The version in the common ancestor was:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py aac6d17</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In the master branch, we have</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py 1d9a25f</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>while in the development branch, the script reads</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py a807c98</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
@@ -905,7 +905,7 @@ let us assume that we add a doc string to the <code class="docutils literal notr
 a different text in the master branch and in the development branch. In the master branch
 we have</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py in master</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;print text repeatedly</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -915,7 +915,7 @@ we have</p>
 </div>
 <p>while in the development branch we have chosen a different doc string</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py in dev</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;print text several times&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
@@ -951,12 +951,12 @@ Git needs to be told which version of the doc string should be used in the maste
 branch. Let us take a look at our script:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
 <span class="o">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> <span class="n">HEAD</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;print text repeatedly</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 <span class="o">=======</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;print text several times&quot;&quot;&quot;</span>
 <span class="o">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> <span class="n">dev</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
@@ -970,7 +970,7 @@ branch. The reason for the conflict lies in the different doc strings. In such a
 situation, Git needs help. The script should now be brought into the desired
 form by using an editor or a tool to handle merge conflicts. We choose</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
-<span class="k">def</span> <span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;print text repeatedly</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1915,7 +1915,7 @@ in the GitLab documentation.</p>
 
 
       </div>
-      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      <div class="bottomnav" role="navigation" aria-label="Bottom">
       
         <p>
         «&#160;&#160;<a href="introduction.html"><span class="section-number">1. </span>Introduction</a>
@@ -1929,7 +1929,7 @@ in the GitLab documentation.</p>
 
     <div class="footer" role="contentinfo">
     &#169; Copyright 2018—2022, Gert-Ludwig Ingold, license: CC BY 4.0 International.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>
