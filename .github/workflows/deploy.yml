@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-deploy-book:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - name: checkout merge commit
       uses: actions/checkout@v5
