@@ -11,7 +11,7 @@
     "@slidev/cli": "^52.2.5",
     "@slidev/theme-default": "latest",
     "@slidev/theme-seriph": "latest",
-    "npm": "^10.8.1",
+    "npm": "^9.6.5",
     "vue": "^3.4.21"
   },
   "devDependencies": {
