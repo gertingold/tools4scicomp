@@ -235,10 +235,10 @@ collaborate (see also: git help workflows)
    pull              Fetch from and integrate with another repository or a local branch
    push              Update remote refs along with associated objects
 
-&#39;git help -a&#39; and &#39;git help -g&#39; list available subcommands and some
-concept guides. See &#39;git help &lt;command&gt;&#39; or &#39;git help &lt;concept&gt;&#39;
+'git help -a' and 'git help -g' list available subcommands and some
+concept guides. See 'git help &lt;command&gt;' or 'git help &lt;concept&gt;'
 to read about a specific subcommand or concept.
-See &#39;git help git&#39; for an overview of the system.
+See 'git help git' for an overview of the system.
 </pre></div>
 </div>
 <p>Information on a specific command is obtained by means of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">help</span> <span class="pre">&lt;command&gt;</span></code>.</p>
@@ -265,10 +265,10 @@ The common Git guides are:
    tutorial-2          A tutorial introduction to Git: part two
    workflows           An overview of recommended workflows with Git
 
-&#39;git help -a&#39; and &#39;git help -g&#39; list available subcommands and some
-concept guides. See &#39;git help &lt;command&gt;&#39; or &#39;git help &lt;concept&gt;&#39;
+'git help -a' and 'git help -g' list available subcommands and some
+concept guides. See 'git help &lt;command&gt;' or 'git help &lt;concept&gt;'
 to read about a specific subcommand or concept.
-See &#39;git help git&#39; for an overview of the system.
+See 'git help git' for an overview of the system.
 </pre></div>
 </div>
 <p>For a detailed discussion of Git, the book <em>Pro Git</em> by Scott Chacon and Ben
@@ -321,7 +321,7 @@ $ git config --global user.email &lt;your email&gt;
 <p>where the part in angle brackets has to be replaced by the corresponding
 information. Enclose the information, in particular your name, in double quotes
 if it contains one or more blanks like in the following example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git config --global user.name &quot;Gert-Ludwig Ingold&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git config --global user.name "Gert-Ludwig Ingold"
 </pre></div>
 </div>
 <p>This information will be used by Git when new or modified files are committed
@@ -365,7 +365,7 @@ On branch master
 
 No commits yet
 
-nothing to commit (create/copy files and use &quot;git add&quot; to track)
+nothing to commit (create/copy files and use "git add" to track)
 </pre></div>
 </div>
 <p>The output first tells us that we are on a branch called <code class="docutils literal notranslate"><span class="pre">master</span></code>
@@ -378,7 +378,7 @@ promised earlier, Git tries to be helpful and adds some information about what
 we could do. Obviously, we first have to create a file in the project
 directory.</p>
 <p>So let us go ahead and create a very simple Python file:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"Hello world!"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now, the status reflects the fact that a new file <code class="docutils literal notranslate"><span class="pre">hello.py</span></code>  exists:</p>
@@ -388,10 +388,10 @@ On branch master
 No commits yet
 
 Untracked files:
-  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+  (use "git add &lt;file&gt;..." to include in what will be committed)
         hello.py
 
-nothing added to commit but untracked files present (use &quot;git add&quot; to track)
+nothing added to commit but untracked files present (use "git add" to track)
 </pre></div>
 </div>
 <p>Git has detected the presence of a new file but it is an untracked file which
@@ -407,7 +407,7 @@ On branch master
 No commits yet
 
 Changes to be committed:
-  (use &quot;git rm --cached &lt;file&gt;...&quot; to unstage)
+  (use "git rm --cached &lt;file&gt;..." to unstage)
         new file:   hello.py
 </pre></div>
 </div>
@@ -421,7 +421,7 @@ commit. Committing the file to the repository would be the next logical step.
 However, for the sake of illustration, we want to first modify our script. Our
 new script could read</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Hello world!"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The status now has changed to:</p>
@@ -431,12 +431,12 @@ On branch master
 No commits yet
 
 Changes to be committed:
-  (use &quot;git rm --cached &lt;file&gt;...&quot; to unstage)
+  (use "git rm --cached &lt;file&gt;..." to unstage)
         new file:   hello.py
 
 Changes not staged for commit:
-  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
-  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git restore &lt;file&gt;..." to discard changes in working directory)
         modified:   hello.py
 </pre></div>
 </div>
@@ -455,25 +455,25 @@ purpose of the commit. The commit message should consist of a single line with
 preferably at most 50 characters. If necessary, one can add an empty line followed
 by a longer explanatory text. If a single-line commit message suffices, one can
 give the message as a command line argument:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -m &#39;simple hello world script added&#39;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -m 'simple hello world script added'
 [master (root-commit) a5b522b] simple hello world script added
  1 file changed, 1 insertion(+)
  create mode 100644 hello.py
 $ git status
 On branch master
 Changes not staged for commit:
-  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
-  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git restore &lt;file&gt;..." to discard changes in working directory)
         modified:   hello.py
 
-no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+no changes added to commit (use "git add" and/or "git commit -a")
 </pre></div>
 </div>
 <p>Checking the status, we see that our two-line script is still unstaged. We could
 add it to the staging area and then commit it. Since Git already tracks this file,
 we can carry out this procedure in one single step. However, this is only possible
 if we do not wish to commit more than one file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -a -m &#39;repetition of hello world implemented&#39;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -a -m 'repetition of hello world implemented'
 [master 011ce76] repetition of hello world implemented
  1 file changed, 2 insertions(+), 1 deletion(-)
 (base) gli@gli-tp14-1:~/git_example$ git status
@@ -531,7 +531,7 @@ function to repeatedly printing a given text. Doing so, we end up with two files
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">repeat</span><span class="w"> </span><span class="kn">import</span> <span class="n">repeated_print</span>
 
-<span class="n">repeated_print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">repeated_print</span><span class="p">(</span><span class="s2">"Hello world!"</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>and</p>
@@ -553,12 +553,12 @@ check the status before committing.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git status
 On branch master
 Changes to be committed:
-  (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)
+  (use "git restore --staged &lt;file&gt;..." to unstage)
         modified:   hello.py
         new file:   repeat.py
 
 Untracked files:
-  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+  (use "git add &lt;file&gt;..." to include in what will be committed)
         __pycache__/
 </pre></div>
 </div>
@@ -677,12 +677,12 @@ grows.</p>
 of the <code class="docutils literal notranslate"><span class="pre">switch</span></code> command. With the following commands, we got to the development
 branch and back to the master branch while verifying where we are after each checkout:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch dev
-Switched to branch &#39;dev&#39;
+Switched to branch 'dev'
 $ git branch
 * dev
   master
 $ git switch master
-Switched to branch &#39;master&#39;
+Switched to branch 'master'
 $ git branch
   dev
 * master
@@ -702,7 +702,7 @@ new branch is not really visible as branch because we have not done any developm
 typically wants to switch to the new branch immediately after having created it, there
 exists a shortcut:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch -c dev
-Switched to a new branch &#39;dev&#39;
+Switched to a new branch 'dev'
 </pre></div>
 </div>
 <p>The option <code class="docutils literal notranslate"><span class="pre">-c</span></code> demands a new branch to be created.</p>
@@ -711,11 +711,11 @@ you arrive at the following script:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">repeat</span><span class="w"> </span><span class="kn">import</span> <span class="n">repeated_print</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-        <span class="n">repeated_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
+        <span class="n">repeated_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">repeated_print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
+        <span class="n">repeated_print</span><span class="p">(</span><span class="s2">"Hello world!"</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>After committing it, the commit log looks as follows:</p>
@@ -755,7 +755,7 @@ continuing to work in the development branch, we perform the following steps:</p
 </div>
 </li>
 <li><p>commit the new version of the script</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -a -m &#39;default value for number of repetitions defined&#39;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -a -m 'default value for number of repetitions defined'
 </pre></div>
 </div>
 </li>
@@ -782,15 +782,15 @@ after the name and calling the new function <code class="docutils literal notran
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">repeat</span><span class="w"> </span><span class="kn">import</span> <span class="n">repeated_print</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;Hello, &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;!&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">"Hello, "</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">"!"</span>
         <span class="n">repeated_print</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">repeated_print</span><span class="p">(</span><span class="s2">&quot;Hello world!&quot;</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
+        <span class="n">repeated_print</span><span class="p">(</span><span class="s2">"Hello world!"</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">hello</span><span class="p">(</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">hello</span><span class="p">(</span><span class="s2">"Alice"</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Before committing the new version, we start thinking about atomic commits. Strictly
@@ -805,15 +805,15 @@ index b2ee076..c287658 100644
 +++ b/hello.py
 @@ -3,6 +3,9 @@ from repeat import repeated_print
 
- def hello(name=&quot;&quot;, repetitions=1):
+ def hello(name="", repetitions=1):
      if name:
--        repeated_print(f&quot;Hello, {name}&quot;, repetitions)
-+        repeated_print(f&quot;Hello, {name}!&quot;, repetitions)
+-        repeated_print(f"Hello, {name}", repetitions)
++        repeated_print(f"Hello, {name}!", repetitions)
      else:
-         repeated_print(&quot;Hello world!&quot;, repetitions)
+         repeated_print("Hello world!", repetitions)
 +
-+if __name__ == &quot;__main__&quot;:
-+    hello(&quot;Alice&quot;, 3)
++if __name__ == "__main__":
++    hello("Alice", 3)
 (1/1) Stage this hunk [y,n,q,a,d,s,e,?]?
 </pre></div>
 </div>
@@ -837,13 +837,13 @@ arrive at the following history:</p>
 merge the commits from the development branch into the master branch. To this
 end, we switch to the master branch and merge the development branch:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch master
-Switched to branch &#39;master&#39;
+Switched to branch 'master'
 $ git merge dev
-Merge made by the &#39;recursive&#39; strategy.
+Merge made by the 'recursive' strategy.
  hello.py | 9 ++++++++-
  1 file changed, 8 insertions(+), 1 deletion(-)
 $ git log --oneline --graph --decorate --all
-*   53e12db (HEAD -&gt; master) Merge branch &#39;dev&#39;
+*   53e12db (HEAD -&gt; master) Merge branch 'dev'
 |\
 | * a807c98 (dev) function call added
 | * d07dbda exclamation mark added
@@ -906,9 +906,9 @@ a different text in the master branch and in the development branch. In the mast
 we have</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py in master</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text repeatedly</span>
+<span class="w">    </span><span class="sd">"""print text repeatedly</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
@@ -916,7 +916,7 @@ we have</p>
 <p>while in the development branch we have chosen a different doc string</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py in dev</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text several times&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""print text several times"""</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
@@ -925,7 +925,7 @@ we have</p>
 more complex:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">c3ab8cb</span> <span class="p">(</span><span class="n">HEAD</span> <span class="o">-&gt;</span> <span class="n">dev</span><span class="p">)</span> <span class="n">added</span> <span class="n">a</span> <span class="n">doc</span> <span class="n">string</span>
 <span class="o">|</span> <span class="o">*</span> <span class="n">cc484da</span> <span class="p">(</span><span class="n">master</span><span class="p">)</span> <span class="n">doc</span> <span class="n">string</span> <span class="n">added</span>
-<span class="o">|</span> <span class="o">*</span>   <span class="mf">53e12</span><span class="n">db</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">&#39;dev&#39;</span>
+<span class="o">|</span> <span class="o">*</span>   <span class="mf">53e12</span><span class="n">db</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">'dev'</span>
 <span class="o">|</span> <span class="o">|</span>\
 <span class="o">|</span> <span class="o">|/</span>
 <span class="o">|/|</span>
@@ -939,7 +939,7 @@ more complex:</p>
 </div>
 <p>We switch to the master branch and try to merge once more the development branch:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git switch master
-Switched to branch &#39;master&#39;
+Switched to branch 'master'
 $ git merge dev
 Auto-merging repeat.py
 CONFLICT (content): Merge conflict in repeat.py
@@ -952,12 +952,12 @@ branch. Let us take a look at our script:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
 <span class="o">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> <span class="n">HEAD</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text repeatedly</span>
+<span class="w">    </span><span class="sd">"""print text repeatedly</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 <span class="o">=======</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text several times&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""print text several times"""</span>
 <span class="o">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> <span class="n">dev</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
@@ -971,9 +971,9 @@ situation, Git needs help. The script should now be brought into the desired
 form by using an editor or a tool to handle merge conflicts. We choose</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># repeat.py</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">repeated_print</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;print text repeatedly</span>
+<span class="w">    </span><span class="sd">"""print text repeatedly</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
@@ -986,7 +986,7 @@ now looks as follows:</p>
 <span class="o">|</span>\
 <span class="o">|</span> <span class="o">*</span> <span class="n">c3ab8cb</span> <span class="p">(</span><span class="n">dev</span><span class="p">)</span> <span class="n">added</span> <span class="n">a</span> <span class="n">doc</span> <span class="n">string</span>
 <span class="o">*</span> <span class="o">|</span> <span class="n">cc484da</span> <span class="n">doc</span> <span class="n">string</span> <span class="n">added</span>
-<span class="o">*</span> <span class="o">|</span> <span class="mf">53e12</span><span class="n">db</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">&#39;dev&#39;</span>
+<span class="o">*</span> <span class="o">|</span> <span class="mf">53e12</span><span class="n">db</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">'dev'</span>
 <span class="o">|</span>\<span class="o">|</span>
 <span class="o">|</span> <span class="o">*</span> <span class="n">a807c98</span> <span class="n">function</span> <span class="n">call</span> <span class="n">added</span>
 <span class="o">|</span> <span class="o">*</span> <span class="n">d07dbda</span> <span class="n">exclamation</span> <span class="n">mark</span> <span class="n">added</span>
@@ -1198,7 +1198,7 @@ server, i.e. the repository referred to as <code class="docutils literal notrans
 in <a class="reference internal" href="#gitlab-create-project-3"><span class="std std-numref">Figure 2.8</span></a>, the repository is cloned into a local
 directory as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone ssh://git@localhost:30022/gert/example.git
-Cloning into &#39;example&#39; ...
+Cloning into 'example' ...
 remote: Enumerating objects: 3, done.
 remote: Counting objects: 100% (3/3), done.
 remote: Compressing objects: 100% (2/2), done.
@@ -1252,7 +1252,7 @@ facilitating a later merge into the main code base.</p>
 <p>The developer decides to contribute a “Hello world” script to the <code class="docutils literal notranslate"><span class="pre">example</span></code> project
 and first creates a new branch named <code class="docutils literal notranslate"><span class="pre">hello</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout -b hello
-Switched to a new branch &#39;hello&#39;
+Switched to a new branch 'hello'
 $ git branch
 * hello
   master
@@ -1288,7 +1288,7 @@ remote:   http://localhost:30080/gert/example/merge_requests/new?merge_request%5
 remote:
 To ssh://localhost:30022/gert/example.git
  * [new branch]      hello -&gt; hello
-Branch &#39;hello&#39; set up to track remote branch &#39;hello&#39; from &#39;origin&#39;.
+Branch 'hello' set up to track remote branch 'hello' from 'origin'.
 </pre></div>
 </div>
 <figure class="align-center" id="id19">
@@ -1384,8 +1384,8 @@ kept in sync with the <code class="docutils literal notranslate"><span class="pr
 are still in the development branch <code class="docutils literal notranslate"><span class="pre">hello</span></code>, it is now time to go back to the
 <code class="docutils literal notranslate"><span class="pre">master</span></code> branch:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout master
-Switched to branch &#39;master&#39;
-Your branch is up-to-date with &#39;origin/master&#39;.
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
 </pre></div>
 </div>
 <p>Now, we have two options. With <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span> <span class="pre">upstream</span> <span class="pre">master</span></code>, the present state
@@ -1410,7 +1410,7 @@ Fast-forward
 merges the objects from the remote branch <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>. The history of the
 local <code class="docutils literal notranslate"><span class="pre">master</span></code> repository looks as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline --graph --decorate --all
-*   e55831a (HEAD -&gt; master, upstream/master) Merge branch &#39;hello&#39; into &#39;master&#39;
+*   e55831a (HEAD -&gt; master, upstream/master) Merge branch 'hello' into 'master'
 |\
 | * 313a6a5 (origin/hello, hello) hello world script added
 |/
@@ -1455,7 +1455,7 @@ Total 1 (delta 0), reused 0 (delta 0)
 To ssh://localhost:30022/gert/example.git
    7219a23..e55831a  master -&gt; master
 $ git log --oneline --decorate --graph
-*   e55831a (HEAD -&gt; master, upstream/master, origin/master, origin/HEAD) Merge branch &#39;hello&#39; into &#39;master&#39;
+*   e55831a (HEAD -&gt; master, upstream/master, origin/master, origin/HEAD) Merge branch 'hello' into 'master'
 |\
 | * 313a6a5 hello world script added
 |/
@@ -1477,19 +1477,19 @@ discussed in this section.</p>
 where we modified the <code class="docutils literal notranslate"><span class="pre">hello.py</span></code> script and committed the new version. We
 can then change between branches without any problem:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout -b dev
-Switched to a new branch &#39;dev&#39;
+Switched to a new branch 'dev'
 $ cat hello.py
-print(&quot;Hello world!&quot;)
-print(&quot;Hello world!&quot;)
-print(&quot;Hello world!&quot;)
-$ git commit -a -m&#39;repetitive output of message&#39;
+print("Hello world!")
+print("Hello world!")
+print("Hello world!")
+$ git commit -a -m'repetitive output of message'
 [dev 01dc5a1] repetitive output of message
  1 file changed, 2 insertions(+)
 $ git checkout master
-Switched to branch &#39;master&#39;
-Your branch is up-to-date with &#39;origin/master&#39;.
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
 $ git checkout dev
-Switched to branch &#39;dev&#39;
+Switched to branch 'dev'
 </pre></div>
 </div>
 <p>The situation is different if we do not commit the changes. In the following
@@ -1498,7 +1498,7 @@ but did not commit the change. Git now does not allow us to change to the
 <code class="docutils literal notranslate"><span class="pre">master</span></code> branch because we might lose data:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat hello.py
 for _ in range(3):
-    print(&quot;Hello world!&quot;)
+    print("Hello world!")
 $ git checkout master
 error: Your local changes to the following files would be overwritten by checkout:
         hello.py
@@ -1514,14 +1514,14 @@ branch:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git stash
 Saved working directory and index state WIP on dev: 01dc5a1 repetitive output of message
 $ git checkout master
-Switched to branch &#39;master&#39;
-Your branch is up-to-date with &#39;origin/master&#39;.
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
 $ git checkout dev
-Switched to branch &#39;dev&#39;
+Switched to branch 'dev'
 $ cat hello.py
-print(&quot;Hello world!&quot;)
-print(&quot;Hello world!&quot;)
-print(&quot;Hello world!&quot;)
+print("Hello world!")
+print("Hello world!")
+print("Hello world!")
 </pre></div>
 </div>
 <p>After stashing the changes, Git allowed us to switch back and forth between the
@@ -1534,16 +1534,16 @@ stash@{0}: WIP on dev: 01dc5a1 repetitive output of message
 $ git stash pop
 On branch dev
 Changes not staged for commit:
-  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
-  (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
 
         modified:       hello.py
 
-no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+no changes added to commit (use "git add" and/or "git commit -a")
 Dropped refs/stash@{0} (049ca57b4dda40d0869129482e2d216f82186d75)
 $ cat hello.py
 for _ in range(3):
-    print(&quot;Hello world!&quot;)
+    print("Hello world!")
 </pre></div>
 </div>
 <p>As the code example given above demonstrates, one can list the content of the
@@ -1559,7 +1559,7 @@ SHA1 value. Occasionally, it is useful to tag a revision with a name for easier
 reference. For example, one might want to introduce different versions of the
 code tagged by labels like <code class="docutils literal notranslate"><span class="pre">v1</span></code>, <code class="docutils literal notranslate"><span class="pre">v2</span></code> and so on.</p>
 <p>The present revision can be tagged as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git tag -a v1 -m &quot;first production release&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git tag -a v1 -m "first production release"
 </pre></div>
 </div>
 <p>Here, the option <code class="docutils literal notranslate"><span class="pre">-a</span></code> means that an annotated tag is created which will
@@ -1578,20 +1578,20 @@ Merge: a459aec 7a7b8f7
 Author: Gert-Ludwig Ingold &lt;gert.ingold@physik.uni-augsburg.de&gt;
 Date:   Mon Oct 22 09:28:03 2018 +0200
 
-    Merge branch &#39;dev&#39;
+    Merge branch 'dev'
 </pre></div>
 </div>
 <p>It is also possible to tag older revisions by referring to a specific commit like
 in the following example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git tag -a v0.1 -m &quot;prerelease version&quot; a459aec
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git tag -a v0.1 -m "prerelease version" a459aec
 $ git tag
 v0.1
 v1
 $ git log --oneline -n5
-d08b086 (HEAD -&gt; master, tag: v1) Merge branch &#39;dev&#39;
+d08b086 (HEAD -&gt; master, tag: v1) Merge branch 'dev'
 7a7b8f7 added doc string
 a459aec (tag: v0.1) doc string added
-ac805d5 Merge branch &#39;dev&#39;
+ac805d5 Merge branch 'dev'
 41e9e21 function call added
 </pre></div>
 </div>
@@ -1654,7 +1654,7 @@ DESCRIPTION
 
        In addition, some Git commands (such as git-show(1)) also take revision
        parameters which denote other objects than commits, e.g. blobs
-       (&quot;files&quot;) or trees (&quot;directories of files&quot;).
+       ("files") or trees ("directories of files").
 
 SPECIFYING REVISIONS
        A revision parameter &lt;rev&gt; typically, but not necessarily, names a
@@ -1664,22 +1664,22 @@ SPECIFYING REVISIONS
 </div>
 <p>Here, we reproduced only part of the help text.</p>
 <p>Now let us suppose that the recent history of our repository looks as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d08b086</span> <span class="p">(</span><span class="n">HEAD</span> <span class="o">-&gt;</span> <span class="n">master</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="n">v1</span><span class="p">)</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">&#39;dev&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d08b086</span> <span class="p">(</span><span class="n">HEAD</span> <span class="o">-&gt;</span> <span class="n">master</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="n">v1</span><span class="p">)</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">'dev'</span>
 <span class="mi">7</span><span class="n">a7b8f7</span> <span class="n">added</span> <span class="n">doc</span> <span class="n">string</span>
 <span class="n">a459aec</span> <span class="p">(</span><span class="n">tag</span><span class="p">:</span> <span class="n">v0</span><span class="mf">.1</span><span class="p">)</span> <span class="n">doc</span> <span class="n">string</span> <span class="n">added</span>
-<span class="n">ac805d5</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">&#39;dev&#39;</span>
+<span class="n">ac805d5</span> <span class="n">Merge</span> <span class="n">branch</span> <span class="s1">'dev'</span>
 <span class="mf">41e9</span><span class="n">e21</span> <span class="n">function</span> <span class="n">call</span> <span class="n">added</span>
 <span class="mi">1</span><span class="n">bac36d</span> <span class="n">exclamation</span> <span class="n">mark</span> <span class="n">appended</span>
 <span class="n">d8d7313</span> <span class="n">default</span> <span class="n">value</span> <span class="k">for</span> <span class="n">repetitions</span> <span class="n">added</span>
-<span class="n">c95fa0e</span> <span class="n">new</span> <span class="n">argument</span> <span class="s1">&#39;name&#39;</span> <span class="n">added</span>
+<span class="n">c95fa0e</span> <span class="n">new</span> <span class="n">argument</span> <span class="s1">'name'</span> <span class="n">added</span>
 </pre></div>
 </div>
 <p>For some reason, we want to take a look at commit <code class="docutils literal notranslate"><span class="pre">41e9e21</span></code> and decide to
 check this commit out:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout 41e9e21
-Note: checking out &#39;41e9e21&#39;.
+Note: checking out '41e9e21'.
 
-You are in &#39;detached HEAD&#39; state. You can look around, make experimental
+You are in 'detached HEAD' state. You can look around, make experimental
 changes and commit them, and you can discard any commits you make in this
 state without impacting any branches by performing another checkout.
 
@@ -1705,14 +1705,14 @@ to do so, Git will give the following warning:</p>
 Warning: you are leaving 1 commit behind, not connected to
 any of your branches:
 
-  4d252a9 &#39;how are you&#39; added
+  4d252a9 'how are you' added
 
 If you want to keep it by creating a new branch, this may be a good time
 to do so with:
 
  git branch &lt;new-branch-name&gt; 4d252a9
 
-Switched to branch &#39;master&#39;
+Switched to branch 'master'
 </pre></div>
 </div>
 <p>The new branch needs to be created before garbage collection destroys the
@@ -1740,25 +1740,25 @@ the commit message contains a typo. It is rather straightforward to correct
 such a mistake locally. Suppose that “How are you?” has been added to the
 output of the script <code class="docutils literal notranslate"><span class="pre">hello.py</span></code> and that the recent history looks as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git log --oneline -n5
-c7be5c2 (HEAD -&gt; master) &#39;Who are you&#39; added
-89f459f Merge branch &#39;dev&#39;
+c7be5c2 (HEAD -&gt; master) 'Who are you' added
+89f459f Merge branch 'dev'
 7a7b8f7 added doc string
 a459aec (tag: v0.1) doc string added
-ac805d5 Merge branch &#39;dev&#39;
+ac805d5 Merge branch 'dev'
 </pre></div>
 </div>
 <p>Clearly, the commit message is wrong and even worse, it is misleading. The commit
 message of the last commit can be amended in the following way:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit --amend -m&quot;&#39;How are you?&#39; added&quot;
-[master 3eec1a6] &#39;How are you?&#39; added
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit --amend -m"'How are you?' added"
+[master 3eec1a6] 'How are you?' added
  Date: Fri Oct 26 14:49:03 2018 +0200
  1 file changed, 1 insertion(+), 1 deletion(-)
 $ git log --oneline -n5
-3eec1a6 (HEAD -&gt; master) &#39;How are you?&#39; added
-89f459f Merge branch &#39;dev&#39;
+3eec1a6 (HEAD -&gt; master) 'How are you?' added
+89f459f Merge branch 'dev'
 7a7b8f7 added doc string
 a459aec (tag: v0.1) doc string added
-ac805d5 Merge branch &#39;dev&#39;
+ac805d5 Merge branch 'dev'
 </pre></div>
 </div>
 <p>If the option <code class="docutils literal notranslate"><span class="pre">-m</span></code> is omitted, an editor will be opened to allow you to enter
@@ -1767,12 +1767,12 @@ the new commit message.</p>
 be used to reset <code class="docutils literal notranslate"><span class="pre">HEAD</span></code> to another commit. For example, <code class="docutils literal notranslate"><span class="pre">HEAD^</span></code> denotes the
 first parent of <code class="docutils literal notranslate"><span class="pre">HEAD</span></code> so that the last commit can be removed by:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git reset --hard HEAD^
-HEAD is now at 89f459f Merge branch &#39;dev&#39;
+HEAD is now at 89f459f Merge branch 'dev'
 $ git log --oneline -n5
-89f459f (HEAD -&gt; master) Merge branch &#39;dev&#39;
+89f459f (HEAD -&gt; master) Merge branch 'dev'
 7a7b8f7 added doc string
 a459aec (tag: v0.1) doc string added
-ac805d5 Merge branch &#39;dev&#39;
+ac805d5 Merge branch 'dev'
 41e9e21 function call added
 </pre></div>
 </div>
@@ -1811,13 +1811,13 @@ pick e0ac1ba add __name__ to output
 # r, reword &lt;commit&gt; = use commit, but edit the commit message
 # e, edit &lt;commit&gt; = use commit, but stop for amending
 # s, squash &lt;commit&gt; = use commit, but meld into previous commit
-# f, fixup &lt;commit&gt; = like &quot;squash&quot;, but discard this commit&#39;s log message
+# f, fixup &lt;commit&gt; = like "squash", but discard this commit's log message
 # x, exec &lt;command&gt; = run command (the rest of the line) using shell
 # d, drop &lt;commit&gt; = remove commit
 # l, label &lt;label&gt; = label current HEAD with a name
 # t, reset &lt;label&gt; = reset HEAD to a label
 # m, merge [-C &lt;commit&gt; | -c &lt;commit&gt;] &lt;label&gt; [# &lt;oneline&gt;]
-# .       create a merge commit using the original merge commit&#39;s
+# .       create a merge commit using the original merge commit's
 # .       message (or the oneline, if no original merge commit was
 # .       specified). Use -c &lt;commit&gt; to reword the commit message.
 #
@@ -1838,9 +1838,9 @@ CONFLICT (content): Merge conflict in test.py
 error: could not apply e0ac1ba... add __name__ to output
 
 Resolve all conflicts manually, mark them as resolved with
-&quot;git add/rm &lt;conflicted_files&gt;&quot;, then run &quot;git rebase --continue&quot;.
-You can instead skip this commit: run &quot;git rebase --skip&quot;.
-To abort and get back to the state before &quot;git rebase&quot;, run &quot;git rebase --abort&quot;.
+"git add/rm &lt;conflicted_files&gt;", then run "git rebase --continue".
+You can instead skip this commit: run "git rebase --skip".
+To abort and get back to the state before "git rebase", run "git rebase --abort".
 
 Could not apply e0ac1ba... add __name__ to output
 </pre></div>

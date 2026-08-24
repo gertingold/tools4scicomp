@@ -92,11 +92,11 @@ in the following example.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="w">    </span><span class="sd">"""Print a greeting.</span>
 
 <span class="sd">    name: name of the person to greet</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">'Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!'</span>
 </pre></div>
 </div>
 <p>In our example, the docstring is available as <code class="docutils literal notranslate"><span class="pre">welcome.__doc__</span></code> and can also be
@@ -123,22 +123,22 @@ Python shell.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="w">    </span><span class="sd">"""Print a greeting.</span>
 
 <span class="sd">    name: name of the person to greet</span>
 
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
-<span class="sd">    &#39;Hello Alice!&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+<span class="sd">    &gt;&gt;&gt; welcome('Alice')</span>
+<span class="sd">    'Hello Alice!'</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">'Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!'</span>
 </pre></div>
 </div>
 <p>Running the test with the option <code class="docutils literal notranslate"><span class="pre">-v</span></code> to obtain some output, we find:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m doctest -v hello.py
 Trying:
-    welcome(&#39;Alice&#39;)
+    welcome('Alice')
 Expecting:
-    &#39;Hello Alice!&#39;
+    'Hello Alice!'
 ok
 1 items had no tests:
     hello
@@ -159,28 +159,28 @@ when designing our function.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># hello.py</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-<span class="linenos"> 4</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="sd">"""Print a greeting.</span>
 <span class="linenos"> 5</span>
 <span class="linenos"> 6</span><span class="sd">    name: name of the person to greet</span>
 <span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
-<span class="linenos"> 9</span><span class="sd">    &#39;Hello!&#39;</span>
-<span class="linenos">10</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
-<span class="linenos">11</span><span class="sd">    &#39;Hello Alice!&#39;</span>
-<span class="linenos">12</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">13</span>    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+<span class="linenos"> 8</span><span class="sd">    &gt;&gt;&gt; welcome('')</span>
+<span class="linenos"> 9</span><span class="sd">    'Hello!'</span>
+<span class="linenos">10</span><span class="sd">    &gt;&gt;&gt; welcome('Alice')</span>
+<span class="linenos">11</span><span class="sd">    'Hello Alice!'</span>
+<span class="linenos">12</span><span class="sd">    """</span>
+<span class="linenos">13</span>    <span class="k">return</span> <span class="sa">f</span><span class="s1">'Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!'</span>
 </pre></div>
 </div>
 <p>Running the doctests, we identify our first coding error by means of a test:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m doctest hello.py
 **********************************************************************
-File &quot;hello.py&quot;, line 8, in hello.welcome
+File "hello.py", line 8, in hello.welcome
 Failed example:
-    welcome(&#39;&#39;)
+    welcome('')
 Expected:
-    &#39;Hello!&#39;
+    'Hello!'
 Got:
-    &#39;Hello !&#39;
+    'Hello !'
 **********************************************************************
 1 items had failures:
    1 of   2 in hello.welcome
@@ -193,19 +193,19 @@ make the tests pass.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="w">    </span><span class="sd">"""Print a greeting.</span>
 
 <span class="sd">    name: name of the person to greet</span>
 
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
-<span class="sd">    &#39;Hello!&#39;</span>
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
-<span class="sd">    &#39;Hello Alice!&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; welcome('')</span>
+<span class="sd">    'Hello!'</span>
+<span class="sd">    &gt;&gt;&gt; welcome('Alice')</span>
+<span class="sd">    'Hello Alice!'</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">'Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!'</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;Hello!&#39;</span>
+        <span class="k">return</span> <span class="s1">'Hello!'</span>
 </pre></div>
 </div>
 <p>Now the tests pass successfully.</p>
@@ -214,20 +214,20 @@ name, we can use the tests as a safety net. They should run for the modified scr
 as well.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">''</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Print a greeting.</span>
 
 <span class="sd">    name: name of the person to greet</span>
 
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
-<span class="sd">    &#39;Hello!&#39;</span>
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
-<span class="sd">    &#39;Hello Alice!&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; welcome('')</span>
+<span class="sd">    'Hello!'</span>
+<span class="sd">    &gt;&gt;&gt; welcome('Alice')</span>
+<span class="sd">    'Hello Alice!'</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">'Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!'</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;Hello!&#39;</span>
+        <span class="k">return</span> <span class="s1">'Hello!'</span>
 </pre></div>
 </div>
 <p>Both tests pass successfully. However, we have not yet tested the new default value
@@ -235,59 +235,59 @@ for the variable <code class="docutils literal notranslate"><span class="pre">na
 works fine.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">''</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Print a greeting.</span>
 
 <span class="sd">    name: name of the person to greet</span>
 
 <span class="sd">    &gt;&gt;&gt; welcome()</span>
-<span class="sd">    &#39;Hello!&#39;</span>
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
-<span class="sd">    &#39;Hello!&#39;</span>
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
-<span class="sd">    &#39;Hello Alice!&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    'Hello!'</span>
+<span class="sd">    &gt;&gt;&gt; welcome('')</span>
+<span class="sd">    'Hello!'</span>
+<span class="sd">    &gt;&gt;&gt; welcome('Alice')</span>
+<span class="sd">    'Hello Alice!'</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">'Hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!'</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;Hello!&#39;</span>
+        <span class="k">return</span> <span class="s1">'Hello!'</span>
 </pre></div>
 </div>
 <p>All three tests pass successfully.</p>
 <p>In a next step development step, we make the function <code class="docutils literal notranslate"><span class="pre">welcome</span></code> multilingual.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># hello.py</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">''</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s1">'en'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Print a greeting.</span>
 
 <span class="sd">    name: name of the person to greet</span>
 
 <span class="sd">    &gt;&gt;&gt; welcome()</span>
-<span class="sd">    &#39;Hello!&#39;</span>
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
-<span class="sd">    &#39;Hello!&#39;</span>
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
-<span class="sd">    &#39;Hello Alice!&#39;</span>
-<span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;, lang=&#39;de&#39;)</span>
-<span class="sd">    &#39;Hallo Alice!&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">hellodict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;en&#39;</span><span class="p">:</span> <span class="s1">&#39;Hello&#39;</span><span class="p">,</span> <span class="s1">&#39;de&#39;</span><span class="p">:</span> <span class="s1">&#39;Hallo&#39;</span><span class="p">}</span>
+<span class="sd">    'Hello!'</span>
+<span class="sd">    &gt;&gt;&gt; welcome('')</span>
+<span class="sd">    'Hello!'</span>
+<span class="sd">    &gt;&gt;&gt; welcome('Alice')</span>
+<span class="sd">    'Hello Alice!'</span>
+<span class="sd">    &gt;&gt;&gt; welcome('Alice', lang='de')</span>
+<span class="sd">    'Hallo Alice!'</span>
+<span class="sd">    """</span>
+    <span class="n">hellodict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'en'</span><span class="p">:</span> <span class="s1">'Hello'</span><span class="p">,</span> <span class="s1">'de'</span><span class="p">:</span> <span class="s1">'Hallo'</span><span class="p">}</span>
     <span class="n">hellostring</span> <span class="o">=</span> <span class="n">hellodict</span><span class="p">[</span><span class="n">lang</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!'</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1">!&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1">!'</span>
 </pre></div>
 </div>
 <p>It is interesting to consider the case where the value of <code class="docutils literal notranslate"><span class="pre">lang</span></code> is not a valid
 key. Calling the function with <code class="docutils literal notranslate"><span class="pre">lang</span></code> set to <code class="docutils literal notranslate"><span class="pre">fr</span></code>, one obtains:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python hello.py
 Traceback (most recent call last):
-  File &quot;hello.py&quot;, line 25, in &lt;module&gt;
-    welcome(&#39;Alice&#39;, &#39;fr&#39;)
-  File &quot;hello.py&quot;, line 18, in welcome
+  File "hello.py", line 25, in &lt;module&gt;
+    welcome('Alice', 'fr')
+  File "hello.py", line 18, in welcome
     hellostring = hellodict[lang]
-KeyError: &#39;fr&#39;
+KeyError: 'fr'
 </pre></div>
 </div>
 <p>Typically, error messages related to exception can be quite complex and it is
@@ -302,36 +302,36 @@ the context of exceptions and one should know ways to handle such situations.</p
 with an appropriate error message.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># hello.py</span>
 <span class="linenos"> 2</span>
-<span class="linenos"> 3</span><span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
-<span class="linenos"> 4</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a greeting.</span>
+<span class="linenos"> 3</span><span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">''</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s1">'en'</span><span class="p">):</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="sd">"""Print a greeting.</span>
 <span class="linenos"> 5</span>
 <span class="linenos"> 6</span><span class="sd">    name: name of the person to greet</span>
 <span class="linenos"> 7</span>
 <span class="linenos"> 8</span><span class="sd">    &gt;&gt;&gt; welcome()</span>
-<span class="linenos"> 9</span><span class="sd">    &#39;Hello!&#39;</span>
-<span class="linenos">10</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;&#39;)</span>
-<span class="linenos">11</span><span class="sd">    &#39;Hello!&#39;</span>
-<span class="linenos">12</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;)</span>
-<span class="linenos">13</span><span class="sd">    &#39;Hello Alice!&#39;</span>
-<span class="linenos">14</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;, lang=&#39;de&#39;)</span>
-<span class="linenos">15</span><span class="sd">    &#39;Hallo Alice!&#39;</span>
-<span class="linenos">16</span><span class="sd">    &gt;&gt;&gt; welcome(&#39;Alice&#39;, lang=&#39;fr&#39;)</span>
+<span class="linenos"> 9</span><span class="sd">    'Hello!'</span>
+<span class="linenos">10</span><span class="sd">    &gt;&gt;&gt; welcome('')</span>
+<span class="linenos">11</span><span class="sd">    'Hello!'</span>
+<span class="linenos">12</span><span class="sd">    &gt;&gt;&gt; welcome('Alice')</span>
+<span class="linenos">13</span><span class="sd">    'Hello Alice!'</span>
+<span class="linenos">14</span><span class="sd">    &gt;&gt;&gt; welcome('Alice', lang='de')</span>
+<span class="linenos">15</span><span class="sd">    'Hallo Alice!'</span>
+<span class="linenos">16</span><span class="sd">    &gt;&gt;&gt; welcome('Alice', lang='fr')</span>
 <span class="linenos">17</span><span class="sd">    Traceback (most recent call last):</span>
 <span class="linenos">18</span><span class="sd">    ValueError: unknown language: fr</span>
-<span class="linenos">19</span><span class="sd">    &quot;&quot;&quot;</span>
-<span class="linenos">20</span>    <span class="n">hellodict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;en&#39;</span><span class="p">:</span> <span class="s1">&#39;Hello&#39;</span><span class="p">,</span> <span class="s1">&#39;de&#39;</span><span class="p">:</span> <span class="s1">&#39;Hallo&#39;</span><span class="p">}</span>
+<span class="linenos">19</span><span class="sd">    """</span>
+<span class="linenos">20</span>    <span class="n">hellodict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'en'</span><span class="p">:</span> <span class="s1">'Hello'</span><span class="p">,</span> <span class="s1">'de'</span><span class="p">:</span> <span class="s1">'Hallo'</span><span class="p">}</span>
 <span class="linenos">21</span>    <span class="k">try</span><span class="p">:</span>
 <span class="linenos">22</span>        <span class="n">hellostring</span> <span class="o">=</span> <span class="n">hellodict</span><span class="p">[</span><span class="n">lang</span><span class="p">]</span>
 <span class="linenos">23</span>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<span class="linenos">24</span>        <span class="n">errmsg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;unknown language: </span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s1">&#39;</span>
+<span class="linenos">24</span>        <span class="n">errmsg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'unknown language: </span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s1">'</span>
 <span class="linenos">25</span>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">errmsg</span><span class="p">)</span>
 <span class="linenos">26</span>    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-<span class="linenos">27</span>        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!&#39;</span>
+<span class="linenos">27</span>        <span class="k">return</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">!'</span>
 <span class="linenos">28</span>    <span class="k">else</span><span class="p">:</span>
-<span class="linenos">29</span>        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1">!&#39;</span>
+<span class="linenos">29</span>        <span class="k">return</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">hellostring</span><span class="si">}</span><span class="s1">!'</span>
 <span class="linenos">30</span>
-<span class="linenos">31</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-<span class="linenos">32</span>    <span class="n">welcome</span><span class="p">(</span><span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="s1">&#39;fr&#39;</span><span class="p">)</span>
+<span class="linenos">31</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+<span class="linenos">32</span>    <span class="n">welcome</span><span class="p">(</span><span class="s1">'Alice'</span><span class="p">,</span> <span class="s1">'fr'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>All tests run successfully. Note that in lines 17 and 18 we did not reproduce the full
@@ -340,11 +340,11 @@ can be ignored. Line 18 is checked again to be consistent with the actual error 
 If one does not need to verify the error message but just the type of exception raised,
 one can use a doctest directive. For example, one could replace lines 16 to 18 by the
 following code.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">&gt;&gt;&gt; welcome(&#39;Alice&#39;, lang=&#39;fr&#39;) # doctest: +ELLIPSIS</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
+<span class="sd">&gt;&gt;&gt; welcome('Alice', lang='fr') # doctest: +ELLIPSIS</span>
 <span class="sd">Traceback (most recent call last):</span>
 <span class="sd">ValueError: ...</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 </pre></div>
 </div>
 <p>The directive is here specified by the comment “<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">doctest:</span> <span class="pre">+ELLIPSIS</span></code>” and the
@@ -375,22 +375,22 @@ distribution.</p>
 <p>We illustrate the basic usage of <code class="docutils literal notranslate"><span class="pre">pytest</span></code> by testing a function generating
 a line of Pascal’s triangle.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pascal</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;create the n-th line of Pascal&#39;s triangle</span>
+<span class="w">    </span><span class="sd">"""create the n-th line of Pascal's triangle</span>
 
 <span class="sd">    The line numbers start with n=0 for the line</span>
 <span class="sd">    containing only the entry 1. The elements of</span>
 <span class="sd">    a line are generated successively.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">yield</span> <span class="n">x</span>
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">k</span><span class="p">)</span><span class="o">//</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">x</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">):</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s1">2</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pascal</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s1">2</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pascal</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">+</span><span class="n">line</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -500,7 +500,7 @@ test_pascal.py ..x                                                      [100%]
 marked by an uppercase <code class="docutils literal notranslate"><span class="pre">X</span></code> to indicate that corresponding test should not pass.</p>
 <p>One can also skip tests by means of the decorator <code class="docutils literal notranslate"><span class="pre">pytest.mark.skip</span></code> which
 takes an optional variable <code class="docutils literal notranslate"><span class="pre">reason</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s2">&quot;just for demonstration&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s2">"just for demonstration"</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">test_n5</span><span class="p">():</span>
     <span class="n">expected</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
     <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="o">==</span> <span class="n">expected</span>
@@ -604,7 +604,7 @@ is the <code class="docutils literal notranslate"><span class="pre">parametrize<
 <span class="linenos"> 2</span><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
 <span class="linenos"> 3</span><span class="kn">from</span><span class="w"> </span><span class="nn">pascal</span><span class="w"> </span><span class="kn">import</span> <span class="n">pascal</span>
 <span class="linenos"> 4</span>
-<span class="linenos"> 5</span><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;lineno, expected&quot;</span><span class="p">,</span> <span class="p">[</span>
+<span class="linenos"> 5</span><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"lineno, expected"</span><span class="p">,</span> <span class="p">[</span>
 <span class="linenos"> 6</span>    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
 <span class="linenos"> 7</span>    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
 <span class="linenos"> 8</span>    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
@@ -612,7 +612,7 @@ is the <code class="docutils literal notranslate"><span class="pre">parametrize<
 <span class="linenos">10</span><span class="k">def</span><span class="w"> </span><span class="nf">test_line</span><span class="p">(</span><span class="n">lineno</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
 <span class="linenos">11</span>    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">pascal</span><span class="p">(</span><span class="n">lineno</span><span class="p">))</span> <span class="o">==</span> <span class="n">expected</span>
 <span class="linenos">12</span>
-<span class="linenos">13</span><span class="n">powers_of_ten</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;lineno&quot;</span><span class="p">,</span>
+<span class="linenos">13</span><span class="n">powers_of_ten</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"lineno"</span><span class="p">,</span>
 <span class="linenos">14</span>                    <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">])</span>
 <span class="linenos">15</span>
 <span class="linenos">16</span><span class="nd">@powers_of_ten</span>
@@ -668,11 +668,11 @@ return values so that we should take care not to let this happen. In the
 following script <code class="docutils literal notranslate"><span class="pre">pascal_float</span></code>, we do so by taking advantage of the fact
 that <code class="docutils literal notranslate"><span class="pre">zip</span></code> terminates whenever one of the generators is exhausted.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">taylor_power</span><span class="p">(</span><span class="n">power</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;generate the Taylor coefficients of (1+x)**power</span>
+<span class="w">    </span><span class="sd">"""generate the Taylor coefficients of (1+x)**power</span>
 
 <span class="sd">       This function is based on the function pascal().</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">coeff</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">yield</span> <span class="n">coeff</span>
     <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
@@ -681,7 +681,7 @@ that <code class="docutils literal notranslate"><span class="pre">zip</span></co
         <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span>
         <span class="k">yield</span> <span class="n">coeff</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">taylor_power</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 </pre></div>

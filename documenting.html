@@ -243,10 +243,10 @@ code can be highlighted.</p>
 <p>Another possibility to typeset code is the use of two colons. If the colons
 follow the preceding text immediately, a single colon will be displayed at the
 end of the text:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">following</span> <span class="n">script</span> <span class="n">displays</span> <span class="s2">&quot;hello world&quot;</span> <span class="n">three</span> <span class="n">times</span><span class="p">::</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">following</span> <span class="n">script</span> <span class="n">displays</span> <span class="s2">"hello world"</span> <span class="n">three</span> <span class="n">times</span><span class="p">::</span>
 
    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello world!&#39;</span><span class="p">)</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s1">'Hello world!'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note the indentation of the code block which indicates which part of the text
@@ -254,23 +254,23 @@ should be considered as code. The output is as follows:</p>
 <blockquote>
 <div><p>The following script displays “hello world” three times:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello world!&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Hello world!'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div></blockquote>
 <p>The colon in the output can be avoided if the colons are separated from the
 text by a blank:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">following</span> <span class="n">script</span> <span class="n">displays</span> <span class="s2">&quot;hello world&quot;</span> <span class="n">three</span> <span class="n">times</span><span class="o">.</span> <span class="p">::</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">following</span> <span class="n">script</span> <span class="n">displays</span> <span class="s2">"hello world"</span> <span class="n">three</span> <span class="n">times</span><span class="o">.</span> <span class="p">::</span>
 
    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello world!&#39;</span><span class="p">)</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s1">'Hello world!'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now, the output looks as follows:</p>
 <blockquote>
 <div><p>The following script displays “hello world” three times.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello world!&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Hello world!'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -428,8 +428,8 @@ value which can also be chosen by simply hitting the return key. Per default, <e
 thus chooses to place build files into a directory <code class="docutils literal notranslate"><span class="pre">_build</span></code> within the source
 directory.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>You have two options for placing the build directory for Sphinx output.
-Either, you use a directory &quot;_build&quot; within the root path, or you separate
-&quot;source&quot; and &quot;build&quot; directories within the root path.
+Either, you use a directory "_build" within the root path, or you separate
+"source" and "build" directories within the root path.
 &gt; Separate source and build directories (y/n) [n]:
 </pre></div>
 </div>
@@ -442,7 +442,7 @@ change one’s mind later by adapting the configuration file <code class="docuti
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; autodoc: automatically insert docstrings from modules (y/n) [n]:
 &gt; doctest: automatically test code snippets in doctest blocks (y/n) [n]:
 &gt; intersphinx: link between Sphinx documentation of different projects (y/n) [n]:
-&gt; todo: write &quot;todo&quot; entries that can be shown or hidden on build (y/n) [n]:
+&gt; todo: write "todo" entries that can be shown or hidden on build (y/n) [n]:
 &gt; coverage: checks for documentation coverage (y/n) [n]:
 &gt; imgmath: include math, rendered as PNG or SVG images (y/n) [n]:
 &gt; mathjax: include math, rendered in the browser by MathJax (y/n) [n]:
@@ -519,21 +519,21 @@ a structure which is commented out, but might be useful if one needs to customiz
 aspects. For example, if one wants to typeset for A4 paper and would like to have floats
 preferentially placed on the top of the page, one might set the dictionary as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">latex_elements</span> <span class="o">=</span> <span class="p">{</span>
-     <span class="c1"># The paper size (&#39;letterpaper&#39; or &#39;a4paper&#39;).</span>
+     <span class="c1"># The paper size ('letterpaper' or 'a4paper').</span>
      <span class="c1">#</span>
-     <span class="s1">&#39;papersize&#39;</span><span class="p">:</span> <span class="s1">&#39;a4paper&#39;</span><span class="p">,</span>
+     <span class="s1">'papersize'</span><span class="p">:</span> <span class="s1">'a4paper'</span><span class="p">,</span>
 
-     <span class="c1"># The font size (&#39;10pt&#39;, &#39;11pt&#39; or &#39;12pt&#39;).</span>
+     <span class="c1"># The font size ('10pt', '11pt' or '12pt').</span>
      <span class="c1">#</span>
-     <span class="c1"># &#39;pointsize&#39;: &#39;10pt&#39;,</span>
+     <span class="c1"># 'pointsize': '10pt',</span>
 
      <span class="c1"># Additional stuff for the LaTeX preamble.</span>
      <span class="c1">#</span>
-     <span class="c1"># &#39;preamble&#39;: &#39;&#39;,</span>
+     <span class="c1"># 'preamble': '',</span>
 
      <span class="c1"># Latex figure (float) alignment</span>
      <span class="c1">#</span>
-     <span class="s1">&#39;figure_align&#39;</span><span class="p">:</span> <span class="s1">&#39;tbp&#39;</span><span class="p">,</span>
+     <span class="s1">'figure_align'</span><span class="p">:</span> <span class="s1">'tbp'</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -545,9 +545,9 @@ an <code class="docutils literal notranslate"><span class="pre">r</span></code> 
 modified in an entry with key <code class="docutils literal notranslate"><span class="pre">'sphinxsetup'</span></code>. If the outline of the box enclosing code
 should be removed and a background color different from white should be used, one
 might specify:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;sphinxsetup&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;&#39;verbatimwithframe=false,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">'sphinxsetup'</span><span class="p">:</span> <span class="s1">'''verbatimwithframe=false,</span>
 <span class="s1">                  VerbatimColor=</span><span class="si">{named}{AliceBlue}</span><span class="s1">,</span>
-<span class="s1">               &#39;&#39;&#39;</span>
+<span class="s1">               '''</span>
 </pre></div>
 </div>
 <p>This definition is used for the present document. Details about which
@@ -578,7 +578,7 @@ partially supplied the code with docstrings which now looks as follows:</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">cm</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">InfiniteWell</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quantum carpet for infinitely deep potential well.</span>
+<span class="w">    </span><span class="sd">"""Quantum carpet for infinitely deep potential well.</span>
 
 <span class="sd">    This class allows to determine the time evolution of an</span>
 <span class="sd">    initial state in an infinitely deep potential well.</span>
@@ -587,7 +587,7 @@ partially supplied the code with docstrings which now looks as follows:</p>
 <span class="sd">    :param float width: width of the potential well</span>
 <span class="sd">    :param int nbase: number of basis states</span>
 <span class="sd">    :param int nint: number of intervals used in the integration routine</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">nbase</span><span class="p">,</span> <span class="n">nint</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
@@ -597,7 +597,7 @@ partially supplied the code with docstrings which now looks as follows:</p>
                                   <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nint</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">eigenfunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine set of eigenfunction values at position ``x``.</span>
+<span class="w">        </span><span class="sd">"""Determine set of eigenfunction values at position ``x``.</span>
 
 <span class="sd">        The basis set is limited by the number of eigenstates given by</span>
 <span class="sd">        ``self.nbase``.</span>
@@ -607,7 +607,7 @@ partially supplied the code with docstrings which now looks as follows:</p>
 <span class="sd">        :return: array of eigenfunction values</span>
 <span class="sd">        :rtype: numpy.ndarray</span>
 <span class="sd">        :raises AssertionError: if the dimension of ``x`` does not equal 1</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="n">normalization</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbase</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span>
@@ -633,25 +633,25 @@ partially supplied the code with docstrings which now looks as follows:</p>
     <span class="k">return</span> <span class="n">delta</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">integrand</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">psi0</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine Gaussian wave function.</span>
+<span class="w">    </span><span class="sd">"""Determine Gaussian wave function.</span>
 
 <span class="sd">    :param float x: position at which the wave function is determined</span>
 <span class="sd">    :return: value of wave function at position ``x``</span>
 <span class="sd">    :rtype: float</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.005</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="mf">0.25</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
     <span class="n">w</span> <span class="o">=</span> <span class="n">InfiniteWell</span><span class="p">(</span><span class="n">psi0</span><span class="o">=</span><span class="n">psi0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nbase</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">nint</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">'text'</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">hot</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$t$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$x$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'$t$'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'$x$'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -663,7 +663,7 @@ if it is in the search path defined in the <em>Sphinx</em> configuration file. T
 requires to uncomment the three lines</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'.'</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>and to adjust the argument of <code class="docutils literal notranslate"><span class="pre">os.path.abspath</span></code> according to the place where the
@@ -746,7 +746,7 @@ We will focus our discussion of these two standards to the method <code class="d
 quantum carpet script.</p>
 <p>Applying the NumPy style to the method <code class="docutils literal notranslate"><span class="pre">eigenfunction</span></code> would result in</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eigenfunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine set of eigenfunction values at position `x`.</span>
+<span class="w">    </span><span class="sd">"""Determine set of eigenfunction values at position `x`.</span>
 
 <span class="sd">    The basis set is limited by the number of eigenstates given by</span>
 <span class="sd">    ``self.nbase``.</span>
@@ -766,7 +766,7 @@ quantum carpet script.</p>
 <span class="sd">    AssertionError</span>
 <span class="sd">        if the dimension of `x` does not equal 1</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </pre></div>
 </div>
 <p>where we did not repeat the code of the eigenfunction method. This docstring is nicely
@@ -778,7 +778,7 @@ that we do not reproduce it here.</p>
 docstring even though the details of the format differ. Our example would take the
 following form where we again leave out the code of the method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">eigenfunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine set of eigenfunction values at position `x`.</span>
+<span class="w">    </span><span class="sd">"""Determine set of eigenfunction values at position `x`.</span>
 
 <span class="sd">    The basis set is limited by the number of eigenstates given by</span>
 <span class="sd">    ``self.nbase``.</span>
@@ -793,7 +793,7 @@ following form where we again leave out the code of the method:</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        AssertionError: The dimension of `x` does not equal 1.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 </pre></div>
 </div>
 <p>These examples may serve to get the basic idea of how a documentation can be autogenerated

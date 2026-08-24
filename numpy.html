@@ -148,7 +148,7 @@ we are in need of a new datatype.</p>
 items called <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>. Before starting to explore this datatype, we need to import
 the NumPy package. While there are different ways to do so, there is one recommended way.
 Let us take a look at the various alternatives:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>                <span class="c1"># don&#39;t do this!</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>                <span class="c1"># don't do this!</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span>  <span class="c1"># not recommended</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>                       <span class="c1"># ok, but the following line is better</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>                 <span class="c1"># recommended way</span>
@@ -192,8 +192,8 @@ calculation. Already for the creation of the array one should decide how large
 it will need to be.</p>
 <p>One way to find out how a NumPy array can be created it to search the NumPy documentation.
 This can be done even within Python:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">lookfor</span><span class="p">(</span><span class="s1">&#39;create array&#39;</span><span class="p">)</span>
-<span class="go">Search results for &#39;create array&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">lookfor</span><span class="p">(</span><span class="s1">'create array'</span><span class="p">)</span>
+<span class="go">Search results for 'create array'</span>
 <span class="go">---------------------------------</span>
 <span class="go">numpy.array</span>
 <span class="go">    Create an array.</span>
@@ -214,7 +214,7 @@ so that its namespace can be accessed via the abbreviation <code class="docutils
 present situation. More information can be obtained as usual by means of <code class="docutils literal notranslate"><span class="pre">help(np.array)</span></code>
 or alternatively by</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
-<span class="go">array(object, dtype=None, copy=True, order=&#39;K&#39;, subok=False, ndmin=0)</span>
+<span class="go">array(object, dtype=None, copy=True, order='K', subok=False, ndmin=0)</span>
 
 <span class="go">Create an array.</span>
 
@@ -226,7 +226,7 @@ or alternatively by</p>
 <span class="go">dtype : data-type, optional</span>
 <span class="go">    The desired data-type for the array.  If not given, then the type will</span>
 <span class="go">    be determined as the minimum type required to hold the objects in the</span>
-<span class="go">    sequence.  This argument can only be used to &#39;upcast&#39; the array.  For</span>
+<span class="go">    sequence.  This argument can only be used to 'upcast' the array.  For</span>
 <span class="go">    downcasting, use the .astype(t) method.</span>
 </pre></div>
 </div>
@@ -245,7 +245,7 @@ Let us consider a first example:</p>
 <span class="go">       [3, 4, 5],</span>
 <span class="go">       [6, 7, 8]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">myarray</span><span class="p">)</span>
-<span class="go">&lt;class &#39;numpy.ndarray&#39;&gt;</span>
+<span class="go">&lt;class 'numpy.ndarray'&gt;</span>
 </pre></div>
 </div>
 <p>We have started with a list of lists which is a valid argument for <code class="docutils literal notranslate"><span class="pre">np.array</span></code>.
@@ -264,8 +264,8 @@ efficiency of NumPy arrays.</p>
 to analyze the metadata, we use a short function enabling us to list the
 attributes of an array.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">array_attributes</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ndim&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;itemsize&#39;</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="s1">&#39;strides&#39;</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">:</span><span class="s1">8s</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">attr</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'ndim'</span><span class="p">,</span> <span class="s1">'size'</span><span class="p">,</span> <span class="s1">'itemsize'</span><span class="p">,</span> <span class="s1">'dtype'</span><span class="p">,</span> <span class="s1">'shape'</span><span class="p">,</span> <span class="s1">'strides'</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">attr</span><span class="si">:</span><span class="s1">8s</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">attr</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>A convenient way of generating an array for test purposes is the <code class="docutils literal notranslate"><span class="pre">arange</span></code> function
@@ -308,33 +308,33 @@ length can serve to illustrate the problem of overflows:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">numerictypes</span><span class="o">.</span><span class="n">sctypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
-<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    </span><span class="si">{</span><span class="n">elem</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'    </span><span class="si">{</span><span class="n">elem</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="go">int</span>
-<span class="go">    &lt;class &#39;numpy.int8&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.int16&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.int32&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.int64&#39;&gt;</span>
+<span class="go">    &lt;class 'numpy.int8'&gt;</span>
+<span class="go">    &lt;class 'numpy.int16'&gt;</span>
+<span class="go">    &lt;class 'numpy.int32'&gt;</span>
+<span class="go">    &lt;class 'numpy.int64'&gt;</span>
 <span class="go">uint</span>
-<span class="go">    &lt;class &#39;numpy.uint8&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.uint16&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.uint32&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.uint64&#39;&gt;</span>
+<span class="go">    &lt;class 'numpy.uint8'&gt;</span>
+<span class="go">    &lt;class 'numpy.uint16'&gt;</span>
+<span class="go">    &lt;class 'numpy.uint32'&gt;</span>
+<span class="go">    &lt;class 'numpy.uint64'&gt;</span>
 <span class="go">float</span>
-<span class="go">    &lt;class &#39;numpy.float16&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.float32&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.float64&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.float128&#39;&gt;</span>
+<span class="go">    &lt;class 'numpy.float16'&gt;</span>
+<span class="go">    &lt;class 'numpy.float32'&gt;</span>
+<span class="go">    &lt;class 'numpy.float64'&gt;</span>
+<span class="go">    &lt;class 'numpy.float128'&gt;</span>
 <span class="go">complex</span>
-<span class="go">    &lt;class &#39;numpy.complex64&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.complex128&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.complex256&#39;&gt;</span>
+<span class="go">    &lt;class 'numpy.complex64'&gt;</span>
+<span class="go">    &lt;class 'numpy.complex128'&gt;</span>
+<span class="go">    &lt;class 'numpy.complex256'&gt;</span>
 <span class="go">others</span>
-<span class="go">    &lt;class &#39;bool&#39;&gt;</span>
-<span class="go">    &lt;class &#39;object&#39;&gt;</span>
-<span class="go">    &lt;class &#39;bytes&#39;&gt;</span>
-<span class="go">    &lt;class &#39;str&#39;&gt;</span>
-<span class="go">    &lt;class &#39;numpy.void&#39;&gt;</span>
+<span class="go">    &lt;class 'bool'&gt;</span>
+<span class="go">    &lt;class 'object'&gt;</span>
+<span class="go">    &lt;class 'bytes'&gt;</span>
+<span class="go">    &lt;class 'str'&gt;</span>
+<span class="go">    &lt;class 'numpy.void'&gt;</span>
 </pre></div>
 </div>
 <p>The first four groups of datatypes include integers, unsigned integers, floats and
@@ -459,7 +459,7 @@ specific needs.</p>
 <span class="go">array([[0., 0.],</span>
 <span class="go">       [0., 0.]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span>
-<span class="go">dtype(&#39;float64&#39;)</span>
+<span class="go">dtype('float64')</span>
 </pre></div>
 </div>
 <p>As we can see, the default type is <code class="docutils literal notranslate"><span class="pre">float64</span></code>. If we prefer an array of integers, we could specify
@@ -469,7 +469,7 @@ the <code class="docutils literal notranslate"><span class="pre">dtype</span></c
 <span class="go">array([[0, 0],</span>
 <span class="go">       [0, 0]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span>
-<span class="go">dtype(&#39;int64&#39;)</span>
+<span class="go">dtype('int64')</span>
 </pre></div>
 </div>
 <p>As an alternative, one can create an empty array which should however not be confused with an array
@@ -627,7 +627,7 @@ that we have a data file called <code class="docutils literal notranslate"><span
 </pre></div>
 </div>
 <p>Loading the data from the file, we obtain:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;mydata.dat&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">'mydata.dat'</span><span class="p">)</span>
 <span class="go">array([[0. , 0. ],</span>
 <span class="go">       [0.1, 0.1],</span>
 <span class="go">       [0.2, 0.4],</span>
@@ -669,7 +669,7 @@ shows an example generated by the following code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">hot</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">hot</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">'none'</span><span class="p">)</span>
 <span class="go">&lt;matplotlib.image.AxesImage object at 0x7f39027afe48&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
 <span class="go">&lt;matplotlib.colorbar.Colorbar object at 0x7f39027e58d0&gt;</span>
@@ -1130,7 +1130,7 @@ offer so-called universal functions:</p>
 <span class="go">array([0. , 0.2, 0.4, 0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2. ])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">"&lt;stdin&gt;"</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
 <span class="gr">TypeError</span>: <span class="n">only size-1 arrays can be converted to Python scalars</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <span class="go">array([0.        , 0.19866933, 0.38941834, 0.56464247, 0.71735609,</span>
@@ -1164,9 +1164,9 @@ quantum mechanics in a linear potential:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">airy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ai</span><span class="p">,</span> <span class="n">aip</span><span class="p">,</span> <span class="n">bi</span><span class="p">,</span> <span class="n">bip</span> <span class="o">=</span> <span class="n">airy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ai</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Ai(x)&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ai</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ai(x)"</span><span class="p">)</span>
 <span class="go">[&lt;matplotlib.lines.Line2D object at 0x7f62184e2278&gt;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">aip</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Ai&#39;(x)&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">aip</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ai'(x)"</span><span class="p">)</span>
 <span class="go">[&lt;matplotlib.lines.Line2D object at 0x7f621bbb4518&gt;]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -1239,12 +1239,12 @@ instead:</p>
 code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">jv</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nu</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ogrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">41</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">100</span><span class="n">j</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">jv</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">jv</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s1">'lower'</span><span class="p">)</span>
 <span class="go">&lt;matplotlib.image.AxesImage object at 0x7fde903736d8&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$x$&#39;</span><span class="p">)</span>
-<span class="go">Text(0.5,0,&#39;$x$&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\nu$&#39;</span><span class="p">)</span>
-<span class="go">Text(0,0.5,&#39;$\\nu$&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'$x$'</span><span class="p">)</span>
+<span class="go">Text(0.5,0,'$x$')</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$\nu$'</span><span class="p">)</span>
+<span class="go">Text(0,0.5,'$\\nu$')</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1304,12 +1304,12 @@ array sizes:</p>
 <span class="n">tvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">nvals</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">nr</span><span class="p">,</span> <span class="n">nmax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nvals</span><span class="p">):</span>
     <span class="n">tvals</span><span class="p">[</span><span class="n">nr</span><span class="p">]</span> <span class="o">=</span> <span class="n">sin_math</span><span class="p">(</span><span class="n">nmax</span><span class="p">)</span><span class="o">/</span><span class="n">sin_numpy</span><span class="p">(</span><span class="n">nmax</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$n_\mathrm</span><span class="si">{max}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$t_\mathrm</span><span class="si">{math}</span><span class="s1">/t_\mathrm</span><span class="si">{numpy}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">nvals</span><span class="p">,</span> <span class="n">tvals</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">'text'</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s1">'log'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">'log'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'$n_\mathrm</span><span class="si">{max}</span><span class="s1">$'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'$t_\mathrm</span><span class="si">{math}</span><span class="s1">/t_\mathrm</span><span class="si">{numpy}</span><span class="s1">$'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">nvals</span><span class="p">,</span> <span class="n">tvals</span><span class="p">,</span> <span class="s1">'o'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1454,9 +1454,9 @@ much faster:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">timeit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">250000</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">+</span><span class="n">a</span><span class="o">.</span><span class="n">T</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="s1">&#39;LA.eig(a)&#39;</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="s1">'LA.eig(a)'</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
 <span class="go">[13.307299479999529, 13.404196323999713, 13.798628489999828]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="s1">&#39;LA.eigh(a)&#39;</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeit</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="s1">'LA.eigh(a)'</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
 <span class="go">[1.8066274120001253, 1.7375857540000652, 1.739574907000133]</span>
 </pre></div>
 </div>
@@ -1481,7 +1481,7 @@ step, we create data on a line with normally distributed noise added on top:</p>
 to do a least-squares regression of the noisy data:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">linregress</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">rvalue</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">linregress</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">'o'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">slope</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">intercept</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rvalue</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span>
@@ -1507,7 +1507,7 @@ to the <code class="docutils literal notranslate"><span class="pre">curve_fit</s
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">'o'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">fitfunc</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">popt</span>
 <span class="go">array([2.08496412, 0.43937489])</span>
@@ -1557,13 +1557,13 @@ the function requires an additional argument <span class="math notranslate nohig
 <span class="gp">&gt;&gt;&gt; </span><span class="mf">0.45375316586032827</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span>
 <span class="go">       converged: True</span>
-<span class="go">           flag: &#39;converged&#39;</span>
+<span class="go">           flag: 'converged'</span>
 <span class="go"> function_calls: 7</span>
 <span class="go">     iterations: 6</span>
 <span class="go">           root: 0.45375316586032827)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">alpha</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'o'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1602,8 +1602,8 @@ depicted in <a class="reference internal" href="#hangingchain"><span class="std 
 <span class="k">class</span><span class="w"> </span><span class="nc">Chain</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nlinks</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">damping</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">nlinks</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;length requirement cannot be fulfilled with &#39;</span>
-                             <span class="s1">&#39;the given number of links&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'length requirement cannot be fulfilled with '</span>
+                             <span class="s1">'the given number of links'</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nlinks</span> <span class="o">=</span> <span class="n">nlinks</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_m</span><span class="p">()</span>
@@ -1626,9 +1626,9 @@ depicted in <a class="reference internal" href="#hangingchain"><span class="std 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">equilibrium</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_energy</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nlinks</span><span class="p">),</span>
-                          <span class="n">method</span><span class="o">=</span><span class="s1">&#39;SLSQP&#39;</span><span class="p">,</span>
-                          <span class="n">constraints</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;eq&#39;</span><span class="p">,</span> <span class="s1">&#39;fun&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_constraint</span><span class="p">},</span>
-                                       <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;eq&#39;</span><span class="p">,</span> <span class="s1">&#39;fun&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_constraint</span><span class="p">}])</span>
+                          <span class="n">method</span><span class="o">=</span><span class="s1">'SLSQP'</span><span class="p">,</span>
+                          <span class="n">constraints</span><span class="o">=</span><span class="p">[{</span><span class="s1">'type'</span><span class="p">:</span> <span class="s1">'eq'</span><span class="p">,</span> <span class="s1">'fun'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_constraint</span><span class="p">},</span>
+                                       <span class="p">{</span><span class="s1">'type'</span><span class="p">:</span> <span class="s1">'eq'</span><span class="p">,</span> <span class="s1">'fun'</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_constraint</span><span class="p">}])</span>
         <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">x</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_equilibrium</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1638,8 +1638,8 @@ depicted in <a class="reference internal" href="#hangingchain"><span class="std 
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">nlinks</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phis</span><span class="p">))</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">'o'</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">matrix_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1672,7 +1672,7 @@ depicted in <a class="reference internal" href="#hangingchain"><span class="std 
     <span class="k">def</span><span class="w"> </span><span class="nf">solve_eq_of_motion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_i</span><span class="p">,</span> <span class="n">time_f</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
         <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nlinks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="n">y0</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nlinks</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equilibrium</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">solution</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">,</span> <span class="p">(</span><span class="n">time_i</span><span class="p">,</span> <span class="n">time_f</span><span class="p">),</span> <span class="n">y0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;Radau&#39;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solution</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">,</span> <span class="p">(</span><span class="n">time_i</span><span class="p">,</span> <span class="n">time_f</span><span class="p">),</span> <span class="n">y0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'Radau'</span><span class="p">,</span>
                                   <span class="n">t_eval</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">time_i</span><span class="p">,</span> <span class="n">time_f</span><span class="p">,</span> <span class="n">nt</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1682,8 +1682,8 @@ depicted in <a class="reference internal" href="#hangingchain"><span class="std 
             <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phis</span><span class="p">))</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nlinks</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phis</span><span class="p">))</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="n">chain</span> <span class="o">=</span> <span class="n">Chain</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mf">0.003</span><span class="p">)</span>
